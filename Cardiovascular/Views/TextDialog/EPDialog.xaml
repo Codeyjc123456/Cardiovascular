@@ -1,0 +1,46 @@
+﻿<Border
+    x:Class="Cardio.Views.TextDialog.EPDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:Cardio.CustomRule"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:local="clr-namespace:Cardio.Views.TextDialog"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid>
+        <Border Width="800" Height="450" Style="{StaticResource CustomDialag}">
+            <StackPanel Width="800" HorizontalAlignment="Center">
+                
+                <StackPanel Margin="10" Orientation="Horizontal">
+                    <Rectangle Style="{StaticResource CustomSmallOrangeRectangle}" />
+                    <TextBlock Style="{StaticResource CustomSmallTitle}" Text="心电心音检测" />
+                </StackPanel>
+
+                <hc:Divider Height="1" Margin="0,0,0,0" />
+
+                <StackPanel Grid.Row="1" Orientation="Vertical">
+                    <StackPanel Height="80" Orientation="Horizontal" />
+                    <StackPanel Height="100" Orientation="Horizontal">
+                        <TextBlock
+                            Width="752"
+                            Margin="20,20,20,0"
+                            FontSize="28"
+                            Text="       请佩戴好心电心音模块检测器，点击确认后开始心电心音和脉搏波测量。"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel Height="100" Orientation="Horizontal" />
+                </StackPanel>
+
+                <StackPanel  Grid.Row="2" Width="800" Margin="0,30,18,0" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Margin="50,0,0,0" Click="CancleButton_Click" Content="关   闭" Style="{StaticResource MedianRedBtnStyle}" />
+                    <Button Margin="475,0,0,0" Click="OkButton_Click" Content="确   定" Style="{StaticResource MedianGreenBtnStyle}" />
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+        
+    </Grid>
+</Border>

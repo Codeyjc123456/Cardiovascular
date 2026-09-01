@@ -1,0 +1,1071 @@
+﻿<Page
+    x:Class="Cadio.Views.DataManagePage.Mc.UpdateDataPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:Cadio.CustomRule"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:local="clr-namespace:Cadio.Views.DataManagePage.Mc"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:r="clr-namespace:Cardio.CustomConvert"
+    Title="UpdateDataPage"
+    d:DesignHeight="1080"
+    d:DesignWidth="1920"
+    IsVisibleChanged="Page_IsVisibleChanged"
+    Loaded="Window_OnLoaded"
+    mc:Ignorable="d">
+    <hc:Interaction.Behaviors>
+        <c:ValidationExceptionBehavior />
+    </hc:Interaction.Behaviors>
+    <Page.Background>
+        <ImageBrush ImageSource="pack://application:,,,/Resources/Image/DataManage/hsbk.png" />
+    </Page.Background>
+    <Page.Resources>
+        <r:CheckConverter x:Key="CheckConverter" />
+    </Page.Resources>
+    <hc:TransitioningContentControl TransitionStoryboard="{StaticResource FadeTransition}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="72" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="880" />
+                <RowDefinition Height="84" />
+            </Grid.RowDefinitions>
+            <Grid>
+                <Button
+                    Height="72"
+                    Margin="0,0,0,0"
+                    HorizontalAlignment="Right"
+                    Click="BackBtn">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Grid>
+                                <Image Source="pack://application:,,,/Resources/Image/Common/back.png" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+            <Grid Grid.Row="2" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="330" />
+                        <RowDefinition Height="370" />
+                        <RowDefinition Height="172" />
+                    </Grid.RowDefinitions>
+                    <hc:Card
+                        Margin="8"
+                        BorderThickness="0"
+                        Effect="{DynamicResource EffectShadow2}">
+                        <Border Margin="0,0,0,0" CornerRadius="4,4,0,0">
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Margin="10,20,10,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="120"
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="账    号：" />
+                                    <TextBox
+                                        Width="400"
+                                        Height="40"
+                                        FontSize="22"
+                                        IsReadOnly="True"
+                                        TextAlignment="Center">
+                                        <TextBox.Text>
+                                            <Binding
+                                                NotifyOnValidationError="True"
+                                                Path="UserID"
+                                                UpdateSourceTrigger="PropertyChanged">
+                                                <Binding.ValidationRules>
+                                                    <c:NullRule ValidatesOnTargetUpdated="True" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
+                                    </TextBox>
+                                </StackPanel>
+                                <StackPanel Margin="10,10,10,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="120"
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="姓    名：" />
+                                    <TextBox
+                                        Width="400"
+                                        Height="40"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <TextBox.Text>
+                                            <Binding
+                                                Mode="TwoWay"
+                                                NotifyOnValidationError="True"
+                                                Path="UserName"
+                                                UpdateSourceTrigger="PropertyChanged">
+                                                <Binding.ValidationRules>
+                                                    <c:NullRule ValidatesOnTargetUpdated="True" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
+                                    </TextBox>
+                                </StackPanel>
+                                <StackPanel Margin="10,10,10,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="120"
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="身    高：" />
+                                    <TextBox
+                                        Width="120"
+                                        Height="40"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <TextBox.Text>
+                                            <Binding
+                                                NotifyOnValidationError="True"
+                                                Path="UserHeight"
+                                                UpdateSourceTrigger="PropertyChanged">
+                                                <Binding.ValidationRules>
+                                                    <c:DataValueRule
+                                                        Max="300"
+                                                        Min="50"
+                                                        RegexPattern="180"
+                                                        ValidatesOnTargetUpdated="True" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
+                                    </TextBox>
+                                    <TextBlock
+                                        Margin="20,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="厘米" />
+                                    <TextBlock
+                                        Width="120"
+                                        Margin="120,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="   体    重：" />
+                                    <TextBox
+                                        Width="120"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <TextBox.Text>
+                                            <Binding
+                                                NotifyOnValidationError="True"
+                                                Path="UserWeight"
+                                                UpdateSourceTrigger="PropertyChanged">
+                                                <Binding.ValidationRules>
+                                                    <c:DataValueRule
+                                                        Max="300"
+                                                        Min="30"
+                                                        RegexPattern="70"
+                                                        ValidatesOnTargetUpdated="True" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
+                                    </TextBox>
+                                    <TextBlock
+                                        Margin="20,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="千克" />
+                                </StackPanel>
+                                <StackPanel Margin="10,10,10,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="年    龄：" />
+                                    <TextBox
+                                        Width="120"
+                                        Height="40"
+                                        Margin="20,0,0,0"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <TextBox.Text>
+                                            <Binding
+                                                NotifyOnValidationError="True"
+                                                Path="UserAge"
+                                                UpdateSourceTrigger="PropertyChanged">
+                                                <Binding.ValidationRules>
+                                                    <c:DataValueRule
+                                                        Max="130"
+                                                        Min="7"
+                                                        ValidatesOnTargetUpdated="True" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
+                                    </TextBox>
+                                    <TextBlock
+                                        Margin="20,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="岁" />
+                                    <TextBlock
+                                        Width="110"
+                                        Margin="145,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="24"
+                                        Text="   性    别：" />
+                                    <RadioButton
+                                        Margin="10,10,10,10"
+                                        Content="男"
+                                        FontSize="24"
+                                        IsChecked="{Binding UserSex, Mode=TwoWay, Converter={StaticResource CheckConverter}, ConverterParameter='男'}" />
+                                    <RadioButton
+                                        Margin="10,10,10,10"
+                                        Content="女"
+                                        FontSize="24"
+                                        IsChecked="{Binding UserSex, Mode=TwoWay, Converter={StaticResource CheckConverter}, ConverterParameter='女'}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <hc:Card.Header>
+                            <StackPanel Margin="10" Orientation="Horizontal">
+                                <Rectangle
+                                    Width="12"
+                                    Height="44"
+                                    Margin="0,0,10,0"
+                                    Fill="Orange" />
+                                <TextBlock
+                                    HorizontalAlignment="Left"
+                                    Style="{DynamicResource TextBlockLargeBold}"
+                                    Text="基本信息"
+                                    TextTrimming="CharacterEllipsis"
+                                    TextWrapping="NoWrap" />
+                            </StackPanel>
+                        </hc:Card.Header>
+                    </hc:Card>
+                    <hc:Card
+                        Grid.Row="1"
+                        Grid.RowSpan="2"
+                        Margin="8,0"
+                        BorderThickness="0"
+                        Effect="{DynamicResource EffectShadow2}">
+                        <Border Margin="0,0,0,0" CornerRadius="4,4,0,0">
+                            <StackPanel
+                                Width="900"
+                                HorizontalAlignment="Center"
+                                Orientation="Vertical">
+                                <StackPanel Margin="10,20,0,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="80"
+                                        Margin="90,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="左臂" />
+                                    <TextBlock
+                                        Width="80"
+                                        Margin="155,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="左踝" />
+                                    <TextBlock
+                                        Width="80"
+                                        Margin="155,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="右臂" />
+                                    <TextBlock
+                                        Width="80"
+                                        Margin="155,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="右踝" />
+
+                                </StackPanel>
+                                <StackPanel Margin="10,10,0,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="80"
+                                        Margin="00,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="Sbp:" />
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="00,0,0,0"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="LBSbp"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="300"
+                                                    Min="60"
+                                                    RegexPattern="120"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="130,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="LASbp"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="300"
+                                                    Min="60"
+                                                    RegexPattern="120"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="135,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="RBSbp"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="300"
+                                                    Min="60"
+                                                    RegexPattern="120"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="135,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="RASbp"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="300"
+                                                    Min="60"
+                                                    RegexPattern="120"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                </StackPanel>
+                                <StackPanel Margin="10,20,0,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="80"
+                                        Margin="00,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="Dbp:" />
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="00,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="LBDbp"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="200"
+                                                    Min="20"
+                                                    RegexPattern="80"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="130,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="LADbp"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="200"
+                                                    Min="20"
+                                                    RegexPattern="80"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="135,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="RBDbp"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="200"
+                                                    Min="20"
+                                                    RegexPattern="80"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="135,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="RADbp"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="200"
+                                                    Min="20"
+                                                    RegexPattern="80"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                </StackPanel>
+                                <StackPanel Margin="10,20,0,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="80"
+                                        Margin="00,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="Map:" />
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="00,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="LBMap"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="300"
+                                                    Min="20"
+                                                    RegexPattern="60"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="130,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="LAMap"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="300"
+                                                    Min="20"
+                                                    RegexPattern="60"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="135,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="RBMap"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="300"
+                                                    Min="20"
+                                                    RegexPattern="60"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="135,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="RAMap"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max="300"
+                                                    Min="20"
+                                                    RegexPattern="60"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                </StackPanel>
+                                <StackPanel Margin="10,10,0,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="120"
+                                        Margin="65,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="LeftABI:" />
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="20,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="LeftAbi"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max=" 2.0"
+                                                    Min="0.2"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBlock
+                                        Width="120"
+                                        Margin="200,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="RightABI:" />
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="50,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="RightAbi"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max=" 2.0"
+                                                    Min="0.2"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                </StackPanel>
+                                <StackPanel Margin="10,10,0,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="120"
+                                        Margin="65,20,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="LeftPWV:" />
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="20,20,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="LeftPWV"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max=" 30"
+                                                    Min="6"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                    <TextBlock
+                                        Width="150"
+                                        Margin="200,20,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="RightPWV:" />
+                                    <TextBox
+                                        Width="100"
+                                        Height="60"
+                                        Margin="20,20,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        TextAlignment="Center">
+                                        <Binding
+                                            Mode="TwoWay"
+                                            NotifyOnValidationError="True"
+                                            Path="RightPWV"
+                                            UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <c:DataValueRule
+                                                    Max=" 30"
+                                                    Min="6"
+                                                    ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <hc:Card.Header>
+                            <StackPanel Margin="10" Orientation="Horizontal">
+                                <Rectangle
+                                    Width="12"
+                                    Height="44"
+                                    Margin="0,0,10,0"
+                                    Fill="Orange" />
+                                <TextBlock
+                                    HorizontalAlignment="Left"
+                                    Style="{DynamicResource TextBlockLargeBold}"
+                                    Text="血压信息"
+                                    TextTrimming="CharacterEllipsis"
+                                    TextWrapping="NoWrap" />
+                            </StackPanel>
+                        </hc:Card.Header>
+                    </hc:Card>
+
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="220" />
+                        <RowDefinition Height="220" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <hc:Card
+                        Grid.Row="0"
+                        Margin="8,8,8,8"
+                        BorderThickness="0"
+                        Effect="{DynamicResource EffectShadow2}">
+                        <StackPanel Margin="0,10,0,0">
+                            <StackPanel Margin="10,10,0,5" Orientation="Horizontal">
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="HR:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="00,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="ED:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="0,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="SPTI:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="5,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="DPTI:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="5,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="SEVR:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="5,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+
+                            </StackPanel>
+                            <StackPanel Margin="10,20,0,5" Orientation="Horizontal">
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="SBP:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="00,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="DBP:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="0,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="PP:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="5,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="CAP:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="5,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+                                <TextBlock
+                                    Width="60"
+                                    Margin="30,0,0,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Text="AI:" />
+                                <TextBox
+                                    Width="90"
+                                    Height="40"
+                                    Margin="5,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    TextAlignment="Center" />
+
+                            </StackPanel>
+                        </StackPanel>
+                        <hc:Card.Header>
+                            <StackPanel Margin="10" Orientation="Horizontal">
+                                <Rectangle
+                                    Width="12"
+                                    Height="44"
+                                    Margin="0,0,10,0"
+                                    Fill="Orange" />
+                                <TextBlock
+                                    HorizontalAlignment="Left"
+                                    Style="{DynamicResource TextBlockLargeBold}"
+                                    Text="心血管参数"
+                                    TextTrimming="CharacterEllipsis"
+                                    TextWrapping="NoWrap" />
+                            </StackPanel>
+                        </hc:Card.Header>
+                    </hc:Card>
+                    <hc:Card
+                        Grid.Row="1"
+                        Margin="8,8,8,8"
+                        BorderThickness="0"
+                        Effect="{DynamicResource EffectShadow2}">
+                        <Border CornerRadius="4,4,0,0">
+                            <StackPanel Margin="0,10,0,0">
+
+                                <StackPanel Margin="10,5,0,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="240"
+                                        Margin="10,0,0,0"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="血管阻塞程度评估(ABI):" />
+                                    <TextBox
+                                        Width="650"
+                                        Height="40"
+                                        Margin="10,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="{Binding ABIAssess, Mode=TwoWay}" />
+
+                                </StackPanel>
+                                <StackPanel Margin="10,5,0,5" Orientation="Horizontal">
+                                    <TextBlock
+                                        Width="240"
+                                        Margin="10,0,0,0"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="血管弹性评估(PWV)    :" />
+                                    <TextBox
+                                        Width="650"
+                                        Height="40"
+                                        Margin="10,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="22"
+                                        Text="{Binding PWVAssess, Mode=TwoWay}" />
+
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <hc:Card.Header>
+                            <StackPanel Margin="10" Orientation="Horizontal">
+                                <Rectangle
+                                    Width="12"
+                                    Height="44"
+                                    Margin="0,0,10,0"
+                                    Fill="Orange" />
+                                <TextBlock
+                                    HorizontalAlignment="Left"
+                                    Style="{DynamicResource TextBlockLargeBold}"
+                                    Text="血管弹性与阻塞程度评估"
+                                    TextTrimming="CharacterEllipsis"
+                                    TextWrapping="NoWrap" />
+                            </StackPanel>
+                        </hc:Card.Header>
+                    </hc:Card>
+                    <hc:Card
+                        Grid.Row="2"
+                        Height="425"
+                        Margin="8,8,8,8"
+                        BorderThickness="0"
+                        Effect="{DynamicResource EffectShadow2}">
+                        <Border CornerRadius="4,4,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock
+                                        Margin="10,10,0,0"
+                                        HorizontalAlignment="Left"
+                                        FontSize="22"
+                                        Style="{DynamicResource TextBlockLargeBold}"
+                                        Text="外周血管诊断结果:" />
+                                    <TextBox
+                                        Width="450"
+                                        Height="140"
+                                        Margin="10,10,0,0"
+                                        VerticalContentAlignment="Top"
+                                        FontSize="22"
+                                        Text="{Binding ResultDiag, Mode=TwoWay}"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Margin="10,10,0,0"
+                                        HorizontalAlignment="Left"
+                                        FontSize="22"
+                                        Style="{DynamicResource TextBlockLargeBold}"
+                                        Text="外周血管诊断建议:" />
+                                    <TextBox
+                                        Width="450"
+                                        Height="120"
+                                        Margin="10,10,0,0"
+                                        VerticalContentAlignment="Top"
+                                        FontSize="22"
+                                        Text="{Binding ProposalDiag, Mode=TwoWay}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock
+                                        Margin="20,10,0,0"
+                                        HorizontalAlignment="Left"
+                                        FontSize="22"
+                                        Style="{DynamicResource TextBlockLargeBold}"
+                                        Text="心血管诊断结果:" />
+                                    <TextBox
+                                        Width="450"
+                                        Height="140"
+                                        Margin="20,10,0,0"
+                                        VerticalContentAlignment="Top"
+                                        FontSize="22"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Margin="20,10,0,0"
+                                        HorizontalAlignment="Left"
+                                        FontSize="22"
+                                        Style="{DynamicResource TextBlockLargeBold}"
+                                        Text="心血管诊断建议:" />
+                                    <TextBox
+                                        Width="450"
+                                        Height="120"
+                                        Margin="20,10,0,0"
+                                        VerticalContentAlignment="Top"
+                                        FontSize="22"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <hc:Card.Header>
+                            <StackPanel Margin="10" Orientation="Horizontal">
+                                <Rectangle
+                                    Width="12"
+                                    Height="44"
+                                    Margin="0,0,10,0"
+                                    Fill="Orange" />
+                                <TextBlock
+                                    HorizontalAlignment="Left"
+                                    Style="{DynamicResource TextBlockLargeBold}"
+                                    Text="诊断结果与建议"
+                                    TextTrimming="CharacterEllipsis"
+                                    TextWrapping="NoWrap" />
+                            </StackPanel>
+                        </hc:Card.Header>
+                    </hc:Card>
+                </Grid>
+            </Grid>
+            <!--<ScrollViewer
+             Grid.Row="2"
+             Grid.Column="0"
+             Grid.ColumnSpan="2"
+             Height="Auto"
+             HorizontalAlignment="Right"
+             VerticalAlignment="Top"
+             Panel.ZIndex="9999"
+             VerticalScrollBarVisibility="Hidden">
+             <StackPanel
+                 Margin="0,10,10,10"
+                 VerticalAlignment="Top"
+                 hc:Growl.GrowlParent="True" />
+         </ScrollViewer>-->
+            <StackPanel
+                Grid.Row="3"
+                Background="White"
+                FlowDirection="RightToLeft"
+                Orientation="Horizontal">
+                <Button
+                    Margin="10,10,10,10"
+                    Click="Commit_Click"
+                    Content="修改"
+                    Style="{StaticResource BigBlueBtnStyle}" />
+
+            </StackPanel>
+        </Grid>
+    </hc:TransitioningContentControl>
+</Page>

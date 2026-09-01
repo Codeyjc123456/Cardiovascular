@@ -1,0 +1,229 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <Platforms>AnyCPU;x64</Platforms>
+    <PackageIcon>cardiology.ico</PackageIcon>
+    <ApplicationIcon>cardiology.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Data\BroshareCADB.db" />
+    <None Remove="Resources\Image\Common\123.jpg" />
+    <None Remove="Resources\Image\Common\back.png" />
+    <None Remove="Resources\Image\Common\background_a.png" />
+    <None Remove="Resources\Image\DataManage\historyBK.png" />
+    <None Remove="Resources\Image\DataManage\hsBK.png" />
+    <None Remove="Resources\Image\Help\m_helpAccount.png" />
+    <None Remove="Resources\Image\Login\登入背景.png" />
+    <None Remove="Resources\Image\Login\输入框.png" />
+    <None Remove="Resources\Image\Measure\ai波形.jpg" />
+    <None Remove="Resources\Image\Measure\Border.png" />
+    <None Remove="Resources\Image\Measure\Check.png" />
+    <None Remove="Resources\Image\Measure\m_login.png" />
+    <None Remove="Resources\Image\Measure\Save.png" />
+    <None Remove="Resources\Image\Measure\testback.png" />
+    <None Remove="Resources\Image\Measure\医师诊断.png" />
+    <None Remove="Resources\Image\Measure\升高.png" />
+    <None Remove="Resources\Image\Measure\开始测量.jpg" />
+    <None Remove="Resources\Image\Measure\心血管测试.png" />
+    <None Remove="Resources\Image\Measure\打印报表.jpg" />
+    <None Remove="Resources\Image\Measure\注册弹窗bj.png" />
+    <None Remove="Resources\Image\Measure\测量准备.png" />
+    <None Remove="Resources\Image\Measure\添加记忆.png" />
+    <None Remove="Resources\Image\Measure\确定.png" />
+    <None Remove="Resources\Image\Measure\结束测量.png" />
+    <None Remove="Resources\Image\Measure\降低.png" />
+    <None Remove="Resources\Image\Menu\bp测试.png" />
+    <None Remove="Resources\Image\Menu\主界面背景.png" />
+    <None Remove="Resources\Image\Menu\关机按钮.png" />
+    <None Remove="Resources\Image\Menu\帮助.png" />
+    <None Remove="Resources\Image\Menu\帮助按钮.png" />
+    <None Remove="Resources\Image\Menu\数据管理.png" />
+    <None Remove="Resources\Image\Menu\测试.png" />
+    <None Remove="Resources\Image\Menu\测试血压.png" />
+    <None Remove="Resources\Image\Menu\用户管理.png" />
+    <None Remove="Resources\Image\Menu\用户管理按钮.png" />
+    <None Remove="Resources\Image\Menu\系统设置.png" />
+    <None Remove="Resources\Image\Menu\退出.png" />
+    <None Remove="Resources\Image\System\参数设置.png" />
+    <None Remove="Resources\Image\System\工厂设置.png" />
+    <None Remove="Resources\Image\System\设备调试.png" />
+    <None Remove="Resources\Report\9e20b14580744dfda20b0799c4b242fa.png" />
+    <None Remove="Resources\Template\Chinese.frl" />
+    <None Remove="Resources\Template\WPFABIAI202.frx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="cardiology.ico" />
+    <Content Include="Resources\Data\BroshareCADB.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Image\Common\123.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Image\Common\back.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Image\Common\background_a.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Image\DataManage\historyBK.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Image\DataManage\hsBK.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Image\Help\m_helpAccount.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\Image\System\参数设置.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="Resources\Report\9e20b14580744dfda20b0799c4b242fa.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Template\Chinese.frl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Template\WPFABIAI202.frx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\Image\Login\登入背景.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Login\输入框.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\ai波形.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\Border.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\Check.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\m_login.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\Save.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\testback.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\医师诊断.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\升高.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\开始测量.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\心血管测试.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\打印报表.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\注册弹窗bj.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\测量准备.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\添加记忆.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\确定.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\结束测量.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Measure\降低.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\bp测试.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\主界面背景.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\关机按钮.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\帮助.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\帮助按钮.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\数据管理.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\测试.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\测试血压.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\用户管理.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\用户管理按钮.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\系统设置.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\Menu\退出.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\System\工厂设置.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Image\System\设备调试.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="8.5.4" />
+    <PackageReference Include="FastReport.OpenSource" Version="2026.2.0" />
+    <PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2026.2.0" />
+    <PackageReference Include="HandyControl" Version="3.6.0-rc3" />
+    <PackageReference Include="MiniExcel" Version="2.0.0-preview.2" />
+    <PackageReference Include="MySql.Data" Version="9.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
+    <PackageReference Include="RestSharp" Version="114.0.0" />
+    <PackageReference Include="ScottPlot.WPF" Version="5.0.54" />
+    <PackageReference Include="SerialPort" Version="1.0.0.1" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.4.215-preview06" />
+    <PackageReference Include="System.IO.Ports" Version="11.0.0-preview.2.26159.112" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\..\..\..\动脉硬化\最新版本\BXASHK(20260121发货)\bin\Debug\log4net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Image\UserManage\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="cardiology.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,93 @@
+﻿<Page
+    x:Class="Cardio.Views.SystemWinPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:local="clr-namespace:Cardio.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="SystemWinPage"
+    d:DesignHeight="1080"
+    d:DesignWidth="1920"
+    IsVisibleChanged="Page_IsVisibleChanged"
+    Loaded="Window_OnLoaded"
+    RenderOptions.BitmapScalingMode="HighQuality"
+    RenderOptions.ClearTypeHint="Enabled"
+    ShowsNavigationUI="False"
+    mc:Ignorable="d">
+
+    <Grid Width="1920" Height="1080">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="72" />
+            <RowDefinition Height="1008" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Image Style="{StaticResource TitleImageStyle}" />
+            <Button Click="BackBtn" Style="{StaticResource TitleBackBtnStyle}" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="1720" />
+            </Grid.ColumnDefinitions>
+            <hc:SideMenu
+                Width="200"
+                AutoSelect="True"
+                BorderThickness="1"
+                ExpandMode="ShowAll">
+
+                <hc:SideMenuItem
+                    Margin="20,0,0,0"
+                    FontSize="22"
+                    Header="参数设置"
+                    MouseLeftButtonDown="OpenParamterPageBtn">
+                    <hc:SideMenuItem.Icon>
+                        <Image
+                            Width="30"
+                            Height="30"
+                            Source="/Resources/Image/System/参数设置.png" />
+                    </hc:SideMenuItem.Icon>
+                </hc:SideMenuItem>
+
+                <hc:SideMenuItem
+                    Margin="20,10,0,0"
+                    FontSize="22"
+                    Header="工厂设置"
+                    MouseLeftButtonDown="OpenFactorysetPageBtn">
+                    <hc:SideMenuItem.Icon>
+                        <Image
+                            Width="30"
+                            Height="30"
+                            Source="/Resources/Image/System/工厂设置.png" />
+                    </hc:SideMenuItem.Icon>
+                </hc:SideMenuItem>
+
+                <hc:SideMenuItem
+                    Margin="20,10,0,0"
+                    FontSize="22"
+                    Header="仪器调试"
+                    MouseLeftButtonDown="OpenDebugPageBtn">
+                    <hc:SideMenuItem.Icon>
+                        <Image
+                            Width="30"
+                            Height="30"
+                            Source="/Resources/Image/System/设备调试.png" />
+                    </hc:SideMenuItem.Icon>
+                </hc:SideMenuItem>
+
+
+
+            </hc:SideMenu>
+
+
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="22*" />
+                    <ColumnDefinition Width="17*" />
+                </Grid.ColumnDefinitions>
+                <ContentControl x:Name="SystemFrame" Grid.ColumnSpan="2" />
+            </Grid>
+        </Grid>
+
+    </Grid>
+</Page>

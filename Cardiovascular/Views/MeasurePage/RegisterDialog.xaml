@@ -1,0 +1,309 @@
+﻿<Border
+    x:Class="Cardio.Views.MeasurePage.RegisterDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:Cadio.CustomRule"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:r="clr-namespace:Cardio.CustomConvert"
+    d:DesignHeight="700"
+    d:DesignWidth="1244"
+    IsVisibleChanged="Page_IsVisibleChanged"
+    Loaded="Border_Loaded"
+    mc:Ignorable="d">
+
+    <hc:Interaction.Behaviors>
+        <c:ValidationExceptionBehavior />
+    </hc:Interaction.Behaviors>
+
+    <Border.Resources>
+        <r:CheckConverter x:Key="CheckConverter" />
+    </Border.Resources>
+    <Border.Background>
+        <ImageBrush ImageSource="pack://application:,,,/Resources/Image/Measure/注册弹窗bj.png" Stretch="Fill" />
+    </Border.Background>
+    <hc:TransitioningContentControl TransitionMode="Fade">
+        <Border
+            Width="1244"
+            Height="700"
+            CornerRadius="8">
+            <Grid>
+
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Margin="10,70,0,0" Orientation="Horizontal">
+                        <!--  Card 的一级内容  -->
+                        <!--<Image Source="pack://application:,,,/Resources/tip_img.png"/>-->
+                        <Rectangle
+                            Width="12"
+                            Height="34"
+                            Margin="50,0,0,0"
+                            Fill="Orange" />
+                        <TextBlock
+                            Margin="10,10,0,0"
+                            HorizontalAlignment="Left"
+                            FontSize="28"
+                            Text="基本信息"
+                            TextAlignment="Center"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap" />
+                    </StackPanel>
+                    <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center">
+                        <StackPanel Margin="10,15,10,10" Orientation="Horizontal">
+                            <!--<hc:Badge   Value="12" Text="new" BadgeMargin="0" Width="200" Height="100" >-->
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text="账       号 " />
+                            <TextBlock
+                                Margin="0,-10,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="36"
+                                Foreground="Red"
+                                Text="*" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text=":" />
+                            <TextBox
+                                x:Name="UserIDInfo"
+                                Width="462"
+                                Margin="25,0,0,0"
+                                FontSize="32"
+                                TextAlignment="Center">
+                                <TextBox.Text>
+                                    <Binding
+                                        NotifyOnValidationError="True"
+                                        Path="UserID"          
+                                        UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <c:StringValueRule
+                                                Max="18"
+                                                Min="1"
+                                                ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+
+                        </StackPanel>
+                        <StackPanel Margin="10,15,10,10" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text="姓       名 " />
+                            <TextBlock
+                                x:Name="UserNameBtn"
+                                Margin="0,-10,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="36"
+                                Foreground="Red"
+                                Text="*" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text=":" />
+                            <TextBox
+                                Width="462"
+                                Margin="25,0,0,0"
+                                FontSize="32"
+                                TextAlignment="Center">
+                                <TextBox.Text>
+                                    <Binding
+                                        NotifyOnValidationError="True"
+                                        Path="UserName"
+                                        UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <c:NullRule ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                        </StackPanel>
+                        <StackPanel Margin="10,15,10,10" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text="身       高 " />
+                            <TextBlock
+                                Margin="0,-10,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="36"
+                                Foreground="Red"
+                                Text="*" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text=":" />
+                            <TextBox
+                                Width="374"
+                                Margin="25,0,0,0"
+                                FontSize="32"
+                                TextAlignment="Center">
+                                <TextBox.Text>
+                                    <Binding
+                                        NotifyOnValidationError="True"
+                                        Path="UserHeight"
+                                        UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <c:DataValueRule
+                                                Max="300"
+                                                Min="50"
+                                                RegexPattern="180"
+                                                ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBlock
+                                Margin="20,0,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text="厘米" />
+                        </StackPanel>
+                        <StackPanel Margin="10,15,10,10" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text="体       重 " />
+                            <TextBlock
+                                Margin="0,-10,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="36"
+                                Foreground="Red"
+                                Text="*" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text=":" />
+                            <TextBox
+                                Width="374"
+                                Margin="25,0,0,0"
+                                FontSize="32"
+                                TextAlignment="Center">
+                                <TextBox.Text>
+                                    <Binding
+                                        NotifyOnValidationError="True"
+                                        Path="UserWeight"
+                                        UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <c:DataValueRule
+                                                Max="300"
+                                                Min="30"
+                                                RegexPattern="70"
+                                                ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBlock
+                                Margin="20,0,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text="千克" />
+                        </StackPanel>
+                        <StackPanel Margin="10,15,10,10" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text="出生日期 " />
+                            <TextBlock
+                                Margin="0,-10,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="36"
+                                Foreground="Red"
+                                Text="*" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text=":" />
+                            <DatePicker
+                                Width="374"
+                                Margin="25,0,0,0"
+                                FontSize="28"
+                                SelectedDateFormat="Short">
+                                <DatePicker.Text>
+                                    <Binding
+                                        Mode="TwoWay"
+                                        NotifyOnValidationError="True"
+                                        Path="BirthDay"
+                                        UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <c:BirthDateRule ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </DatePicker.Text>
+                            </DatePicker>
+                        </StackPanel>
+                        <StackPanel Margin="10,15,10,10" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text="性       别 " />
+                            <TextBlock
+                                Margin="0,-10,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="36"
+                                Foreground="Red"
+                                Text="*" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="32"
+                                Text=":" />
+                            <RadioButton
+                                Margin="30,10,10,10"
+                                Content="男"
+                                FontSize="32"
+                                IsChecked="{Binding UserSex, Mode=TwoWay, Converter={StaticResource CheckConverter}, ConverterParameter='男'}" />
+                            <RadioButton
+                                Margin="100,10,10,10"
+                                Content="女"
+                                FontSize="32"
+                                IsChecked="{Binding UserSex, Mode=TwoWay, Converter={StaticResource CheckConverter}, ConverterParameter='女'}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel
+                        Width="1200"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Button
+                            Width="240"
+                            Margin="100,09,80,30"
+                            Click="Clear_Click"
+                            Content="返  回"
+                            DockPanel.Dock="Left"
+                            Style="{StaticResource IconBigBlueBtn}"
+                            Tag="M48.5 224H40c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2S50.1 48.1 57 55l41.6 41.6c87.6-86.5 228.7-86.2 315.8 1 87.5 87.5 87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3c-62.2-62.2-162.7-62.5-225.3-1L185 183c6.9 6.9 8.9 17.2 5.2 26.2S177.7 224 168 224H48.5z" />
+                        <Button
+                            Width="259"
+                            Margin="470,09,50,30"
+                            Click="Commit_Click"
+                            Content="确  定"
+                            Style="{StaticResource IconBigBlueBtn}"
+                            Tag="m217.9 105.9 122.8 122.8c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L217.9 406.1c-6.4 6.4-15 9.9-24 9.9-18.7 0-33.9-15.2-33.9-33.9V320H32c-17.7 0-32-14.3-32-32v-64c0-17.7 14.3-32 32-32h128v-62.1c0-18.7 15.2-33.9 33.9-33.9 9 0 17.6 3.6 24 9.9zM352 416h64c17.7 0 32-14.3 32-32V128c0-17.7-14.3-32-32-32h-64c-17.7 0-32-14.3-32-32s14.3-32 32-32h64c53 0 96 43 96 96v256c0 53-43 96-96 96h-64c-17.7 0-32-14.3-32-32s14.3-32 32-32z" />
+                    </StackPanel>
+                </StackPanel>
+
+
+
+                <ScrollViewer
+                    Height="Auto"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Panel.ZIndex="9999"
+                    VerticalScrollBarVisibility="Hidden">
+                    <StackPanel
+                        Margin="0,10,10,10"
+                        VerticalAlignment="Top"
+                        hc:Growl.Token="Rigister" />
+                </ScrollViewer>
+
+            </Grid>
+
+        </Border>
+    </hc:TransitioningContentControl>
+
+</Border>
