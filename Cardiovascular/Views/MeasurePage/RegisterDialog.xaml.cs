@@ -63,7 +63,7 @@ namespace Cardio.Views.MeasurePage
             userinfo.UserBirthday = t.ToString("yyyy-MM-dd");
             userinfo.UserHeight = userViewModel.UserHeight;
             userinfo.UserWeight = userViewModel.UserWeight;
-            userinfo.CreateTime = DateTime.Now.ToString();
+            //userinfo.CreateTime = DateTime.Now.ToString();
             double[] Temp_Distance = new double[3];
             Temp_Distance[0] = (double)(0.8129 * userinfo.UserHeight + 12.328);
             Temp_Distance[1] = (double)(0.2195 * userinfo.UserHeight - 2.0734);
