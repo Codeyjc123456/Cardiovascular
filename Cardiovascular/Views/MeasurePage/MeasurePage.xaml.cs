@@ -170,9 +170,9 @@ namespace Cardio.Views.MeasurePage
             serialPortManager.InformMsgEvnet = new SerialPortManager.InformMsg(ReciveAlarm);
             serialPortManager.InformDebugMsgEvnet = new SerialPortManager.InformDebugMsg(msg);
 
-            serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
-            Thread.Sleep(500);
-            serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
+            //serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
+            //Thread.Sleep(500);
+            //serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
         }
         /// <summary>
         /// 初始化 定时器
@@ -1108,7 +1108,7 @@ namespace Cardio.Views.MeasurePage
             FaultStr = (ECFault) switch
             {
                 0x01 => "从袖带获得脉搏波信号弱",
-                0x02 => "从修改获得脉搏波信号不稳定",
+                0x02 => "从袖带获得脉搏波信号不稳定",
                 0x03 => "血压值超出测量范围",
                 0x04 => "超过测量时限",
                 0x55 => "气动堵塞",
