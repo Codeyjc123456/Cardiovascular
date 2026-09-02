@@ -354,17 +354,30 @@ namespace Cardio.Views.MeasurePage
             {
                 FeaturePoint featurepoint = new ();
                 g_typeBpMrsValue.Sbp = FinalBpMrsValue.Sbp;
-                g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp; 
+                g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp;
                 //g_typeBpMrsValue.Sbp = 120;
                 //g_typeBpMrsValue.Dbp = 80;
-                if (featurepoint.Identify(g_typeBpMrsValue.Sbp, g_typeBpMrsValue.Dbp, RpRawData) == 0)//保存数据
+                try
+                {
+                    if (featurepoint.Identify(g_typeBpMrsValue.Sbp, g_typeBpMrsValue.Dbp, RpRawData) == 0)//保存数据
+                    {
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            measureViewModel.Tips = "温馨提示：波形分析出错，请重新测量";
+                        }));
+                        ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
+                        SaveDataAfterAIAcquisitionFlag = false;
+                        return false;
+                    }
+                }
+                catch (Exception ex)
                 {
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        measureViewModel.Tips = "温馨提示：波形分析出错，请重新测量";
+                        this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败:稳定段数据较少！";
                     }));
+                    AITestIntit();
                     ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
-                    SaveDataAfterAIAcquisitionFlag = false;
                     return false;
                 }
                 //心率值是否有误string result = ;//把数字字符串中的数字提取出来
@@ -373,7 +386,7 @@ namespace Cardio.Views.MeasurePage
                 {
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        measureViewModel.Tips = $"温馨提示：心率指标数值有误，{g_typeCardiacIndex.Hr}请重新测量";//直接退出检测
+                        measureViewModel.Tips = $"温馨提示：心率为{g_typeCardiacIndex.Hr}次/分,测量有误，请重新测量!";//直接退出检测
                     }));
                     return false;
                 }
@@ -438,7 +451,7 @@ namespace Cardio.Views.MeasurePage
             {
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败！" + ex.Message;
+                    this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败！";
                 }));
                 AITestIntit();
                 ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");

@@ -67,7 +67,7 @@ namespace Cardio.SPCL
             {
                 for (int i = 0; i < receivedData.Count - 1; i++)  // i < receivedData.Count - 1  保留一位用以CRC位
                 {
-                    if (receivedData[i] == endBitDataReceive && receivedData[i + 1] == endBitDataReceive && receivedData[i + 2] != 9)
+                    if (receivedData[i] == endBitDataReceive && receivedData[i + 1] == endBitDataReceive)
                     {
                         indexNum.Add(i);  //是最后一位则加入到末位 索引 号数组中
                     }
