@@ -1,4 +1,3 @@
-﻿
 using Cardio.DAL;
 using Cardio.Util;
 using FastReport;
@@ -7,9 +6,11 @@ using Mysqlx.Prepare;
 using ScottPlot;
 using ScottPlot.WPF;
 using System.Data;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Xml.Linq;
+using SDColor = System.Drawing.Color;
 
 namespace Cardio.Model
 {
@@ -119,19 +120,20 @@ namespace Cardio.Model
             SetTxt("txt_userHeight", testResult.userHeight.ToString() + " cm");
             SetTxt("txt_userWeight", testResult.userWeight.ToString() + " kg");
             SetTxt("TestDate", testResult.TestDateTime);
-            SetTxt("txt_HR", testResult.Hr.ToString());
-            SetTxt("txt_ED", testResult.Ed.ToString("f2"));
-            SetTxt("txt_SPTI", testResult.Spti.ToString());
-            SetTxt("txt_DPTI", testResult.Dpti.ToString());
-            SetTxt("txt_SEVR", testResult.Sevr.ToString("f2"));
-            SetTxt("txt_SBP", testResult.Sbp.ToString());
+            // 指标异常标注：超出正常范围显示 ↑/↓ 并变红（范围与测量界面一致）
+            SetTxtWithMark("txt_HR",   testResult.Hr,   60, 100,   "f0");
+            SetTxtWithMark("txt_ED",   testResult.Ed,   20, 40,    "f2");
+            SetTxtWithMark("txt_SPTI", testResult.Spti, 1800, 2500, "f0");
+            SetTxtWithMark("txt_DPTI", testResult.Dpti, 2300, 3500, "f0");
+            SetTxtWithMark("txt_SEVR", testResult.Sevr, 1.0, 4,    "f2");
+            SetTxtWithMark("txt_SBP",  testResult.Sbp,  90, 130,  "f0");
             SetTxt("txt_title", APPSettingUtil.APP_OwnerSet);
             SetTxt("txt_SBP1", testResult.Sbp.ToString() + "mmHg");
-            SetTxt("txt_DBP", testResult.Dbp.ToString());
+            SetTxtWithMark("txt_DBP",  testResult.Dbp,  60, 90,   "f0");
             SetTxt("txt_DBP1", testResult.Dbp.ToString() + "mmHg");
-            SetTxt("txt_PP", testResult.Pp.ToString());
-            SetTxt("txt_SBP2", testResult.Sbp2.ToString());
-            SetTxt("txt_AI", testResult.AIx.ToString("f2"));
+            SetTxtWithMark("txt_PP",   testResult.Pp,   30, 45,   "f0");
+            SetTxtWithMark("txt_SBP2", testResult.Sbp2, 85, 110,  "f0");
+            SetTxtWithMark("txt_AI",   testResult.AIx,  0.75, 99,  "f2");
             SetTxt("txt_AIDiagnosisResult", testResult.AIDiagnosisResult.ToString());
             SetTxt("txt_AIDiagnosisProposal", testResult.AIDiagnosisProposal.ToString());
             SetTxt("txt_title", APPSettingUtil.APP_CompaneTitle);
@@ -191,6 +193,21 @@ namespace Cardio.Model
             if (txt == null)
                 return;
             txt.Text = value;
+        }
+
+        /// <summary>
+        /// 设置指标文本：超出正常范围时追加 ↑/↓ 箭头并标红
+        /// </summary>
+        private void SetTxtWithMark(string key, double value, double min, double max, string format)
+        {
+            TextObject txt = pReport?.FindObject(key) as TextObject;
+            if (txt == null)
+                return;
+            bool high = value > max;
+            bool low = value < min;
+            string arrow = high ? "↑" : (low ? "↓" : "");
+            txt.Text = value.ToString(format) + (arrow.Length > 0 ? " " + arrow : "");
+            txt.TextColor = (high || low) ? SDColor.Red : SDColor.Black;
         }
         private void SetPic(string key, string pic)
         {
