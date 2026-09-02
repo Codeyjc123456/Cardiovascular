@@ -1142,6 +1142,7 @@ namespace Cardio.Views.MeasurePage
             }
             else
             {
+                bPressMrsStart = true;
                 this.NavigationService.GoBack();
             }
         }
