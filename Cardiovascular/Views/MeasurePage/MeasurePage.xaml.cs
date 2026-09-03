@@ -231,6 +231,7 @@ namespace Cardio.Views.MeasurePage
                     BpTest_Function(0x01);
                     Dispatcher.Invoke(new Action(() =>
                     {
+                        bPressMrsStart = true;
                         measureViewModel.Tips = "温馨提示：血压测量开始！";
                     }));
                 }
