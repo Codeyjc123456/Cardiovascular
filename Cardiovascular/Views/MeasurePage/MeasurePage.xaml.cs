@@ -524,6 +524,7 @@ namespace Cardio.Views.MeasurePage
                     {
                         NumOfBpMrs = NumOfBpMrs + 1;
                         bPressMrsStart = false;
+                        WaitTime = 60;   // 每次新测量轮次前重置倒计时，避免上一轮残留为0导致立刻进行第二次测量
                         TimerBPTest.Start();
                     }
                     //测量两次血压已完成
@@ -609,7 +610,9 @@ namespace Cardio.Views.MeasurePage
                 SaveFirstTimeData();
                 return true;
             }
-            return false;
+            // 第二轮及以后测完血压：覆盖前一次保存的数据
+            SaveFirstTimeData();
+            return true;
         }
         /// <summary>
         /// 首次保存数据
