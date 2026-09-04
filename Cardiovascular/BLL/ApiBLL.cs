@@ -483,5 +483,27 @@ namespace Cardio.BLL
                 return string.Empty;
             }
         }
+
+        public static async Task DoPostUpload(string url,Dictionary<string, object> data)
+        {
+            try
+            {
+                var response = await HttpUtil.DoPost(url, data);
+                var response_json = (JObject)JsonConvert.DeserializeObject(response);
+                if ((string)response_json["ERROR_TYPE"] =="0")
+                {
+                    HandyControl.Controls.Growl.Success("数据上传成功！");
+                }
+                else
+                {
+                    HandyControl.Controls.Growl.Error("数据上传失败！");
+                }
+            }
+            catch (Exception ex)
+            {
+                HandyControl.Controls.Growl.Error("数据上传失败！");
+                LogUtil.Error("上传数据", ex.Message);
+            }
+        }
     }
 }

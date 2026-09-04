@@ -1,4 +1,5 @@
 ﻿using Cadio.BLL;
+using Cardio.BLL;
 using Cardio.DAL;
 using Cardio.Model;
 using Cardio.Util;
@@ -10,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using static System.Net.WebRequestMethods;
 
 namespace Cardio.Views.DataManagePage.Mc
 {
@@ -122,19 +124,67 @@ namespace Cardio.Views.DataManagePage.Mc
                 Dispatcher.Invoke(new Action(() => {
                     Upload.IsEnabled = false;
                 }));
-                //PDFExport export = new PDFExport();
-                //string filePath = System.IO.Directory.GetCurrentDirectory() + "/"+ testResult.Report_Name;
-                //.Export(pReport,filePath);
-                //var code = await ApiBLL.CommitDataAPI(testResult, filePath);
-                //if (code == 200)
+
+                string url = APPSettingUtil.APP_ApiUrlData;
+                url = "http://127.0.0.1:4523/m2/7869154-7618859-default/510691540";
+                url = "http://39.105.221.110:10013/health/rest/cardiovascularservice/uploadcardiovascular";
+                var data = new Dictionary<string, object>
                 {
-                    HandyControl.Controls.Growl.Success("数据上传成功！");
-                }
-                //else
-                {
-                    HandyControl.Controls.Growl.Success("数据上传失败！");
-                }
-                //File.Delete(filePath);
+                    { "userId", model.testResult.userId },
+                    { "userCode", model.testResult.userCode },
+                    { "userName", model.testResult.userName },
+                    { "userSex", model.testResult.userSex },
+                    { "userBirthday", model.testResult.userBirthday },
+                    { "userHeight", model.testResult.userHeight },
+                    { "userWeight", model.testResult.userWeight },
+                    { "doctorId", model.testResult.OperationgDoctor },
+                    { "orgId", model.testResult.orgId },
+                    { "checkTime", model.testResult.TestDateTime },
+                    { "hr", model.testResult.Hr },
+                    { "sbp", model.testResult.Sbp },
+                    { "dbp", model.testResult.Dbp },
+                    { "pp", model.testResult.Pp },
+                    { "cap", model.testResult.Sbp2},
+                    { "ai", model.testResult.AIx },
+                    { "ed", model.testResult.Ed },
+                    { "spti", model.testResult.Spti },
+                    { "dpti", model.testResult.Dpti },
+                    { "sevr", model.testResult.Sevr },
+                    { "Result", model.testResult.AIDiagnosisResult },
+                    { "data", model.testResult.RpRawData },
+                    { "proposal", model.testResult.AIDiagnosisProposal },
+                    { "reportName", model.testResult.Report_Name },
+                };
+
+                //var data = new Dictionary<string, object>
+                //{
+                //    { "userId", "18955154603-mbr" },
+                //    { "userCode", "18955154603" },
+                //    { "userName", "张三" },
+                //    { "userSex", "01" },
+                //    { "userBirthday", "1985-05-01" },
+                //    { "userHeight", "175" },
+                //    { "userWeight", "70" },
+                //    { "doctorId", "13970000001-dr" },
+                //    { "orgId", "org009" },
+                //    { "checkTime", "2026-08-06 10:00:00" },
+                //    { "hr", "72" },
+                //    { "sbp", "120" },
+                //    { "dbp", "80" },
+                //    { "pp", "40" },
+                //    { "cap", "100"},
+                //    { "ai", "80" },
+                //    { "ed", "300" },
+                //    { "spti", "110" },
+                //    { "dpti", "90" },
+                //    { "sevr", "120" },
+                //    { "Result", "未见异常" },
+                //    { "data", "原始波形采样字符串" },
+                //    { "proposal", "建议控制饮食，规律作息，定期监测血压" },
+                //    { "reportName", "2026 年心血管检测报告" },
+                //};
+
+                await ApiBLL.DoPostUpload(url, data);
                 Dispatcher.Invoke(new Action(() => {
                     Upload.IsEnabled = true;
                 }));

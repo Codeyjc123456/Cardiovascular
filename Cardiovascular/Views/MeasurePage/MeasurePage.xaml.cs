@@ -124,6 +124,10 @@ namespace Cardio.Views.MeasurePage
             LogUtil.Warn("真人测试");
             GlobalVariable.Pressure = 80;
 
+            pulsedata.userCode = userInfo.UserCode;
+            pulsedata.OperationgDoctor = userInfo.OperatingDoctor;
+            pulsedata.orgId = userInfo.OrgId;
+
             //Ready.Visibility = Visibility.Hidden;
             //AITest.Visibility = Visibility.Visible;
             //measureViewModel.Tips = "温馨提示：血压测量完成！";
@@ -866,7 +870,7 @@ namespace Cardio.Views.MeasurePage
                                 if (DataCount % 2 == 0)
                                 {
                                     measureViewModel.AIData.Add(iData[0]);
-                                    if (measureViewModel.AIData.Count % 4 == 0)
+                                    if (measureViewModel.AIData.Count % 50 == 0)
                                         AiSeries.Refresh();
                                     HandleAIPulseData(ref DataCount, ref iData[0]);
                                 }
@@ -1265,7 +1269,6 @@ namespace Cardio.Views.MeasurePage
             if (pulsedata.AI_num == 1)
             {
                 UpdataToDatabase();
-                //this.NavigationService.Navigate(new OpenReportPage(pulsedata));
                 this.NavigationService.Navigate(new OpenReportPage(pulsedata, ReportAction));
             }
             else

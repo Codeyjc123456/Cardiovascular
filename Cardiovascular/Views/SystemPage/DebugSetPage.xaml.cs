@@ -383,7 +383,7 @@ namespace CardioVascular.Views.SystemPage
                             }
                             i += 15;//一次多处理15个数据
                                     
-                            if (AIData.Count % 8 == 0)
+                            if (AIData.Count % 20 == 0)
                             {
                                 zg_ai.Refresh();
                                 //if (AIData.Count % 32 == 0)

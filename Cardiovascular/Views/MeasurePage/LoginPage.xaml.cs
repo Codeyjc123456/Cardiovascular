@@ -5,6 +5,7 @@ using Cardio.SPCL;
 using Cardio.Util;
 using HandyControl.Controls;
 using HandyControl.Tools.Extension;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Windows;
@@ -38,29 +39,53 @@ namespace Cardio.Views.MeasurePage
 
         private async void LoginAPI()
         {
-            try
+            string url = APPSettingUtil.APP_ApiUrlLogin;
+            var data = new Dictionary<string, object>
             {
-                Login.IsEnabled = false;
-                var data = new Dictionary<string, object>
+                { "mbrKey", loginViewModel.UserID }
+            };
+            //url = "http://127.0.0.1:4523/m2/7869154-7618859-default/510152173";
+            url = "http://39.105.221.110:10013/health/rest/cardiovascularservice/getmemberbykey";
+            var response = ApiBLL.DoGetUser(url, data);
+            var response_json = (JObject)JsonConvert.DeserializeObject(response);
+            UserInfoEntity userInfo = new UserInfoEntity();
+            if (response_json != null)
+            {
+                JObject obj = JObject.Parse(response);
+
+                userInfo.UserHeight = (double)obj["memberEntity"]["height"];
+                userInfo.UserWeight = (double)obj["memberEntity"]["weight"];
+                userInfo.UserName = obj["memberEntity"]["name"].ToString();
+                userInfo.UserId = obj["memberEntity"]["id"].ToString();
+                userInfo.UserCode = obj["memberEntity"]["code"].ToString();
+                userInfo.UserSex = obj["memberEntity"]["sex"].ToString() == "01" ? "男" : "女";
+                userInfo.UserBirthday = obj["memberEntity"]["birth"].ToString();
+                if (userInfo.UserName.IsNullOrEmpty() || userInfo.UserHeight.ToString().IsNullOrEmpty() || userInfo.UserWeight.ToString().IsNullOrEmpty()
+                    || userInfo.UserSex.IsNullOrEmpty() || userInfo.UserBirthday.IsNullOrEmpty())
                 {
-                    { "UserId", loginViewModel.UserID }
-                };
-                UserInfoEntity userInfo = await ApiBLL.LoginAPI(data);
-                if (userInfo != null)
-                {
-                    this.NavigationService.Navigate(new MeasureReePage(userInfo));
+                    await Dialog.Show(new UpdateDialog(userInfo, tabAction)).GetResultAsync<string>();
+                    
                 }
-                else
-                {
-                    HandyControl.Controls.Growl.Warning("查无此用户信息！");
-                }
-                Login.IsEnabled = true;
+                userInfo.CreateTime = obj["memberEntity"]["createdTime"]?.ToString();
+                userInfo.OperatingDoctor = obj["memberEntity"]["drId"].ToString();
+                userInfo.OrgId = obj["memberEntity"]["orgId"].ToString();
+
+                userInfo.UserAge = CalcuAge(userInfo.UserBirthday);
+                TestMode.AI_Select = true;
+                TestMode.LBBP_Select = true;
+                TestMode.LABP_Select = true;
+                TestMode.RBBP_Select = true;
+                TestMode.RABP_Select = true;
+                double[] Temp_Distance = new double[3];
+                Temp_Distance[0] = 0.8129 * userInfo.UserHeight + 12.328;
+                Temp_Distance[1] = 0.2195 * userInfo.UserHeight - 2.0734;
+                Temp_Distance[2] = Temp_Distance[0] - Temp_Distance[1];
+                userInfo.UserDistance = Math.Round(Temp_Distance[2], 1, MidpointRounding.AwayFromZero);
+                this.NavigationService.Navigate(new MeasureReePage(userInfo));
             }
-            catch (Exception ex)
+            else
             {
-                Login.IsEnabled = true;
-                LogUtil.Error("登录",ex.Message);
-                Growl.Warning("参数错误！");
+                HandyControl.Controls.Growl.Warning("查无此用户信息！");
             }
         }
 
@@ -78,9 +103,9 @@ namespace Cardio.Views.MeasurePage
             }
             else
             {
-                //LoginAPI();//标准API接口获取用户信息
+                LoginAPI();//标准API接口获取用户信息
                 //LoginAPPID();//圣乐版本获取用户信息
-                LoginAPIBX();//博谐内部系统
+                //LoginAPIBX();//博谐内部系统
             }
         }
         private async void LoginLocal()

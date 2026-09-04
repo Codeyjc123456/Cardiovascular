@@ -13,6 +13,8 @@ namespace Cardio.DAL
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true, ColumnName = "Id")]
         public new int Id { get; set; }
+        public string userCode { get; set; }   
+        public string orgId { get; set; }
         public string userId { get; set; }
         public string userName { get; set; }
         public string userSex { get; set; }
