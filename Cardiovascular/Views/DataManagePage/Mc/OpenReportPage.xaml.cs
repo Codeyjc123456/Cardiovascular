@@ -126,8 +126,8 @@ namespace Cardio.Views.DataManagePage.Mc
                 }));
 
                 string url = APPSettingUtil.APP_ApiUrlData;
-                url = "http://127.0.0.1:4523/m2/7869154-7618859-default/510691540";
-                url = "http://39.105.221.110:10013/health/rest/cardiovascularservice/uploadcardiovascular";
+                //url = "http://127.0.0.1:4523/m2/7869154-7618859-default/510691540";
+                //url = "http://39.105.221.110:10013/health/rest/cardiovascularservice/uploadcardiovascular";
                 var data = new Dictionary<string, object>
                 {
                     { "userId", model.testResult.userId },
@@ -146,7 +146,7 @@ namespace Cardio.Views.DataManagePage.Mc
                     { "pp", model.testResult.Pp },
                     { "cap", model.testResult.Sbp2},
                     { "ai", model.testResult.AIx },
-                    { "ed", model.testResult.Ed },
+                    { "ed", model.testResult.Ed/100 },
                     { "spti", model.testResult.Spti },
                     { "dpti", model.testResult.Dpti },
                     { "sevr", model.testResult.Sevr },
@@ -160,21 +160,21 @@ namespace Cardio.Views.DataManagePage.Mc
                 //{
                 //    { "userId", "18955154603-mbr" },
                 //    { "userCode", "18955154603" },
-                //    { "userName", "张三" },
+                //    { "userName", "项龙飞" },
                 //    { "userSex", "01" },
-                //    { "userBirthday", "1985-05-01" },
-                //    { "userHeight", "175" },
-                //    { "userWeight", "70" },
-                //    { "doctorId", "13970000001-dr" },
-                //    { "orgId", "org009" },
-                //    { "checkTime", "2026-08-06 10:00:00" },
-                //    { "hr", "72" },
-                //    { "sbp", "120" },
+                //    { "userBirthday", "1988-01-01 00:00:00" },
+                //    { "userHeight", "165" },
+                //    { "userWeight", "57" },
+                //    { "doctorId", "1567153547218-0001-0070-1615" },
+                //    { "orgId", "0001" },
+                //    { "checkTime", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") },
+                //    { "hr", "60" },
+                //    { "sbp", "140" },
                 //    { "dbp", "80" },
                 //    { "pp", "40" },
                 //    { "cap", "100"},
                 //    { "ai", "80" },
-                //    { "ed", "300" },
+                //    { "ed", "0.30" },
                 //    { "spti", "110" },
                 //    { "dpti", "90" },
                 //    { "sevr", "120" },

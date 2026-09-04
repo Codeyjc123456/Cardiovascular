@@ -45,7 +45,7 @@ namespace Cardio.Views.MeasurePage
                 { "mbrKey", loginViewModel.UserID }
             };
             //url = "http://127.0.0.1:4523/m2/7869154-7618859-default/510152173";
-            url = "http://39.105.221.110:10013/health/rest/cardiovascularservice/getmemberbykey";
+            //url = "http://39.105.221.110:10013/health/rest/cardiovascularservice/getmemberbykey";
             var response = ApiBLL.DoGetUser(url, data);
             var response_json = (JObject)JsonConvert.DeserializeObject(response);
             UserInfoEntity userInfo = new UserInfoEntity();
