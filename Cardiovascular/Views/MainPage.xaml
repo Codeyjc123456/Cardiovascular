@@ -68,7 +68,7 @@
                         HorizontalAlignment="Center"
                         Foreground="White"
                         Style="{StaticResource BXTextBlockFont}"
-                        Text="1.0.0 20251105" />
+                        Text="1.0.0.20251105" />
                 </StackPanel>
             </StackPanel>
             <Grid Grid.Row="0" Margin="16,0,0,0">
