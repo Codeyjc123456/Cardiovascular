@@ -1,4 +1,4 @@
-﻿using Cardio.CustomRule;
+using Cardio.CustomRule;
 using Cardio.DAL;
 using HandyControl.Tools.Extension;
 using ScottPlot;
@@ -503,9 +503,15 @@ namespace Cardio.Model
             get => imgxinji;
             set => SetProperty(ref imgxinji, value);
         }
-        public int RemoveAndAdd { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Message { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Result { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int RemoveAndAdd { get; set; } = 0;
+        public string Message { get; set; } = "";
+
+        private string _result = "";
+        /// <summary>
+        /// 对话框返回值：Diagnosis 等用 MeasureViewModel 作 DataContext 关闭时，HandyControl 会读取它，
+        /// 不能抛 NotImplementedException
+        /// </summary>
+        public string Result { get => _result; set => SetProperty(ref _result, value); }
         #endregion
 
         public void InitializeZedGraph(WpfPlot zg_ai)

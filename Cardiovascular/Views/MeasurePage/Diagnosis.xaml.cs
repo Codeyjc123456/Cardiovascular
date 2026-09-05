@@ -1,4 +1,4 @@
-﻿using Cardio.Model;
+using Cardio.Model;
 using System.Windows;
 using System.Windows.Controls;
 using Cardio.DAL;
@@ -65,6 +65,11 @@ namespace Cardio.Views.MeasurePage
             CbDoctor.SelectedIndex = 0;
             doctorViewModel.DiagnosisTime = DateTime.Now.ToString("yyyy-MM-dd");
             doctorViewModel.CardiovascularDIS = pulsedata.CardiovascularDis;
+            // 医师诊断文本框初始展示 AI 生成的建议（医师可编辑后保存；已有医师诊断则不覆盖）
+            if (string.IsNullOrEmpty(pulsedata.DoctorDiagnosis))
+            {
+                doctorViewModel.Doctordiagnosis = pulsedata.AIDiagnosisProposal ?? "";
+            }
             Intshow();
 
         }
@@ -188,8 +193,24 @@ namespace Cardio.Views.MeasurePage
             pulsedata.OperationgDoctor = doctorViewModel.DoctorName;
             pulsedata.DiagnosisTime = doctorViewModel.DiagnosisTime;
             pulsedata.OperationgDoctor = CbDoctor.Text;
-            bool isSucess = dataDAL.Update(pulsedata);   //医师诊断更新
-            doctorViewModel.CloseAction?.Invoke();
+            bool isSucess;
+            if (pulsedata.Id > 0)
+            {
+                isSucess = dataDAL.Update(pulsedata);   //已有记录：更新
+            }
+            else
+            {
+                isSucess = dataDAL.Insert(pulsedata) > 0;   //首次保存：插入
+            }
+            if (isSucess)
+            {
+                HandyControl.Controls.Growl.Success("诊断信息保存成功！", "SuccessMsg");
+                doctorViewModel.CloseAction?.Invoke();   // 保存成功自动关闭
+            }
+            else
+            {
+                HandyControl.Controls.Growl.Warning("诊断信息保存失败！", "SuccessMsg");
+            }
         }
         private void Close(object sender, RoutedEventArgs e)
         {

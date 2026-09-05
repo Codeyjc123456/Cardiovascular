@@ -5,6 +5,7 @@ using Cardio.Model;
 using Cardio.SPCL;
 using Cardio.Util;
 using HandyControl.Controls;
+using HandyControl.Tools.Extension;
 using Newtonsoft.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -297,6 +298,15 @@ namespace Cardio.Views.MeasurePage
                 }));
                 workStatus = WorkStatus.NoWork;
                 pulsedata.AI_num = 1;
+                // 结果可用：先把 AI 诊断结果回填到记录，再自动打开医师诊断界面（保存时入库/更新）
+                pulsedata.AIDiagnosisResult = strAIDiagnosisResult;
+                pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
+                Dispatcher.BeginInvoke(new Action(async () =>
+                {
+                    // 必须走 GetResultAsync：HandyControl 会在此时把 CloseAction 注入到 DataContext，
+                    // 否则 Diagnosis 内点“保存/取消”时 CloseAction?.Invoke() 为空，无法自动关闭回到本页
+                    await HandyControl.Controls.Dialog.Show(new Diagnosis(pulsedata)).GetResultAsync<string>();
+                }));
             }
         }
         private void UpdataToDatabase()
