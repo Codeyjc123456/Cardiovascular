@@ -87,7 +87,7 @@ namespace Cardio.SPCL
             catch(Exception ex)
             {
                 LogUtil.Info("serial",ex.Message);
-                InformMsgEvnet(MCErrorCode.OpenSerialFail, null);//打开串口失败
+                InformMsgEvnet?.Invoke(MCErrorCode.OpenSerialFail, null);//打开串口失败
                 return false;
             }
         }
@@ -104,7 +104,7 @@ namespace Cardio.SPCL
             {
                 serialPortRecive_timer.Enabled = false;//关闭定时器
                 reciveCounter = 0;//计数清零
-                InformMsgEvnet(MCErrorCode.TimeLimited, null);
+                InformMsgEvnet?.Invoke(MCErrorCode.TimeLimited, null);
             }
         }
         /// <summary>
@@ -118,14 +118,14 @@ namespace Cardio.SPCL
         {
             bool isSuccess = false;
             byte[] buffer = comDataFormat.DataToSend(cmd, data);//形成需要发送的数据串格式
-            InformDebugMsgEvnet("发送数据" + ExtractData.ByteToString(buffer));
+            InformDebugMsgEvnet?.Invoke("发送数据" + ExtractData.ByteToString(buffer));
             try
             {
                 isSuccess = true;  //置位发送成功标记
                 bool result = OpenSerialPort();//打开串口
                 if (result)
                 {
-                    serialPort.DiscardInBuffer();  // 清空接收缓存
+                    // 接收线程可能尚未取走应答或波形；发送新命令不能丢弃这些数据。
                     serialPort.Write(buffer, 0, buffer.Length);  //写入数据发送
                     reciveCounterMax = time;//重置阈值
                     reciveCounter = 0;//重置计数器
@@ -143,7 +143,7 @@ namespace Cardio.SPCL
                 reciveCounter = 0;//重置计数器
                 serialPortRecive_timer.Enabled = false;//关闭定时器
                 //出现异常需要提示信息
-                InformMsgEvnet(MCErrorCode.OpenSerialFail, null);//打开串口失败
+                InformMsgEvnet?.Invoke(MCErrorCode.OpenSerialFail, null);//打开串口失败
             }
             return isSuccess;
         }
@@ -160,8 +160,8 @@ namespace Cardio.SPCL
                 return;
             }
             byte[] bufferTemp = new byte[byteToRead];
-            serialPort.Read(bufferTemp, 0, byteToRead);
-            myReadBuffer.AddRange(bufferTemp);
+            int bytesRead = serialPort.Read(bufferTemp, 0, byteToRead);
+            myReadBuffer.AddRange(bufferTemp.AsSpan(0, bytesRead).ToArray());
             //提取数据中的有用信息，按照结构体类型放到dataValueAndType中
             List<ReceiveDataStructure> dataValueAndTypes = ExtractData.GetUsefullInfos(myReadBuffer);
             if (dataValueAndTypes.Count > 0)

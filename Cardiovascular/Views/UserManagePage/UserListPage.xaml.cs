@@ -86,6 +86,7 @@ namespace Cardio.Views.UserManagePage
         public UserListPage()
         {
             InitializeComponent();
+            Unloaded += (_, _) => search.Invalidate();
             DataContext = this;
             tabAction += TabCallBackExcute;
         }
@@ -106,49 +107,28 @@ namespace Cardio.Views.UserManagePage
             e.Handled = true;
         }
 
-        private void Search()
-        {
-            IsRunning = "Visible";
-            Thread thread = new Thread(() =>
-            {
-                GetDataList();
-                IsRunning = "Hidden";
-               
-            });
-            thread.Start();
-        }
+        private readonly LatestSearch search = new();
 
-        private void GetDataList()
+        private async void Search()
         {
-            try
+            int page = PageIndex;
+            string text = SearchText;
+            var dal = userInfoDAL;
+            if (dal == null) return;
+            await search.RunAsync(() =>
             {
-                string conditionStr;
-                if (searchText == "")//如果搜索输入框为空
-                {
-                    conditionStr = "";
-                    userlist = userInfoDAL.Finds(pageIndex, size, ref recordTotal, conditionStr, "id desc");//查全部
-                }
-                else
-                {
-                    conditionStr = " userID like '%" + searchText + "%' or userName like '%" + searchText + "%'";
-                    userlist = userInfoDAL.Finds(pageIndex, size, ref recordTotal, conditionStr, "id desc");//按条件查
-                }
-                if (userlist != null && userlist.Count > 0)  //如果搜索到
-                {
-                    DataList = userlist;
-                    RecordTotal = recordTotal;
-                }
-                else //如果未搜索到
-                {
-                    RecordTotal = 0;
-                    DataList = userlist;
-                    HandyControl.Controls.Growl.Info("无任何记录！");
-                }
-            }
-            catch (Exception ex)
+                int total = 0;
+                string condition = string.IsNullOrEmpty(text) ? "" :
+                    " userID like '%" + text + "%' or userName like '%" + text + "%'";
+                var rows = dal.Finds(page, size, ref total, condition, "id desc");
+                return (rows, total);
+            }, result =>
             {
-                LogUtil.Info("userlist", ex.Message);
-            }
+                userlist = DataList = result.rows;
+                RecordTotal = result.total;
+                if (result.rows == null || result.rows.Count == 0)
+                    Growl.Info("无任何记录！");
+            }, busy => IsRunning = busy ? "Visible" : "Hidden");
         }
         // 页码改变
         private void PageNextUpdated(object sender, RoutedEventArgs e)
@@ -243,7 +223,7 @@ namespace Cardio.Views.UserManagePage
             bool isVisible = (bool)e.NewValue;//判断当前界面是否可见 
             if (!isVisible)//不可见主动回收资源
             {
-                GC.Collect();
+                search.Invalidate();
             }
         }
 

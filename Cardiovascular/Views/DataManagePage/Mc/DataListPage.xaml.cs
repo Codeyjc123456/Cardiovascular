@@ -1,4 +1,4 @@
-﻿
+
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -37,6 +37,7 @@ namespace Cardio.Views.DataManagePage.Mc
         public DataListPage()
         {
             InitializeComponent();
+            Unloaded += (_, _) => search.Invalidate();
             DataContext = model;
             taAction += TabCallBackExcute;
         }
@@ -57,72 +58,33 @@ namespace Cardio.Views.DataManagePage.Mc
             e.Handled = true;
         }
 
-        private void Search()
+        private readonly LatestSearch search = new();
+
+        private async void Search()
         {
-            Thread thread = new Thread(() =>
+            int page = model.PageIndex;
+            string text = model.SearchText;
+            string start = StartTime.Text;
+            string end = EndTime.Text;
+            var dal = dataDAL;
+            if (dal == null) return;
+            await search.RunAsync(() =>
             {
-                model.IsRunning = "Visible";
-                GetDataList();
-                model.IsRunning = "Hidden";
-            });
-            thread.Start();
-        }
-
-        private void GetDataList()
-        {
-            try
+                int total = 0;
+                string condition = "(userID like '%" + text + "%' or userName like '%" + text + "%')";
+                if (!string.IsNullOrEmpty(start))
+                    condition += " and TestDateTime >= '" + DateTime.Parse(start).ToString("yyyy-MM-dd") + "'";
+                if (!string.IsNullOrEmpty(end))
+                    condition += " and TestDateTime <= '" + DateTime.Parse(end).ToString("yyyy-MM-dd") + " '";
+                var rows = dal.Finds(page, size, ref total, condition, "id desc");
+                return (rows, total);
+            }, result =>
             {
-                string conditionStr = "(userID like '%" + model.SearchText + "%' or userName like '%" + model.SearchText + "%')";
-                string startTime = "";
-                string endTime = "";
-                Dispatcher.Invoke(new Action(() => {
-                    startTime = StartTime.Text;
-                    endTime = EndTime.Text;
-                }));
-
-                DateTime date1 = new DateTime();
-                DateTime date2 = new DateTime();
-                if (startTime != "")
-                {
-                    date1 = DateTime.Parse(startTime);
-                    startTime = date1.ToString("yyyy-MM-dd");
-                }
-                if (endTime != "")
-                {
-                    date2 = DateTime.Parse(endTime);
-                    endTime = date2.ToString("yyyy-MM-dd");
-                }
-
-                if (startTime == "" && endTime != "")
-                {
-                    conditionStr += " and TestDateTime <= '" + endTime + " '";
-                }
-                else if (startTime != "" && endTime == "")
-                {
-                    conditionStr += " and TestDateTime >= '" + startTime + "'";
-                }
-                else if (startTime != "" && endTime != "")
-                {
-                    conditionStr += " and TestDateTime >= '" + startTime + "' and TestDateTime <= '" + endTime + " '";
-                }
-                
-                datalist = dataDAL.Finds(model.PageIndex, size, ref recordTotal, conditionStr, "id desc");//查全部
-                if (datalist != null && datalist.Count > 0)  //如果搜索到
-                {
-                    model.DataList = datalist;
-                    model.RecordTotal = recordTotal;
-                }
-                else //如果未搜索到
-                {
-                    model.RecordTotal = 0;
-                    model.DataList = datalist;
+                datalist = model.DataList = result.rows;
+                recordTotal = model.RecordTotal = result.total;
+                if (result.rows == null || result.rows.Count == 0)
                     Growl.Info("无任何记录！");
-                }
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Error("datalist", ex.Message);
-            }   
+            }, busy => model.IsRunning = busy ? "Visible" : "Hidden");
         }
 
         // 页码改变 
@@ -376,7 +338,7 @@ namespace Cardio.Views.DataManagePage.Mc
             if (!isVisible)//不可见主动回收资源
             {
                 model.IsRunning = "Hidden";
-                GC.Collect();
+                search.Invalidate();
             }
         }
 

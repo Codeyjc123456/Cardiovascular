@@ -19,6 +19,7 @@ namespace Cardio.Views.MeasurePage
     public partial class LoginPage : Page
     {
         Dialog d = null;
+        private CancellationTokenSource? loginCancellation;
         UserInfoDAL userInfoDAL = null;
         LoginViewModel loginViewModel = new LoginViewModel();
         public static string userID = "";
@@ -28,6 +29,7 @@ namespace Cardio.Views.MeasurePage
         public LoginPage()
         {
             InitializeComponent();
+            Unloaded += (_, _) => loginCancellation?.Cancel();
             DataContext = loginViewModel;
             tabAction += TabCallBackExcute;
         }
@@ -37,7 +39,7 @@ namespace Cardio.Views.MeasurePage
             
         }
 
-        private async void LoginAPI()
+        private async Task LoginAPI(CancellationToken token)
         {
             string url = APPSettingUtil.APP_ApiUrlLogin;
             var data = new Dictionary<string, object>
@@ -46,7 +48,8 @@ namespace Cardio.Views.MeasurePage
             };
             //url = "http://127.0.0.1:4523/m2/7869154-7618859-default/510152173";
             //url = "http://39.105.221.110:10013/health/rest/cardiovascularservice/getmemberbykey";
-            var response = ApiBLL.DoGetUser(url, data);
+            var response = await ApiBLL.DoGetUserAsync(url, data, token);
+            token.ThrowIfCancellationRequested();
             var response_json = (JObject)JsonConvert.DeserializeObject(response);
             UserInfoEntity userInfo = new UserInfoEntity();
             if (response_json != null)
@@ -64,6 +67,7 @@ namespace Cardio.Views.MeasurePage
                     || userInfo.UserSex.IsNullOrEmpty() || userInfo.UserBirthday.IsNullOrEmpty())
                 {
                     await Dialog.Show(new UpdateDialog(userInfo, tabAction)).GetResultAsync<string>();
+                    token.ThrowIfCancellationRequested();
                     
                 }
                 userInfo.CreateTime = obj["memberEntity"]["createdTime"]?.ToString();
@@ -89,7 +93,7 @@ namespace Cardio.Views.MeasurePage
             }
         }
 
-        private void LoginBtn(object sender, RoutedEventArgs e)
+        private async void LoginBtn(object sender, RoutedEventArgs e)
         {
             if (loginViewModel.UserID=="")
             {
@@ -97,22 +101,34 @@ namespace Cardio.Views.MeasurePage
                 return;
             }
 
-            if (APPSettingUtil.APP_Network == "单机版")
+            if (loginCancellation != null) return;
+            using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            loginCancellation = cancellation;
+            try
             {
-                LoginLocal();
+                if (APPSettingUtil.APP_Network == "单机版")
+                    await LoginLocal(cancellation.Token);
+                else
+                    await LoginAPI(cancellation.Token);
             }
-            else
+            catch (OperationCanceledException)
             {
-                LoginAPI();//标准API接口获取用户信息
-                //LoginAPPID();//圣乐版本获取用户信息
-                //LoginAPIBX();//博谐内部系统
+                if (IsLoaded) Growl.Warning("登录请求已取消或超时，请重试。");
             }
+            catch (Exception ex)
+            {
+                LogUtil.Error("登录", ex.ToString());
+                if (IsLoaded) Growl.Error("登录失败：" + ex.Message);
+            }
+            finally { loginCancellation = null; }
         }
-        private async void LoginLocal()
+
+        private async Task LoginLocal(CancellationToken token)
         {
             UserInfoEntity userInfo = new UserInfoEntity();
             string conditionStr = " UserId ='" + loginViewModel.UserID + "'";
-            userInfo = userInfoDAL.Find(conditionStr);
+            userInfo = await Task.Run(() => userInfoDAL.Find(conditionStr), token);
+            token.ThrowIfCancellationRequested();
             if (userInfo != null)
             {
                 this.NavigationService.Navigate(new MeasureReePage(userInfo));
@@ -134,7 +150,7 @@ namespace Cardio.Views.MeasurePage
             bool isVisible = (bool)e.NewValue;//判断当前界面是否可见 
             if (!isVisible)
             {
-                GC.Collect();
+                loginCancellation?.Cancel();
             }
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -176,7 +192,7 @@ namespace Cardio.Views.MeasurePage
                 this.NavigationService.Navigate(new MeasureReePage(userInfo));
             }
         }
-        private async void LoginAPIBX()
+        private async Task LoginAPIBX(CancellationToken token)
         {
             string url = APPSettingUtil.APP_ApiUrlLogin;
             var data = new Dictionary<string, object>
@@ -184,7 +200,8 @@ namespace Cardio.Views.MeasurePage
                     { "userIdcard", loginViewModel.UserID }
                 };
             url = "http://192.168.8.182:8800/api/v1.0/baseInfo/user/getUserByIdcard";
-            var response = ApiBLL.DoGetUser(url, data);
+            var response = await ApiBLL.DoGetUserAsync(url, data, token);
+            token.ThrowIfCancellationRequested();
             var response_json = (JObject)JsonConvert.DeserializeObject(response);
             UserInfoEntity userInfo = new UserInfoEntity();
             if ((string)response_json["code"] == "200")

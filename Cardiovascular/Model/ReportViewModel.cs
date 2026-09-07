@@ -49,9 +49,9 @@ namespace Cardio.Model
             }
             catch (Exception e)
             {
-                Growl.Info("桡动脉采集数据不理想，未能成功绘制波形，待重新采集！" + e.Message);
+                System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    Growl.Info("桡动脉采集数据不理想，未能成功绘制波形，待重新采集！" + e.Message)));
             }
-            Thread.Sleep(1000);
         }
         public void InitReport(string reportFile)
         {
@@ -67,7 +67,6 @@ namespace Cardio.Model
         }
         public void ExprtReport()
         {
-            string tempPath = Path.GetTempFileName();
             FastReport.Export.Image.ImageExport ex;
             SetReportData();
             pReport?.Prepare();
@@ -81,16 +80,14 @@ namespace Cardio.Model
                     ex.Export(pReport, AppDomain.CurrentDomain.BaseDirectory + "/Resources/Report/" + Guid.NewGuid().ToString("N") + ".png");
                     foreach (string file in ex.GeneratedFiles)
                         fileUrls.Add(file);
-                    Image1 = fileUrls[0];
 
                 }
             }
             catch (Exception a)
             {
                 LogUtil.Error("OpenReport", a.Message);
-                HandyControl.Controls.Growl.Error("渲染失败，请重新打开！");
+                throw;
             }
-            IsRunning = "Hidden";
         }//将对象转换为 DataTable（每个属性对应一列，单行）
         public DataTable ObjectToDataTable(object obj)
         {

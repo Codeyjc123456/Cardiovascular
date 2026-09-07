@@ -28,6 +28,7 @@ namespace Cardio.Views.DoctorPage
         public DoctorListDialog()
         {
             InitializeComponent();
+            Unloaded += (_, _) => search.Invalidate();
             DataContext = model;
             tabAction += TabCallBackExcute;
         }
@@ -70,31 +71,23 @@ namespace Cardio.Views.DoctorPage
             }
         }
 
-        private void Search()
-        {
-            model.IsRunning = "Visible";
-            Thread thread = new Thread(() =>
-            {
-                GetDataList();
-                model.IsRunning = "Hidden";
+        private readonly LatestSearch search = new();
 
-            });
-            thread.Start();
-        }
-
-        private void GetDataList()
+        private async void Search()
         {
-            try
+            int page = model.PageIndex;
+            await search.RunAsync(() =>
             {
-                string conditionStr = "1=1";
-                model.DataList = doctorDAL.Finds(model.PageIndex, size, ref recordTotal, conditionStr, "id desc");//查全部
-                model.RecordTotal = recordTotal;
-                if (model.DataList == null && model.DataList.Count == 0) HandyControl.Controls.Growl.Info("无任何记录！", "DoctorList");
-            }
-            catch (Exception ex)
+                int total = 0;
+                var rows = doctorDAL.Finds(page, size, ref total, "1=1", "id desc");
+                return (rows, total);
+            }, result =>
             {
-                LogUtil.Error("userlist", ex.Message);
-            }
+                model.DataList = result.rows;
+                recordTotal = model.RecordTotal = result.total;
+                if (result.rows == null || result.rows.Count == 0)
+                    Growl.Info("无任何记录！", "DoctorList");
+            }, busy => model.IsRunning = busy ? "Visible" : "Hidden");
         }
 
         private void BackBt(object sender, RoutedEventArgs e)
@@ -111,7 +104,7 @@ namespace Cardio.Views.DoctorPage
         {
             bool isVisible = (bool)e.NewValue;//判断当前界面是否可见
             if (!isVisible)
-                GC.Collect();
+                search.Invalidate();
             else
                 Search();
         }

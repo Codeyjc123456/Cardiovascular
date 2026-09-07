@@ -88,6 +88,10 @@ namespace Cardio.Views.MeasurePage
         private readonly APPSettingsViewModel APPSettingUtil = APPSettingsViewModel.getInstance();
         System.Timers.Timer Timer_ABIDelay = null;
         System.Timers.Timer TimerBPTest = null;
+        private CancellationTokenSource? pageLifetime;
+        private int bpTickRunning;
+        private LiveWaveform? liveWaveform;
+        private bool stopCommandRunning;
         #endregion
         /// <summary>
         /// 构造对象 
@@ -101,33 +105,36 @@ namespace Cardio.Views.MeasurePage
             userInfo = u;
             measureViewModel = new MeasureViewModel();
             DataContext = measureViewModel;
+            Unloaded += (_, _) => ReleasePageResources();
            
         }
-        private void Window_OnLoaded(object sender, RoutedEventArgs e)
+        private async void Window_OnLoaded(object sender, RoutedEventArgs e)
         {
+            if (pageLifetime != null) return;
+            pageLifetime = new CancellationTokenSource();
+            var token = pageLifetime.Token;
             workStatus = WorkStatus.NoWork;
             APPSettingUtil.LoadData();
-            //加载一下
-            Thread thread = new Thread(() =>
-            {
-                Thread.Sleep(1000);
-                Dispatcher.Invoke(new Action(() => {
-                    measureViewModel.IsRunningLoad = "Hidden";
-                }));
-            });
-            thread.Start();
             Initialize();
             InitComponent();//初始化组件 
             InitTimer();
             InitShow();
             Recover();
+            AiSeries.Plot.Clear();
             measureViewModel.InitializeZedGraph(AiSeries);
+            liveWaveform = new LiveWaveform(measureViewModel.AIData, () => AiSeries.Refresh());
             LogUtil.Warn("真人测试");
             GlobalVariable.Pressure = 80;
 
             pulsedata.userCode = userInfo.UserCode;
             pulsedata.OperationgDoctor = userInfo.OperatingDoctor;
             pulsedata.orgId = userInfo.OrgId;
+            try
+            {
+                await Task.Delay(1000, token);
+                measureViewModel.IsRunningLoad = "Hidden";
+            }
+            catch (OperationCanceledException) { }
 
             //Ready.Visibility = Visibility.Hidden;
             //AITest.Visibility = Visibility.Visible;
@@ -227,28 +234,34 @@ namespace Cardio.Views.MeasurePage
         }
         private void  TimerBPTest_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (workStatus != WorkStatus.NoWork)
+            if (Interlocked.Exchange(ref bpTickRunning, 1) != 0) return;
+            try
             {
-                if (this.WaitTime <= 0)
+                if (pageLifetime == null || !ReferenceEquals(sender, TimerBPTest)) return;
+                if (workStatus != WorkStatus.NoWork)
                 {
-                    TimerBPTest.Stop();
-                    workStatus = WorkStatus.StartBPtest;
-                    BpTest_Function(0x01);
-                    Dispatcher.Invoke(new Action(() =>
+                    if (this.WaitTime <= 0)
                     {
-                        bPressMrsStart = true;
-                        measureViewModel.Tips = "温馨提示：血压测量开始！";
-                    }));
-                }
-                else
-                {
-                    Dispatcher.Invoke(new Action(() =>
+                        TimerBPTest.Stop();
+                        workStatus = WorkStatus.StartBPtest;
+                        BpTest_Function(0x01);
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            bPressMrsStart = true;
+                            measureViewModel.Tips = "温馨提示：血压测量开始！";
+                        }));
+                    }
+                    else
                     {
-                        measureViewModel.Tips = "温馨提示：" + WaitTime.ToString() + "秒后自动进行第二次血压测量，请耐心稍等！";
-                    }));
-                    WaitTime = WaitTime - 1;
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            measureViewModel.Tips = "温馨提示：" + WaitTime.ToString() + "秒后自动进行第二次血压测量，请耐心稍等！";
+                        }));
+                        WaitTime = WaitTime - 1;
+                    }
                 }
             }
+            finally { Volatile.Write(ref bpTickRunning, 0); }
         }
         #endregion
 
@@ -513,12 +526,7 @@ namespace Cardio.Views.MeasurePage
             }));
             //显示波形
             strTip = "温馨提示：脉脉搏数据采集完成，正在保存... ...";
-            measureViewModel.AIData.Clear();
-            for (int i = 0; i < RpRawData.Count; i++)
-            {
-                measureViewModel. AIData.Add(RpRawData[i]);
-                AiSeries.Refresh();
-            }
+            liveWaveform?.Replace(RpRawData);
         }
 
         #region 定时器事件
@@ -863,6 +871,7 @@ namespace Cardio.Views.MeasurePage
         #region 处理串口数据事件
         private void ReciveAlarm(MCErrorCode code, List<ReceiveDataStructure> dataList)
         {
+            if (pageLifetime == null) return;
             if (code == MCErrorCode.NoError && dataList != null)
             {
                 //不同类型的帧分开存储
@@ -879,18 +888,14 @@ namespace Cardio.Views.MeasurePage
                                 DataCount++;
                                 if (DataCount % 2 == 0)
                                 {
-                                    measureViewModel.AIData.Add(iData[0]);
-                                    if (measureViewModel.AIData.Count % 50 == 0)
-                                        AiSeries.Refresh();
+                                    liveWaveform?.Add(iData[0]);
+
                                     HandleAIPulseData(ref DataCount, ref iData[0]);
                                 }
-                                if (measureViewModel.AIData.Count >= 6000)
+                                if (liveWaveform?.Count >= 6000)
                                 {
-                                    Dispatcher.Invoke(new Action(() =>
-                                    {
-                                        DataCount = 0;
-                                        measureViewModel. AIData.Clear();
-                                    }));
+                                    DataCount = 0;
+                                    liveWaveform?.Clear();
                                 }
                             }
                             i += 15;
@@ -1165,6 +1170,7 @@ namespace Cardio.Views.MeasurePage
 
         private void BackBtn(object sender, RoutedEventArgs e)
         {
+            if (stopCommandRunning) return;
             //this.NavigationService.Navigate(new OpenReportPage(pulsedata, ReportAction));
             if (measureViewModel.IsRunning == "Visible")
             {
@@ -1182,13 +1188,29 @@ namespace Cardio.Views.MeasurePage
             bool isVisible = (bool)e.NewValue;//判断当前界面是否可见
             if (!isVisible)
             {
-                GC.Collect();//回收内存
+                // Unloaded 负责解除回调并释放定时器。
             }
+        }
+        private void ReleasePageResources()
+        {
+            liveWaveform?.Dispose();
+            liveWaveform = null;
+            pageLifetime?.Cancel();
+            pageLifetime?.Dispose();
+            pageLifetime = null;
+            TimerBPTest?.Stop();
+            TimerBPTest?.Dispose();
+            Timer_ABIDelay?.Stop();
+            Timer_ABIDelay?.Dispose();
+            if (serialPortManager?.InformMsgEvnet == ReciveAlarm)
+                serialPortManager.InformMsgEvnet = null;
+            if (serialPortManager?.InformDebugMsgEvnet == msg)
+                serialPortManager.InformDebugMsgEvnet = null;
         }
         private void InitMreasureRelatedControls()
         {
             Ready.Visibility = Visibility.Visible;
-            measureViewModel.AIData.Clear();
+            liveWaveform?.Clear();
             DataCount = 0;
         }
 
@@ -1218,8 +1240,9 @@ namespace Cardio.Views.MeasurePage
         }
         
         //血压测量
-        private void Pic_test_Click(object sender, RoutedEventArgs e)
+        private async void Pic_test_Click(object sender, RoutedEventArgs e)
         {
+            if (stopCommandRunning || pageLifetime == null) return;
             if (measureViewModel.IsRunning == "Visible")
             {
                 Growl.Info("温馨提示：正在分析数据，请稍等！");
@@ -1246,31 +1269,45 @@ namespace Cardio.Views.MeasurePage
             }
             else
             {
-                workStatus = WorkStatus.NoWork;
-                bPressMrsStart = true;
-                WaitForAck = 0;
-                //容错处理，3秒后有没有接收到停止响应应答，则提示出错
-                Thread.Sleep(500);
-                Timer_ABIDelay.Enabled = false;
-                //发送停止命令
-                if (!serialPortManager.SendData(CommandWord.REQ_BP_STOP, 0x05))
+                stopCommandRunning = true;
+                TestBtn.IsEnabled = false;
+                var token = pageLifetime.Token;
+                try
                 {
-                    return;
+                    workStatus = WorkStatus.NoWork;
+                    bPressMrsStart = true;
+                    WaitForAck = 0;
+                    //容错处理，3秒后有没有接收到停止响应应答，则提示出错
+                    await Task.Delay(500, token);
+                    Timer_ABIDelay.Enabled = false;
+                    //发送停止命令
+                    if (!serialPortManager.SendData(CommandWord.REQ_BP_STOP, 0x05))
+                    {
+                        return;
+                    }
+                    await Task.Delay(300, token);
+                    serialPortManager.OpenControl(0x00);
+                    TimerBPTest.Stop();
+                    await Task.Delay(500, token);
+                    ChangeBtStyle(TestBtn, "BigBlueBtnStyle", "开始测量");
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        measureViewModel.Tips = "温馨提示：测量停止！";
+                    }));
                 }
-                Thread.Sleep(300);
-                serialPortManager.OpenControl(0x00);
-                TimerBPTest.Stop();
-                Thread.Sleep(500);
-                ChangeBtStyle(TestBtn, "BigBlueBtnStyle", "开始测量");
-                Dispatcher.Invoke(new Action(() =>
+                catch (OperationCanceledException) { }
+                catch (Exception ex) { LogUtil.Error("停止测量", ex.ToString()); }
+                finally
                 {
-                    measureViewModel.Tips = "温馨提示：测量停止！";
-                }));
+                    stopCommandRunning = false;
+                    TestBtn.IsEnabled = true;
+                }
             }
         }
         //测量报告
         private void Commit_Click(object sender, RoutedEventArgs e)
         {
+            if (stopCommandRunning) return;
             if (measureViewModel.IsRunning == "Visible")
             {
                 Growl.Info("温馨提示：正在分析数据，请稍等！");
@@ -1290,6 +1327,7 @@ namespace Cardio.Views.MeasurePage
         //心血管测量
         private void Pic_AI_test_Click(object sender, RoutedEventArgs e) //桡动脉测量开始
         {
+            if (stopCommandRunning) return;
             //workStatus = WorkStatus.NoWork;
             Variable.Test_ABI_num = 1;
             Ready.Visibility = Visibility.Hidden;
@@ -1321,7 +1359,7 @@ namespace Cardio.Views.MeasurePage
         }
         public void AITestIntit()
         {
-            measureViewModel.AIData.Clear();
+            liveWaveform?.Clear();
             RpRawData.Clear();
             DataCount = 0;
             RpRawDataNum = 0;

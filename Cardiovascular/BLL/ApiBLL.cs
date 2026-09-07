@@ -152,32 +152,18 @@ namespace Cardio.BLL
             }
 
         }
-        public static string DoGetUser(string url, Dictionary<string, object> parameters = null)
+        public static async Task<string> DoGetUserAsync(string url,
+            Dictionary<string, object>? parameters = null, CancellationToken cancellationToken = default)
         {
-            try
+            if (parameters != null && parameters.Count > 0)
             {
-                // 构建带参数的完整URL
-                if (parameters != null && parameters.Count > 0)
-                {
-                    var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
-                    foreach (var param in parameters)
-                    {
-                        query[param.Key] = param.Value?.ToString();
-                    }
-                    url = $"{url}?{query}";
-                }
-
-                using (HttpClient client = new HttpClient())
-                {
-                    HttpResponseMessage response = client.GetAsync(url).Result;
-                    string responseContent = response.Content.ReadAsStringAsync().Result;
-                    return responseContent;
-                }
+                var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+                foreach (var param in parameters) query[param.Key] = param.Value?.ToString();
+                url += (url.Contains('?') ? "&" : "?") + query;
             }
-            catch (Exception e)
-            {
-                return "{'code':'400','data':'}" + e.Message + "'}";
-            }
+            using var response = await _httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         }
         public static  (UserInfoEntity, string) GetUser(string url, string dataStic)
         {

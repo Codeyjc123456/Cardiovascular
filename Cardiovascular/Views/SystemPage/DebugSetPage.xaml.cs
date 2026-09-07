@@ -40,6 +40,11 @@ namespace CardioVascular.Views.SystemPage
         private bool SaveDataAfterAIAcquisitionFlag;
         private Timer? TimerGetRealPressure = null;
         private DispatcherTimer? LoopPressureOpen = null;
+        private CancellationTokenSource? pageLifetime;
+        private bool pressureCycleRunning;
+        private CancellationTokenSource? pressureCycleCancellation;
+        private int pressureTickRunning;
+        private LiveWaveform? liveWaveform;
         private List<double> RpRawData = [];//桡动脉原始数据
         #region 心率监测
         FeatureExtraction? feature = null; 
@@ -52,9 +57,13 @@ namespace CardioVascular.Views.SystemPage
         {
             InitializeComponent();
             this.DataContext = debugViewModel;
+            Unloaded += (_, _) => ReleasePageResources();
         }
-        private void Window_OnLoaded(object sender, RoutedEventArgs e)
+        private async void Window_OnLoaded(object sender, RoutedEventArgs e)
         {
+            if (pageLifetime != null) return;
+            pageLifetime = new CancellationTokenSource();
+            var token = pageLifetime.Token;
             serialPortManager = SerialPortManager.getInstance();//串口管理的单例
             serialPortManager.InformMsgEvnet = new SerialPortManager.InformMsg(ReciveAlarm);
             serialPortManager.InformDebugMsgEvnet = new SerialPortManager.InformDebugMsg(msg);
@@ -66,16 +75,21 @@ namespace CardioVascular.Views.SystemPage
             debugViewModel.CorrectLBSbp = "1";
             debugViewModel.CorrectLBDbp = "2";
 
-            serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
-            Thread.Sleep(500);
-            serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
             IntChart();
+            liveWaveform = new LiveWaveform(AIData, () => zg_ai.Refresh());
             feature = new FeatureExtraction();
             APPSettingUtil.LoadData();
             debugViewModel.APP_CorSbp = APPSettingUtil.APP_CorSbp;
             debugViewModel.APP_CorDbp = APPSettingUtil.APP_CorDbp;
             debugViewModel.APP_CorHr = APPSettingUtil.APP_CorHr;
             debugViewModel.APP_CorMap = APPSettingUtil.APP_CorMap;
+            try
+            {
+                serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
+                await Task.Delay(500, token);
+                serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
+            }
+            catch (OperationCanceledException) { }
         }
         private void InitTimer()
         {
@@ -88,32 +102,47 @@ namespace CardioVascular.Views.SystemPage
             LoopPressureOpen?.Start();
             LoopPressureOpen?.Stop();
         }
-        private void LoopPressureOpen_Tick(object sender, EventArgs e)
+        private async void LoopPressureOpen_Tick(object sender, EventArgs e)
         {
-            if (workStatus == WorkStatus.NoWork || workStatus == WorkStatus.StartBPtest || workStatus == WorkStatus.PreStart)
+            if (pressureCycleRunning || pageLifetime == null) return;
+            pressureCycleRunning = true;
+            using var cycle = CancellationTokenSource.CreateLinkedTokenSource(pageLifetime.Token);
+            pressureCycleCancellation = cycle;
+            var token = cycle.Token;
+            try
             {
-                serialPortManager?.OpenControl(Bt_Pressureindex);
+                if (workStatus == WorkStatus.NoWork || workStatus == WorkStatus.StartBPtest || workStatus == WorkStatus.PreStart)
+                {
+                    serialPortManager?.OpenControl(Bt_Pressureindex);
+                }
+                //打开阀门标志
+                Bp_ACK_Flag = -2;
+                await Task.Delay(2000, token);
+                //在等待2s以后发送关闭阀门
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    TimerGetRealPressure?.Stop();//停止读取袖带指令，避免接受不到控制阀门的指令
+                    PressStart = true;
+                }));
+                await Task.Delay(500, token);
+                for(int i = 0; i < 3; i++)
+                {
+                    serialPortManager?.OpenControl(Bt_Pressureindex);
+                    workStatus = WorkStatus.CloseValue;//给出工作状态“关闭阀门”下一步就是执行该命令
+                    Bp_ACK_Flag = -3;
+                    DisPlayTips("关闭阀门中......");
+                    await Task.Delay(500, token);
+                }
+                //关闭阀门以后开始执行压力检测
+                TimerGetRealPressure?.Start();
             }
-            //打开阀门标志
-            Bp_ACK_Flag = -2;
-            Thread.Sleep(2000);
-            //在等待2s以后发送关闭阀门
-            Dispatcher.Invoke(new Action(() =>
+            catch (OperationCanceledException) { }
+            catch (Exception ex) { LogUtil.Error("压力循环", ex.ToString()); }
+            finally
             {
-                TimerGetRealPressure?.Stop();//停止读取袖带指令，避免接受不到控制阀门的指令
-                PressStart = true;
-            }));
-            Thread.Sleep(500);
-            for(int i = 0; i < 3; i++)
-            {
-                serialPortManager?.OpenControl(Bt_Pressureindex);
-                workStatus = WorkStatus.CloseValue;//给出工作状态“关闭阀门”下一步就是执行该命令
-                Bp_ACK_Flag = -3;
-                DisPlayTips("关闭阀门中......");
-                Thread.Sleep(500);
+                if (ReferenceEquals(pressureCycleCancellation, cycle)) pressureCycleCancellation = null;
+                pressureCycleRunning = false;
             }
-            //关闭阀门以后开始执行压力检测
-            TimerGetRealPressure?.Start();
         }
         private void SaveBtn(object sender, RoutedEventArgs e)
         {
@@ -142,7 +171,7 @@ namespace CardioVascular.Views.SystemPage
         }
         private void ClearWave()
         {
-            AIData.Clear();
+            liveWaveform?.Clear();
             RpRawDataNum = 0;
             RpRawData.Clear();
             AIFlag = true;
@@ -307,8 +336,30 @@ namespace CardioVascular.Views.SystemPage
             bool isVisible = (bool)e.NewValue;//判断当前界面是否可见
             if (!isVisible)//不可见主动回收资源
             {
-                GC.Collect();
+                // 定时器在 Unloaded 中释放。
             }
+        }
+        private void ReleasePageResources()
+        {
+            pressureCycleCancellation?.Cancel();
+            liveWaveform?.Dispose();
+            liveWaveform = null;
+            pageLifetime?.Cancel();
+            pageLifetime?.Dispose();
+            pageLifetime = null;
+            TimerGetRealPressure?.Stop();
+            TimerGetRealPressure?.Dispose();
+            TimerGetRealPressure = null;
+            if (LoopPressureOpen != null)
+            {
+                LoopPressureOpen.Stop();
+                LoopPressureOpen.Tick -= LoopPressureOpen_Tick;
+                LoopPressureOpen = null;
+            }
+            if (serialPortManager?.InformMsgEvnet == ReciveAlarm)
+                serialPortManager.InformMsgEvnet = null;
+            if (serialPortManager?.InformDebugMsgEvnet == msg)
+                serialPortManager.InformDebugMsgEvnet = null;
         }
         private void StartTime_Click(object sender, RoutedEventArgs e)
         {
@@ -326,6 +377,7 @@ namespace CardioVascular.Views.SystemPage
             else
             {
                 workStatus = WorkStatus.NoWork;
+                pressureCycleCancellation?.Cancel();
                 TimerGetRealPressure?.Stop();
                 PressStart = true;
                 ChangeBtStyle(PreStart, "BigBlueBtnStyle", "压力测试");
@@ -340,12 +392,19 @@ namespace CardioVascular.Views.SystemPage
 
         private void TimerGetRealPressure_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
-            serialPortManager?.SendData(CommandWord.REQ_BP_PRESSURE, Bt_Pressureindex);
+            if (Interlocked.Exchange(ref pressureTickRunning, 1) != 0) return;
+            try
+            {
+                if (pageLifetime != null && ReferenceEquals(sender, TimerGetRealPressure))
+                    serialPortManager?.SendData(CommandWord.REQ_BP_PRESSURE, Bt_Pressureindex);
+            }
+            finally { Volatile.Write(ref pressureTickRunning, 0); }
         }
         public List<double> XDataList = new List<double>();
 
         private void IntChart()
         {
+            zg_ai.Plot.Clear();
             var AICurve = zg_ai.Plot.Add.Signal(AIData);
             AICurve.LegendText = "AI";
             AICurve.Color = Colors.Black;
@@ -360,6 +419,7 @@ namespace CardioVascular.Views.SystemPage
 
         private void ReciveAlarm(MCErrorCode code, List<ReceiveDataStructure> dataList)
         {
+            if (pageLifetime == null) return;
             if (code == MCErrorCode.NoError && dataList != null)
             {
                 //不同类型的帧分开存储
@@ -379,29 +439,13 @@ namespace CardioVascular.Views.SystemPage
                                 SampleNum++;
                                 if (RpRawDataNum % 2 == 0)
                                     RpRawData.Add(dataList[i + 2 + k].dataValue);//把点保存起来采样率减少一半
-                                AIData.Add(dataList[i + 2 + k].dataValue);
+                                liveWaveform?.Add(dataList[i + 2 + k].dataValue);
                             }
                             i += 15;//一次多处理15个数据
                                     
-                            if (AIData.Count % 20 == 0)
+                            if (liveWaveform?.Count >= 6000)
                             {
-                                zg_ai.Refresh();
-                                //if (AIData.Count % 32 == 0)
-                                //{
-                                //    timeDifference = DateTime.Now - SampleStartTime;//计算时间差
-                                //    secondsDifference = timeDifference.TotalSeconds;//获取时间差的秒数
-                                //    debugViewModel.Number = secondsDifference.ToString("f2"); //Number： 采样时间
-                                //    if (RpRawDataNum % 28 == 0)
-                                //    {
-                                //        rate = SampleNum / secondsDifference;
-                                //        debugViewModel.Rate = rate.ToString("f2");  //Rate :采样频率
-
-                                //    }
-                                //}
-                            }
-                            if (AIData.Count >= 6000)
-                            {
-                                AIData.Clear();
+                                liveWaveform?.Clear();
                             }
                         }
                     }
@@ -684,8 +728,9 @@ namespace CardioVascular.Views.SystemPage
                 TipsStruct tipsStruct = new TipsStruct();
                 tipsStruct.Name = text;
                 debugViewModel.TipsPPGList.Add(tipsStruct);
+                if (debugViewModel.TipsPPGList.Count > 300)
+                    debugViewModel.TipsPPGList.RemoveAt(0);
                 LastMsg = text;
-                TipsMsg.Items.Refresh();
                 TipsMsg.ScrollIntoView(TipsMsg.Items[debugViewModel.TipsPPGList.Count - 1]);
             }));
         }
