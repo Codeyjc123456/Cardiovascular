@@ -442,7 +442,7 @@ namespace Cardio.BLL
             {
                 if (!File.Exists(pdfFilePath))
                 {
-                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    await Application.Current.Dispatcher.BeginInvoke(() =>
                     {
                         HandyControl.Controls.MessageBox.Show($"PDF文件不存在：{pdfFilePath}", "错误",
                             MessageBoxButton.OK, MessageBoxImage.Error);
@@ -452,7 +452,7 @@ namespace Cardio.BLL
                 var fileExtension = Path.GetExtension(pdfFilePath).ToLower();
                 if (fileExtension != ".pdf")
                 {
-                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    await Application.Current.Dispatcher.BeginInvoke(() =>
                     {
                         HandyControl.Controls.MessageBox.Show($"文件不是PDF格式：{pdfFilePath}", "错误",
                             MessageBoxButton.OK, MessageBoxImage.Error);
@@ -467,7 +467,7 @@ namespace Cardio.BLL
                     await fs.ReadAsync(pdfBytes, 0, pdfBytes.Length);
                 }
                 string base64Str = Convert.ToBase64String(pdfBytes);
-                await Application.Current.Dispatcher.InvokeAsync(() =>
+                await Application.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Growl.Info($"PDF转换Base64成功！\n文件大小：{pdfBytes.Length / 1024:F2} KB");
                 });
@@ -475,7 +475,7 @@ namespace Cardio.BLL
             }
             catch (IOException ex)
             {
-                await Application.Current.Dispatcher.InvokeAsync(() =>
+                await Application.Current.Dispatcher.BeginInvoke(() =>
                 {
                     HandyControl.Controls.MessageBox.Show($"读取PDF文件失败：{ex.Message}\n可能文件被占用",
                           "错误", MessageBoxButton.OK, MessageBoxImage.Error);

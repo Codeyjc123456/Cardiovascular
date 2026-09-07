@@ -270,7 +270,7 @@ namespace Cardio.Views.UserManagePage
                     //获取用户选择的文件路径
                     filePath = open.FileName;
                     // 在UI线程上更新运行状态为可见（显示加载指示器）
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         IsRunning = "Visible";
                     }));
@@ -303,7 +303,7 @@ namespace Cardio.Views.UserManagePage
                                     LogUtil.Info($"用户 {user.UserName} 注册失败");
                                 }
                             }
-                            Dispatcher.Invoke(new Action(() =>
+                            Dispatcher.BeginInvoke(new Action(() =>
                             {
                                 IsRunning = "hidden";
                                 HandyControl.Controls.Growl.Success($"批量注册完成！成功：{successCount}个，失败：{failCount}个,详细注册信息请查看Excel表格中最后一列状态位");
@@ -312,7 +312,7 @@ namespace Cardio.Views.UserManagePage
                         }
                         catch (Exception ex)
                         {
-                            Dispatcher.Invoke(new Action(() =>
+                            Dispatcher.BeginInvoke(new Action(() =>
                             {
                                 IsRunning = "Hidden";
                             }));

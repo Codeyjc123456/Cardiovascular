@@ -40,7 +40,7 @@ namespace Cardio.Views
             var task3 = Task.Run(() => {
                 for (int i = 1; i <= 100; i += 1)
                 {
-                    Dispatcher.Invoke(() => { CustomProgressBar.Value = i; });
+                    Dispatcher.BeginInvoke(() => { CustomProgressBar.Value = i; });
                     Thread.Sleep(20);
                 }
             });

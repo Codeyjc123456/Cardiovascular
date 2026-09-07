@@ -128,7 +128,7 @@ namespace Cardio.Views.MeasurePage
                 userViewModel.UserSex = userinfo.UserSex ?? "";
                 userViewModel.UserHeight = Convert.ToInt32(userinfo.UserHeight);
                 userViewModel.UserWeight = Convert.ToDouble(userinfo.UserWeight);
-                Dispatcher.Invoke(() => {
+                Dispatcher.BeginInvoke(() => {
                     UserIDInfo.IsReadOnly = true;
                 });
 

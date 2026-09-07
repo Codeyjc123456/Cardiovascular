@@ -104,7 +104,7 @@ namespace Cardio.Views.MeasurePage
 
             if (userinfo.Id > 0)
             {
-                Dispatcher.Invoke(() => {
+                Dispatcher.BeginInvoke(() => {
                     UserIDInfo.IsReadOnly = true;
                 });
             }

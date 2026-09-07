@@ -98,7 +98,7 @@ namespace CardioVascular.Views.SystemPage
             Bp_ACK_Flag = -2;
             Thread.Sleep(2000);
             //在等待2s以后发送关闭阀门
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 TimerGetRealPressure?.Stop();//停止读取袖带指令，避免接受不到控制阀门的指令
                 PressStart = true;
@@ -316,7 +316,7 @@ namespace CardioVascular.Views.SystemPage
             {
                 PressStart = false;
                 workStatus = WorkStatus.PreStart;
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     TimerGetRealPressure?.Start();
                 }));
@@ -531,7 +531,7 @@ namespace CardioVascular.Views.SystemPage
                     }
                     else if (dataList[i].frameType == CommandWord.REQ_BP_PRESSURE)
                     {
-                        Dispatcher.Invoke(new Action(() => {
+                        Dispatcher.BeginInvoke(new Action(() => {
                             debugViewModel.RealPressure = dataList[i + 1].dataValue.ToString();
                         }));
                         if (dataList[i + 1].dataValue <= 1)
@@ -676,7 +676,7 @@ namespace CardioVascular.Views.SystemPage
 
         public void DisPlayTips(string text)
         {
-            Dispatcher.Invoke(new Action(() => {
+            Dispatcher.BeginInvoke(new Action(() => {
                 if (LastMsg == text)
                 {
                     return;
@@ -748,7 +748,7 @@ namespace CardioVascular.Views.SystemPage
             {
                 double HeartRate = feature.ProcessRpRawData(RpRawData, RpRawDataNum);
                 
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     debugViewModel.Period = (HeartRate * 2).ToString(); // Assuming txtPeriod is a TextBox control
                     HeartRate = (int)((60.0 * 1000) / (HeartRate * 2));

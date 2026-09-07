@@ -49,7 +49,7 @@ namespace Cardio.Views.DataManagePage.Mc
                 // 开始渲染报告
                 model.InitReport(reportFile);
                 model.LoadChartData();
-                Dispatcher.Invoke(() =>
+                Dispatcher.BeginInvoke(() =>
                 {
                     model.SetReport(zg_aichart);
                 });
@@ -77,13 +77,13 @@ namespace Cardio.Views.DataManagePage.Mc
             {
                 Thread thread = new Thread(() =>
                 {
-                    Dispatcher.Invoke(new Action(() => {
+                    Dispatcher.BeginInvoke(new Action(() => {
                         SaveBtnO.IsEnabled = false;
                     }));
                     var export = new PDFSimpleExport();
                     model.pReport?.Export(export, saveImageDialog.FileName);
                     HandyControl.Controls.Growl.Success("保存成功！");
-                    Dispatcher.Invoke(new Action(() => {
+                    Dispatcher.BeginInvoke(new Action(() => {
                         SaveBtnO.IsEnabled = true;
                     }));
                     LogUtil.Info("导出报告成功！文件名称：" + saveImageDialog.FileName);
@@ -121,7 +121,7 @@ namespace Cardio.Views.DataManagePage.Mc
         {
             try
             {
-                Dispatcher.Invoke(new Action(() => {
+                Dispatcher.BeginInvoke(new Action(() => {
                     Upload.IsEnabled = false;
                 }));
 
@@ -185,13 +185,13 @@ namespace Cardio.Views.DataManagePage.Mc
                 //};
 
                 await ApiBLL.DoPostUpload(url, data);
-                Dispatcher.Invoke(new Action(() => {
+                Dispatcher.BeginInvoke(new Action(() => {
                     Upload.IsEnabled = true;
                 }));
             }
             catch (Exception ex)
             {
-                Dispatcher.Invoke(new Action(() => {
+                Dispatcher.BeginInvoke(new Action(() => {
                     Upload.IsEnabled = true;
                 }));
                 HandyControl.Controls.Growl.Success("数据上传失败！");

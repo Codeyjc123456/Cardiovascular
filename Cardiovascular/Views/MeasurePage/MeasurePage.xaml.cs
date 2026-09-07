@@ -110,8 +110,8 @@ namespace Cardio.Views.MeasurePage
             //加载一下
             Thread thread = new Thread(() =>
             {
-                Thread.Sleep(1000);
-                Dispatcher.Invoke(new Action(() => {
+                Task.Delay(1000);
+                Dispatcher.BeginInvoke(new Action(() => {
                     measureViewModel.IsRunningLoad = "Hidden";
                 }));
             });
@@ -139,7 +139,7 @@ namespace Cardio.Views.MeasurePage
         }
         private void Initialize()
         {
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 measureViewModel.Dbp = "--";
                 measureViewModel.Sbp = "--";
@@ -176,7 +176,7 @@ namespace Cardio.Views.MeasurePage
             serialPortManager.InformDebugMsgEvnet = new SerialPortManager.InformDebugMsg(msg);
 
             //serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
-            //Thread.Sleep(500);
+            //Task.Delay(500);
             //serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
         }
         /// <summary>
@@ -191,7 +191,7 @@ namespace Cardio.Views.MeasurePage
         }
         private void InitShow()
         {
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 measureViewModel.UserID = userInfo.UserId;
                 measureViewModel.UserName = userInfo.UserName;
@@ -234,7 +234,7 @@ namespace Cardio.Views.MeasurePage
                     TimerBPTest.Stop();
                     workStatus = WorkStatus.StartBPtest;
                     BpTest_Function(0x01);
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         bPressMrsStart = true;
                         measureViewModel.Tips = "温馨提示：血压测量开始！";
@@ -242,7 +242,7 @@ namespace Cardio.Views.MeasurePage
                 }
                 else
                 {
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         measureViewModel.Tips = "温馨提示：" + WaitTime.ToString() + "秒后自动进行第二次血压测量，请耐心稍等！";
                     }));
@@ -252,7 +252,7 @@ namespace Cardio.Views.MeasurePage
         }
         #endregion
 
-        private void ProcessData()
+        private async Task ProcessData()
         {
             //判断是保存血压数据还是脉搏波
             if (WaitForAck == MrsWaitForAck.MrsBP)
@@ -260,16 +260,16 @@ namespace Cardio.Views.MeasurePage
                 WaitForAck = 0;
                 if (SaveDataAfterBP() == false)
                 {
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         measureViewModel.Tips = "温馨提示：血压数据保存失败";
                     }));
-                    Thread.Sleep(200);//异常错误处理
+                    Task.Delay(200);//异常错误处理
                     return;
                 }
                 //开始pwv测试前再发一次增加冗余，确保当前无工作在执行
                 AlltestStopWhenPWVfail();
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     measureViewModel.Tips = "温馨提示：血压数据测量完成！";
                 }));
@@ -285,14 +285,14 @@ namespace Cardio.Views.MeasurePage
                 }
                 if (g_typeVascularIndex.Cap == 0 && g_typeCardiacIndex.Hr == 0 && g_typeCardiacIndex.Ed == 0)//如果中心动脉压为0同时心率和射血时间也为0表明此次采集波形出现问题
                 {
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         measureViewModel.Tips = "温馨提示：桡动脉采集出现问题，请重新采集桡动脉！";
                     }));
                     workStatus = WorkStatus.NoWork;
                     return;
                 }
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     measureViewModel.Tips = "温馨提示：心血管功能测量完成！";
                 }));
@@ -349,7 +349,7 @@ namespace Cardio.Views.MeasurePage
                 string testData = JsonConvert.SerializeObject(pulsedata);
                 LogUtil.Info(testData);
             }
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 measureViewModel.Tips = tips;
                 measureViewModel.MeasureBtn_Img = "pack://application:,,,/Resources/Image/Measure/开始测量.jpg";
@@ -376,7 +376,7 @@ namespace Cardio.Views.MeasurePage
                 {
                     if (featurepoint.Identify(g_typeBpMrsValue.Sbp, g_typeBpMrsValue.Dbp, RpRawData) == 0)//保存数据
                     {
-                        Dispatcher.Invoke(new Action(() =>
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             measureViewModel.Tips = "温馨提示：波形分析出错，请重新测量";
                         }));
@@ -387,7 +387,7 @@ namespace Cardio.Views.MeasurePage
                 }
                 catch (Exception ex)
                 {
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败:稳定段数据较少！";
                     }));
@@ -399,7 +399,7 @@ namespace Cardio.Views.MeasurePage
                 g_typeCardiacIndex.Hr = Convert.ToInt16(featurepoint.index[1, 0]);
                 if (g_typeCardiacIndex.Hr < 40)
                 {
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         measureViewModel.Tips = $"温馨提示：心率为{g_typeCardiacIndex.Hr}次/分,测量有误，请重新测量!";//直接退出检测
                     }));
@@ -421,7 +421,7 @@ namespace Cardio.Views.MeasurePage
                 g_typeVascularIndex.AIx = Convert.ToSingle(featurepoint.index[1, 6]);
                 g_typeCardiacIndex.Ed = Convert.ToSingle(featurepoint.index[1, 7]);
 
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     measureViewModel.Tips = "温馨提示：脉搏波信号分析中";
                     //显示指标
@@ -462,9 +462,9 @@ namespace Cardio.Views.MeasurePage
                 //UpdataToDatabase();
                 return SaveDataAfterAIAcquisitionFlag;
             }
-            catch (Exception ex)
+            catch
             {
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败！";
                 }));
@@ -498,7 +498,7 @@ namespace Cardio.Views.MeasurePage
                 if (setImg != null && isOut && val < min) 
                     setImg("pack://application:,,,/Resources/Image/Measure/降低.png");
             }
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 Validate(() => Convert.ToDouble(measureViewModel.Sevr), 1.0, 4, v => Sevrup.Visibility = v, b => lblSevr.Foreground = b, p => measureViewModel.SevrUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Hr), 60, 100, v => Hrup.Visibility = v, b => Hr.Foreground = b, p => measureViewModel.HrUp = p);
@@ -552,7 +552,7 @@ namespace Cardio.Views.MeasurePage
                         }
                         catch (Exception ex)
                         {
-                            Dispatcher.Invoke(new Action(() =>
+                            Dispatcher.BeginInvoke(new Action(() =>
                             {
                                 measureViewModel.Tips = ex.Message + "血压值计算失败！";
                             }));
@@ -562,8 +562,8 @@ namespace Cardio.Views.MeasurePage
                        
                         CompleteABIMeasurement();
                         WaitForAck = MrsWaitForAck.MrsBP;
-                        Thread.Sleep(1000);
-                        ProcessData();
+                        Task.Delay(1000);
+                        _ = ProcessData();
                     }
 
                 }
@@ -582,8 +582,8 @@ namespace Cardio.Views.MeasurePage
                 //  '两次血压测量完成
                 CompleteABIMeasurement();
                 //判断下一步应该执行什么操作
-                Thread.Sleep(1000);
-                ProcessData();
+                Task.Delay(1000);
+                _ = ProcessData();
 
             }
         }
@@ -601,7 +601,7 @@ namespace Cardio.Views.MeasurePage
             measureViewModel.Sbp = FinalBpMrsValue.Sbp.ToString();
             measureViewModel.Dbp = FinalBpMrsValue.Dbp.ToString();
             measureViewModel.Map = FinalBpMrsValue.Map.ToString();
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 Ready.Visibility = Visibility.Hidden;
                 AITest.Visibility = Visibility.Visible;
@@ -746,7 +746,7 @@ namespace Cardio.Views.MeasurePage
                     {
                         measureViewModel.Tips = "温馨提示：脉搏波信号采集中，保持稳定";
                     }
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         measureViewModel.TestStatus = (Convert.ToDouble(nMarkSelect) / 12 * 100).ToString("f2");
                     }));
@@ -765,7 +765,7 @@ namespace Cardio.Views.MeasurePage
                     {
                         PulseMrsFinishFlag = "Yes";
                         //避免程序卡顿，停止测量指令发送后，休息300ms
-                        Thread.Sleep(300);
+                        Task.Delay(300);
                         enumPwvMrsResp = PulseMrsResp.PulseStop;
                         AICountOneSec = 0;
                         AICountTwoSec = 0;
@@ -774,7 +774,7 @@ namespace Cardio.Views.MeasurePage
                         nMarkSelect = 0;
                         nCount = 0;
                         nMarkWait = 0;
-                        Dispatcher.Invoke(new Action(() =>
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             strTip = "温馨提示：脉搏波测量完成！";
                             measureViewModel.AITest_Img = "pack://application:,,,/Resources/Image/Measure/心血管测试.png";
@@ -784,13 +784,13 @@ namespace Cardio.Views.MeasurePage
                             strTip = "温馨提示：桡动脉脉搏数据采集完成，正在保存... ...";
                             WaitForAck = MrsWaitForAck.MrsPulse;
                             measureViewModel.TestStatus = "100";
-                            Dispatcher.Invoke(new Action(() =>
+                            Dispatcher.BeginInvoke(new Action(() =>
                             {
                                 measureViewModel.Tips = strTip;
                             }));
                             bPressMrsStart = true;
                             PWVStopFist = true;
-                            Thread.Sleep(200);
+                            Task.Delay(200);
                         }
                     }
                     return true;
@@ -823,7 +823,7 @@ namespace Cardio.Views.MeasurePage
                 if (nMarkSelect < 2 && nMarkWait >= 15)
                 {
                     bool isForceStop = nMarkWait >= 20;
-                    Dispatcher.Invoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         measureViewModel.Tips = isForceStop
                             ? "温馨提示：桡动脉波测量停止，请重新绑扎后测量"
@@ -853,7 +853,7 @@ namespace Cardio.Views.MeasurePage
         }
         private void AlltestStopWhenPWVfail()
         {
-            Thread.Sleep(1000);
+            Task.Delay(1000);
             //指令发送失败
             BpModleIndex = 0x05;
             serialPortManager.OpenControl(BpModleIndex);
@@ -886,7 +886,7 @@ namespace Cardio.Views.MeasurePage
                                 }
                                 if (measureViewModel.AIData.Count >= 6000)
                                 {
-                                    Dispatcher.Invoke(new Action(() =>
+                                    Dispatcher.BeginInvoke(new Action(() =>
                                     {
                                         DataCount = 0;
                                         measureViewModel. AIData.Clear();
@@ -906,7 +906,7 @@ namespace Cardio.Views.MeasurePage
                     }
                     else if (dataList[i].frameType == CommandWord.REQ_BP_INIT_SET)
                     {
-                        Dispatcher.Invoke(new Action(() =>
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             measureViewModel.Tips = "温馨提示：血压测量开始！";
                         }));
@@ -941,7 +941,7 @@ namespace Cardio.Views.MeasurePage
                             //只要提示忙则立马发送四肢停止测量命令，重新发送儿童血压测量命令,出现袖带忙的情况一般比较少见
                             measureViewModel.Tips = strTip;
                             serialPortManager.SendData(CommandWord.REQ_BP_STOP, 0x00);//停止血压测量
-                            Thread.Sleep(2000);//停止完血压测量后，休息2000ms后重新开始充气测量
+                            Task.Delay(2000);//停止完血压测量后，休息2000ms后重新开始充气测量
                             measureViewModel.Tips = "温馨提示：PWV测量开始";
                         }
                         else if (dataList[i + 1].dataValue == 0x4B && dataList[i + 2].dataValue == 0x73)
@@ -987,7 +987,7 @@ namespace Cardio.Views.MeasurePage
                         {
                             if (workStatus == WorkStatus.CloseValue) //判断如果是关闭阀门，则发送关闭阀门指令
                             {
-                                Thread.Sleep(300);
+                                Task.Delay(300);
                                 if (serialPortManager.CloseControl(0x00))
                                 {
                                     //DisPlayTips("关闭阀门中......");
@@ -1017,7 +1017,7 @@ namespace Cardio.Views.MeasurePage
                             if (get_bp.Sbp == 0)
                             {
                                 fault = GetBPResultFault(dataList[6].dataValue);
-                                Dispatcher.Invoke(new Action(() =>
+                                Dispatcher.BeginInvoke(new Action(() =>
                                 {
                                     measureViewModel.Tips = fault;
                                 }));
@@ -1087,21 +1087,21 @@ namespace Cardio.Views.MeasurePage
                                 strTip = "温馨提示：桡动脉脉搏数据采集完成，正在保存... ...";
                                 WaitForAck = MrsWaitForAck.MrsPulse;
                                 measureViewModel.TestStatus = "100";
-                                Dispatcher.Invoke(new Action(() =>
+                                Dispatcher.BeginInvoke(new Action(() =>
                                 {
                                     measureViewModel.Tips = strTip;
                                 })); 
-                                Thread.Sleep(1000);
-                                ProcessData();
+                                Task.Delay(1000);
+                                _ = ProcessData();
                                 bPressMrsStart = true;
                                 PWVStopFist = true;
-                                Thread.Sleep(200);
+                                Task.Delay(200);
                             }
                         }
                     }
                     else if (dataList[i].frameType == CommandWord.REQ_PWV_INC_GAIN_Back)
                     {
-                        Dispatcher.Invoke(new Action(() =>
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             measureViewModel.Tips = "温馨提示：脉搏波增益成功";
                         }));
@@ -1109,7 +1109,7 @@ namespace Cardio.Views.MeasurePage
                 
                     else if (dataList[i].frameType == CommandWord.REQ_PWV_DEC_GAIN_Back)
                     {
-                        Dispatcher.Invoke(new Action(() =>
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             measureViewModel.Tips = "温馨提示：脉搏波减益成功";
                         }));
@@ -1251,19 +1251,19 @@ namespace Cardio.Views.MeasurePage
                 bPressMrsStart = true;
                 WaitForAck = 0;
                 //容错处理，3秒后有没有接收到停止响应应答，则提示出错
-                Thread.Sleep(500);
+                Task.Delay(500);
                 Timer_ABIDelay.Enabled = false;
                 //发送停止命令
                 if (!serialPortManager.SendData(CommandWord.REQ_BP_STOP, 0x05))
                 {
                     return;
                 }
-                Thread.Sleep(300);
+                Task.Delay(300);
                 serialPortManager.OpenControl(0x00);
                 TimerBPTest.Stop();
-                Thread.Sleep(500);
+                Task.Delay(500);
                 ChangeBtStyle(TestBtn, "BigBlueBtnStyle", "开始测量");
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     measureViewModel.Tips = "温馨提示：测量停止！";
                 }));
@@ -1338,7 +1338,7 @@ namespace Cardio.Views.MeasurePage
         }
         private void ChangeBtStyle(Button btn, string styleName, string content)
         {
-            Dispatcher.Invoke(new Action(() => {
+            Dispatcher.BeginInvoke(new Action(() => {
                 var style = Application.Current.FindResource(styleName) as System.Windows.Style;
                 btn.Style = style;
                 btn.Content = content;

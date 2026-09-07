@@ -31,7 +31,7 @@ namespace Cadio.Views.DataManagePage.Mc
                 HandyControl.Controls.Growl.Warning("信息校验失败，请检查后修改!");
                 return;
             }
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 model.testdata.userName = model.UserName;
                 model.testdata.userHeight = Convert.ToInt32(model.UserHeight);

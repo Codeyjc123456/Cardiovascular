@@ -75,7 +75,7 @@ namespace Cardio.Views.DataManagePage.Mc
                 string conditionStr = "(userID like '%" + model.SearchText + "%' or userName like '%" + model.SearchText + "%')";
                 string startTime = "";
                 string endTime = "";
-                Dispatcher.Invoke(new Action(() => {
+                Dispatcher.BeginInvoke(new Action(() => {
                     startTime = StartTime.Text;
                     endTime = EndTime.Text;
                 }));
@@ -216,7 +216,7 @@ namespace Cardio.Views.DataManagePage.Mc
                 string startTime = "";
                 string endTime = "";
                 
-                Dispatcher.Invoke(() => {
+                Dispatcher.BeginInvoke(() => {
                     startTime = StartTime.Text;
                     endTime = EndTime.Text;
                 });
