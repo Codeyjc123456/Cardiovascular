@@ -379,9 +379,9 @@ namespace CardioVascular.Views.SystemPage
                                 SampleNum++;
                                 if (RpRawDataNum % 2 == 0)
                                     RpRawData.Add(dataList[i + 2 + k].dataValue);//把点保存起来采样率减少一半
-                                    AIData.Add(dataList[i + 2 + k].dataValue);
-                                }
-                            i += 15;//一次多处理15个数据
+                                AIData.Add(dataList[i + 2 + k].dataValue);
+                            }
+                            i += 15;
 
                             if (AIData.Count % 20 == 0)
                             {
@@ -404,7 +404,6 @@ namespace CardioVascular.Views.SystemPage
                                 AIData.Clear();
                             }
                         }
-                        return;
                     }
                     else if (dataList[i].frameType == CommandWord.REQ_PWV_INC_GAIN)
                     {
