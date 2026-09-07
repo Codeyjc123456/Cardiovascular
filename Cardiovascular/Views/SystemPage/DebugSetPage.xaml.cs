@@ -66,9 +66,9 @@ namespace CardioVascular.Views.SystemPage
             debugViewModel.CorrectLBSbp = "1";
             debugViewModel.CorrectLBDbp = "2";
 
-            serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
-            Thread.Sleep(500);
-            serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
+            //serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
+            //Task.Delay(500);
+            //serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
             IntChart();
             feature = new FeatureExtraction();
             APPSettingUtil.LoadData();
@@ -96,21 +96,21 @@ namespace CardioVascular.Views.SystemPage
             }
             //打开阀门标志
             Bp_ACK_Flag = -2;
-            Thread.Sleep(2000);
+            Task.Delay(2000);
             //在等待2s以后发送关闭阀门
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 TimerGetRealPressure?.Stop();//停止读取袖带指令，避免接受不到控制阀门的指令
                 PressStart = true;
             }));
-            Thread.Sleep(500);
+            Task.Delay(500);
             for(int i = 0; i < 3; i++)
             {
                 serialPortManager?.OpenControl(Bt_Pressureindex);
                 workStatus = WorkStatus.CloseValue;//给出工作状态“关闭阀门”下一步就是执行该命令
                 Bp_ACK_Flag = -3;
                 DisPlayTips("关闭阀门中......");
-                Thread.Sleep(500);
+                Task.Delay(500);
             }
             //关闭阀门以后开始执行压力检测
             TimerGetRealPressure?.Start();
@@ -142,7 +142,7 @@ namespace CardioVascular.Views.SystemPage
         }
         private void ClearWave()
         {
-            AIData.Clear();
+                AIData.Clear();
             RpRawDataNum = 0;
             RpRawData.Clear();
             AIFlag = true;
@@ -218,7 +218,7 @@ namespace CardioVascular.Views.SystemPage
                     PressStart = true;
                 }));
                 ChangeBtStyle(PreStart, "BigBlueBtnStyle", "压力测试");
-                Thread.Sleep(500);
+                Task.Delay(500);
                 serialPortManager?.SendData(CommandWord.REQ_BP_STOP, Bt_Pressureindex);
                 workStatus = WorkStatus.CloseValue;//给出工作状态“关闭阀门”下一步就是执行该命令
                                                    //关闭阀门标志
@@ -379,10 +379,10 @@ namespace CardioVascular.Views.SystemPage
                                 SampleNum++;
                                 if (RpRawDataNum % 2 == 0)
                                     RpRawData.Add(dataList[i + 2 + k].dataValue);//把点保存起来采样率减少一半
-                                AIData.Add(dataList[i + 2 + k].dataValue);
-                            }
+                                    AIData.Add(dataList[i + 2 + k].dataValue);
+                                }
                             i += 15;//一次多处理15个数据
-                                    
+
                             if (AIData.Count % 20 == 0)
                             {
                                 zg_ai.Refresh();
@@ -404,6 +404,7 @@ namespace CardioVascular.Views.SystemPage
                                 AIData.Clear();
                             }
                         }
+                        return;
                     }
                     else if (dataList[i].frameType == CommandWord.REQ_PWV_INC_GAIN)
                     {
@@ -501,7 +502,7 @@ namespace CardioVascular.Views.SystemPage
                             strDebug = "";
                             if (workStatus == WorkStatus.CloseValue) //判断如果是关闭阀门，则发送关闭阀门指令
                             {
-                                Thread.Sleep(300);
+                                Task.Delay(300);
                                 serialPortManager?.CloseControl(Bt_Pressureindex);
                             }
                         }

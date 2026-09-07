@@ -51,7 +51,7 @@ namespace Cardio.Model
             {
                 Growl.Info("桡动脉采集数据不理想，未能成功绘制波形，待重新采集！" + e.Message);
             }
-            Thread.Sleep(1000);
+            Task.Delay(1000);
         }
         public void InitReport(string reportFile)
         {

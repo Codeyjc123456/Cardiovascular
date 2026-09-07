@@ -41,7 +41,7 @@ namespace Cardio.Views
                 for (int i = 1; i <= 100; i += 1)
                 {
                     Dispatcher.BeginInvoke(() => { CustomProgressBar.Value = i; });
-                    Thread.Sleep(20);
+                    Task.Delay(20);
                 }
             });
             await Task.WhenAll(task1, task2, task3);

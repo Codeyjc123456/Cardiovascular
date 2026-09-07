@@ -41,7 +41,7 @@ namespace Cardio.SPCL
                 Random rd = new Random();
                 int randnum = rd.Next(1, 12);
                 randomNum.Add((byte)randnum);
-                //System.Threading.Thread.Sleep(20);
+                //Task.Delay(20);
             }
             return randomNum;
         }
