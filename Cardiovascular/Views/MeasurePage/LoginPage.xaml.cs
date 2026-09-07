@@ -123,6 +123,7 @@ namespace Cardio.Views.MeasurePage
                 UserInfoEntity u = new UserInfoEntity();
                 u.UserId = loginViewModel.UserID;
                 await Dialog.Show(new RegisterDialog(u, tabAction)).GetResultAsync<string>();
+                this.NavigationService.Navigate(new MeasureReePage(u));
             }
         }
         private void CloseBtn(object sender, RoutedEventArgs e)
