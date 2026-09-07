@@ -38,11 +38,16 @@
                           Margin="0,20,0,0"
                           Grid.Row="1"
                           CellStyle="{StaticResource MedianDataGridCellStyle}"
-                          ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
                           ItemsSource="{Binding DataList}"
                           RowStyle="{StaticResource MedianDataGridRowStyle}"
                           Style="{StaticResource MedianDataGridStyle}">
-                   
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridColumnHeaderStyle}">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
                     <DataGrid.Columns>
                         <DataGridTextColumn Width="1.5*" Binding="{Binding DoctorName}" Header="姓名" />
                         <DataGridTextColumn Width="1.5*" Binding="{Binding DoctorPwd}" Header="密码" />

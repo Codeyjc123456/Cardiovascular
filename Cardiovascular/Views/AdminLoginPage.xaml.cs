@@ -35,10 +35,23 @@ namespace Cardio.Views
         {
             doctorDAL = DoctorInfoDAL.getInstance();
             adminUserDAL = AdminUserDAL.getInstance();
-            GlobalVariable.DoctorName = viewModel.APP_DoctorName;
-            GlobalVariable.DoctorPwd = viewModel.APP_DoctorPWD;
-            loginView.UserID = viewModel.APP_DoctorName;
-            UserPWD.Password = viewModel.APP_DoctorPWD;
+            LoadDefaultDoctor();
+        }
+
+        private void LoadDefaultDoctor()
+        {
+            // 启动时直接进入登录页，不能依赖 StartPage 预先读取配置。
+            bool loaded = viewModel.LoadData();
+            string doctorName = loaded ? viewModel.APP_DoctorName ?? "" : "";
+            string doctorPassword = loaded ? viewModel.APP_DoctorPWD ?? "" : "";
+
+            GlobalVariable.DoctorName = doctorName;
+            GlobalVariable.DoctorPwd = doctorPassword;
+            loginView.UserID = doctorName;
+            UserPWD.Password = doctorPassword;
+
+            if (!loaded)
+                Growl.Warning("系统配置加载失败，未能读取默认医师信息，请手动输入账号和密码。");
         }
         private void LoginBtn(object sender, RoutedEventArgs e)
         {
@@ -100,6 +113,7 @@ namespace Cardio.Views
         private async void AdminManager()
         {
             await Dialog.Show(new DoctorListDialog()).GetResultAsync<string>();
+            LoadDefaultDoctor();
         }
 
         private void CloseBtn(object sender, RoutedEventArgs e)
