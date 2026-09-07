@@ -1,6 +1,7 @@
 ﻿using Cardio.DAL;
 using Cardio.Util;
 using Cardio.Views.MeasurePage;
+using ClosedXML.Excel;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Extension;
@@ -263,7 +264,7 @@ namespace Cardio.Views.UserManagePage
                 open.Filter = "Excel文件（*.xlsx;*.xls)| *.xlsx;*.xls|所有文件(*.*)|*.*";
                 open.Title = "选择包含用户信息的Excel文件";
                 string filePath = "";//存储选中的文件路径
-                //显示对话框并检查用户是否点击了OK按钮
+                                     //显示对话框并检查用户是否点击了OK按钮
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     //获取用户选择的文件路径
@@ -282,12 +283,12 @@ namespace Cardio.Views.UserManagePage
                             var (users, statusColumnIndex) = ReadUsersFromExcelWithStatus(filePath);
                             int successCount = 0;//成功注册计数
                             int failCount = 0;//失败注册计数
-                            //遍历所有读取到的用户，逐个进行注册
+                                              //遍历所有读取到的用户，逐个进行注册
                             for (int i = 0; i < users.Count; i++)
                             {
                                 UserInfoEntity user = users[i];
                                 int excelRow = i + 2;//从Excel中的实际行好（从第2行开始，标题行是第1行）
-                                //执行注册逻辑
+                                                     //执行注册逻辑
                                 bool registrationResult = RegisterUser(user);
                                 // 根据注册结果进行相应处理
                                 if (registrationResult)
@@ -329,54 +330,69 @@ namespace Cardio.Views.UserManagePage
         private (List<UserInfoEntity>, int statusColumnIndex) ReadUsersFromExcelWithStatus(string filePath)
         {
             List<UserInfoEntity> users = new List<UserInfoEntity>();
-            int statusColumnIndex = 0;//状态列的索引
-            //使用EPPlus库读取Excel文件(需要安装EPPlus Nuget包）
-            using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(filePath)))
+            int statusColumnIndex = 0;
+
+            // 使用 ClosedXML 读取 Excel
+            using (var workbook = new XLWorkbook(filePath))
             {
-                //检查工作簿中是否有工作表
-                if (package.Workbook.Worksheets.Count == 0)
+                // 检查工作簿中是否有工作表
+                if (workbook.Worksheets.Count == 0)
                 {
                     throw new Exception("Excel文件中没有工作表");
                 }
-                //获取第一个工作表
-                var worksheet = package.Workbook.Worksheets.First();
-                //获取工作表的行数和列数
-                int rowCount = worksheet.Dimension.Rows;
-                int colCount = worksheet.Dimension.Columns;
 
+                // 获取第一个工作表
+                var worksheet = workbook.Worksheet(1);
 
-                //查找状态列的位置（最后一列）
-                statusColumnIndex = worksheet.Dimension.Columns;
-                //从第二行开始读取（假设第一行是标题行）
+                // 获取使用范围
+                var rangeUsed = worksheet.RangeUsed();
+                if (rangeUsed == null)
+                {
+                    throw new Exception("Excel文件为空");
+                }
+
+                int rowCount = rangeUsed.RowCount();
+                int colCount = rangeUsed.ColumnCount();
+
+                // 状态列 = 最后一列
+                statusColumnIndex = colCount;
+
+                // 从第2行开始读取（第1行是标题）
                 for (int row = 2; row <= rowCount; row++)
                 {
-                    // 检查状态列的值，只处理状态位“否”或空的行
-                    string status = worksheet.Cells[row, statusColumnIndex].Value?.ToString() ?? "";
-                    //如果状态已经是“是”，跳过改行（不注册）
+                    // 检查状态列的值，只处理状态为“否”或空的行
+                    string status = worksheet.Cell(row, statusColumnIndex).GetString();
                     if (status == "是")
                     {
                         LogUtil.Info($"跳过第{row}行，用户已经注册成功");
                         continue;
                     }
-                    //创建用户对象
+
+                    // 创建用户对象
                     UserInfoEntity user = new UserInfoEntity();
-                    //根据Excel列的位置读取数据
-                    //假设Excel列顺序：A列-用户ID，B列-用户名，C列-性别，D列-身高，E列-体重,F列-出生日期
-                    user.UserId = worksheet.Cells[row, 1].Value?.ToString() ?? "";
-                    user.UserName = worksheet.Cells[row, 2].Value?.ToString() ?? "";
-                    user.UserSex = worksheet.Cells[row, 3].Value?.ToString() ?? "";
-                    user.UserHeight = Convert.ToDouble(worksheet.Cells[row, 4].Value?.ToString() ?? "");
-                    user.UserWeight = Convert.ToDouble(worksheet.Cells[row, 5].Value?.ToString() ?? "");
-                    user.UserBirthday = (worksheet.Cells[row, 6].Value?.ToString() ?? "");
-                    //跳过空行（如果用户名为空则认为改行无效）
+                    user.UserId = worksheet.Cell(row, 1).GetString();
+                    user.UserName = worksheet.Cell(row, 2).GetString();
+                    user.UserSex = worksheet.Cell(row, 3).GetString();
+
+                    // 处理数值类型（身高、体重）
+                    double height = 0, weight = 0;
+                    worksheet.Cell(row, 4).TryGetValue(out height);
+                    worksheet.Cell(row, 5).TryGetValue(out weight);
+                    user.UserHeight = height;
+                    user.UserWeight = weight;
+
+                    user.UserBirthday = worksheet.Cell(row, 6).GetString();
+
+                    // 跳过空行（如果用户ID为空则认为该行无效）
                     if (!string.IsNullOrEmpty(user.UserId))
                     {
                         users.Add(user);
                     }
                 }
             }
+
             return (users, statusColumnIndex);
-        }
+        }   
         private bool RegisterUser(UserInfoEntity user)
         {
 
@@ -440,23 +456,20 @@ namespace Cardio.Views.UserManagePage
         /// <param name="rowNumber">行号</param>
         /// <param name="columnIndex">列索引</param>
         /// <param name="status">状态值（"是"或"否"）</param>
-        private void UpdateRegistrationStatus(string filePath, int rowNumber, int columnIndex, string status)
+        private void UpdateRegistrationStatus(string filePath, int excelRow, int statusColumnIndex, string statusValue)
         {
             try
             {
-                //使用EPPlus库更新Excel文件
-                using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(filePath)))
+                using (var workbook = new XLWorkbook(filePath))
                 {
-                    var worksheet = package.Workbook.Worksheets.First();
-                    //更新状态列的值
-                    worksheet.Cells[rowNumber, columnIndex].Value = status;
-                    //保存Excel文件
-                    package.Save();
+                    var worksheet = workbook.Worksheet(1);
+                    worksheet.Cell(excelRow, statusColumnIndex).SetValue(statusValue);
+                    workbook.Save();
                 }
             }
             catch (Exception ex)
             {
-                LogUtil.Info($"更新第{rowNumber}行“状态”失败：{ex.Message}");
+                LogUtil.Info($"更新Excel状态失败：{ex.Message}");
             }
         }
 
