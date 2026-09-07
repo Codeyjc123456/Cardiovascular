@@ -21,6 +21,7 @@ namespace Cardio.Views.MeasurePage
     public partial class MeasureReePage : Page
     {
         private Action<string> ReportAction;
+        private volatile bool aiMeasurementActive;
         private string LastMsg = "";
         private PulseDataLocalDAL pulsedataDAL = null;
         private PulseDataLocalEntity pulsedata = new();
@@ -216,6 +217,7 @@ namespace Cardio.Views.MeasurePage
         #region 清理
         public void Recover()
         {
+            SetAiMeasurementActive(false);
             PressMrsMode = EnumData.MeasureMode.ExpertMode;
             Variable.Test_AI_num = 0;
             Variable.strMrsLocation = "肱踝";
@@ -278,35 +280,43 @@ namespace Cardio.Views.MeasurePage
             }
             else if (WaitForAck == MrsWaitForAck.MrsPulse)//桡动脉波形分析
             {
-                if (SaveDataAfterAIAcquisition() == false)//处理原始脉搏波数据
+                try
                 {
-                    workStatus = WorkStatus.NoWork;
-                    return;
-                }
-                if (g_typeVascularIndex.Cap == 0 && g_typeCardiacIndex.Hr == 0 && g_typeCardiacIndex.Ed == 0)//如果中心动脉压为0同时心率和射血时间也为0表明此次采集波形出现问题
-                {
+                    if (SaveDataAfterAIAcquisition() == false)//处理原始脉搏波数据
+                    {
+                        workStatus = WorkStatus.NoWork;
+                        return;
+                    }
+                    if (g_typeVascularIndex.Cap == 0 && g_typeCardiacIndex.Hr == 0 && g_typeCardiacIndex.Ed == 0)//如果中心动脉压为0同时心率和射血时间也为0表明此次采集波形出现问题
+                    {
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            measureViewModel.Tips = "温馨提示：桡动脉采集出现问题，请重新采集桡动脉！";
+                        }));
+                        workStatus = WorkStatus.NoWork;
+                        return;
+                    }
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        measureViewModel.Tips = "温馨提示：桡动脉采集出现问题，请重新采集桡动脉！";
+                        measureViewModel.Tips = "温馨提示：心血管功能测量完成！";
                     }));
                     workStatus = WorkStatus.NoWork;
-                    return;
+                    pulsedata.AI_num = 1;
+                    // 结果可用：先把 AI 诊断结果回填到记录，再自动打开医师诊断界面（保存时入库/更新）
+                    pulsedata.AIDiagnosisResult = strAIDiagnosisResult;
+                    pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
+                    Dispatcher.BeginInvoke(new Action(async () =>
+                    {
+                        // 必须走 GetResultAsync：HandyControl 会在此时把 CloseAction 注入到 DataContext，
+                        // 否则 Diagnosis 内点“保存/取消”时 CloseAction?.Invoke() 为空，无法自动关闭回到本页
+                        await HandyControl.Controls.Dialog.Show(new Diagnosis(pulsedata)).GetResultAsync<string>();
+                    }));
                 }
-                Dispatcher.BeginInvoke(new Action(() =>
+                finally
                 {
-                    measureViewModel.Tips = "温馨提示：心血管功能测量完成！";
-                }));
-                workStatus = WorkStatus.NoWork;
-                pulsedata.AI_num = 1;
-                // 结果可用：先把 AI 诊断结果回填到记录，再自动打开医师诊断界面（保存时入库/更新）
-                pulsedata.AIDiagnosisResult = strAIDiagnosisResult;
-                pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
-                Dispatcher.BeginInvoke(new Action(async () =>
-                {
-                    // 必须走 GetResultAsync：HandyControl 会在此时把 CloseAction 注入到 DataContext，
-                    // 否则 Diagnosis 内点“保存/取消”时 CloseAction?.Invoke() 为空，无法自动关闭回到本页
-                    await HandyControl.Controls.Dialog.Show(new Diagnosis(pulsedata)).GetResultAsync<string>();
-                }));
+                    workStatus = WorkStatus.NoWork;
+                    SetAiMeasurementActive(false);
+                }
             }
         }
         private void UpdataToDatabase()
@@ -839,6 +849,8 @@ namespace Cardio.Views.MeasurePage
                     if (isForceStop)
                     {
                         serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
+                        workStatus = WorkStatus.NoWork;
+                        SetAiMeasurementActive(false);
                         //serialPortManager.SendDataToMCU(CommandWord.REQ_PWV_STOP, null, APPSettingUtil.ShortWaitTime);
                         return false;
                     }
@@ -1166,6 +1178,7 @@ namespace Cardio.Views.MeasurePage
 
         private void BackBtn(object sender, RoutedEventArgs e)
         {
+            if (aiMeasurementActive) return;
             //this.NavigationService.Navigate(new OpenReportPage(pulsedata, ReportAction));
             if (measureViewModel.IsRunning == "Visible")
             {
@@ -1221,6 +1234,7 @@ namespace Cardio.Views.MeasurePage
         //血压测量
         private void Pic_test_Click(object sender, RoutedEventArgs e)
         {
+            if (aiMeasurementActive) return;
             if (measureViewModel.IsRunning == "Visible")
             {
                 Growl.Info("温馨提示：正在分析数据，请稍等！");
@@ -1272,6 +1286,7 @@ namespace Cardio.Views.MeasurePage
         //测量报告
         private void Commit_Click(object sender, RoutedEventArgs e)
         {
+            if (aiMeasurementActive) return;
             if (measureViewModel.IsRunning == "Visible")
             {
                 Growl.Info("温馨提示：正在分析数据，请稍等！");
@@ -1302,16 +1317,39 @@ namespace Cardio.Views.MeasurePage
             if (workStatus == WorkStatus.NoWork && Variable.Test_ABI_num != 0)
             {
                 AITestIntit();
-                serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
                 workStatus = WorkStatus.StartAItest;
+                SetAiMeasurementActive(true);
+                try
+                {
+                    if (!serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01))
+                    {
+                        workStatus = WorkStatus.NoWork;
+                        SetAiMeasurementActive(false);
+                        measureViewModel.Tips = "温馨提示：脉搏波测量启动失败，请检查设备连接！";
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    workStatus = WorkStatus.NoWork;
+                    SetAiMeasurementActive(false);
+                    LogUtil.Error("启动心血管测试", ex.ToString());
+                    measureViewModel.Tips = "温馨提示：脉搏波测量启动失败，请检查设备连接！";
+                    return;
+                }
                 measureViewModel.Tips = "温馨提示：脉搏波测量开始！";
                 ChangeBtStyle(AITest, "BigGYBtnStyle", "结束测量");
             }
             else if (workStatus == WorkStatus.StartAItest)
             {
                 PulseMrsFinishFlag = "No";
-                serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
+                if (!serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01))
+                {
+                    measureViewModel.Tips = "温馨提示：停止指令发送失败，请检查设备连接！";
+                    return;
+                }
                 workStatus = WorkStatus.NoWork;
+                SetAiMeasurementActive(false);
                 ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
                 measureViewModel.Tips = "温馨提示：脉搏波测量结束！";
             }
@@ -1336,6 +1374,23 @@ namespace Cardio.Views.MeasurePage
             measureViewModel.TestStatus = "0";
             ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
         }
+        private void SetAiMeasurementActive(bool active)
+        {
+            aiMeasurementActive = active;
+            void UpdateButtons()
+            {
+                // 使用当前状态，避免串口回调排队后把已经恢复的按钮再次禁用。
+                bool enabled = !aiMeasurementActive;
+                BackButton.IsEnabled = enabled;
+                TestBtn.IsEnabled = enabled;
+                OpenReport.IsEnabled = enabled;
+                // AITest 保持可用，让用户可以主动结束测量。
+            }
+
+            if (Dispatcher.CheckAccess()) UpdateButtons();
+            else Dispatcher.BeginInvoke((Action)UpdateButtons);
+        }
+
         private void ChangeBtStyle(Button btn, string styleName, string content)
         {
             Dispatcher.BeginInvoke(new Action(() => {
