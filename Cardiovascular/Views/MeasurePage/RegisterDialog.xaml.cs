@@ -1,4 +1,6 @@
-﻿using Cardio.CustomRule;
+﻿using Cadio.CustomRule;
+using System.Globalization;
+using Cardio.CustomRule;
 using Cardio.DAL;
 using Cardio.Model;
 using Microsoft.VisualBasic.ApplicationServices;
@@ -56,11 +58,20 @@ namespace Cardio.Views.MeasurePage
             }
            
            
+            DateTime today = DateTime.Today;
+            var birthDateValidation = BirthDateRule.ValidateBirthDate(
+                userViewModel.BirthDay, CultureInfo.CurrentCulture, today, out DateTime birthDate);
+            if (!birthDateValidation.IsValid)
+            {
+                HandyControl.Controls.Growl.Warning(birthDateValidation.ErrorContent.ToString(), "Rigister");
+                return;
+            }
+
             userinfo.UserId = userViewModel.UserID;
             userinfo.UserName = userViewModel.UserName;
             userinfo.UserSex = userViewModel.UserSex;
-            DateTime t = DateTime.Parse(userViewModel.BirthDay);
-            userinfo.UserBirthday = t.ToString("yyyy-MM-dd");
+
+            userinfo.UserBirthday = birthDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             userinfo.UserHeight = userViewModel.UserHeight;
             userinfo.UserWeight = userViewModel.UserWeight;
             
@@ -69,20 +80,7 @@ namespace Cardio.Views.MeasurePage
             Temp_Distance[1] = (double)(0.2195 * userinfo.UserHeight - 2.0734);
             Temp_Distance[2] = Temp_Distance[0] - Temp_Distance[1];
             userinfo.UserDistance = (float)Math.Round((decimal)Temp_Distance[2], 1, MidpointRounding.AwayFromZero);
-            DateTime bir;
-            if (DateTime.TryParse(userinfo.UserBirthday, out bir))
-            {
-                userinfo.UserAge = DateTime.Now.Year - bir.Year;
-                if (DateTime.Now.Month < bir.Month)
-                {
-                    userinfo.UserAge -= 1;
-                }
-            }
-            if (userinfo.UserAge < 7 || userinfo.UserAge > 100)
-            {
-                HandyControl.Controls.Growl.Warning("出生日期填写有误，请重新填写！", "Rigister");
-                return;
-            }
+            userinfo.UserAge = BirthDateRule.CalculateAge(birthDate, today);
 
             if (userinfo.Id > 0)
             {
