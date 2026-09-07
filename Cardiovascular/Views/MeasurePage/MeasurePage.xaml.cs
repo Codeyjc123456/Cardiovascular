@@ -1025,9 +1025,9 @@ namespace Cardio.Views.MeasurePage
                             }
                             HandleBPData(ref get_bp);//get_Bp为保存了下位机测得的血压信息
                         }
-                        catch (Exception e)
+                        catch
                         {
-                            measureViewModel.Tips = e.Message;
+                            measureViewModel.Tips = "温馨提示：测量过程中出现异常，请重新测量！";
                         }
 
                         i += 11;
@@ -1150,7 +1150,8 @@ namespace Cardio.Views.MeasurePage
                 0x5a => "电源超出范围或其他硬件问题",
                 0x5b => "如未授权的命令或超出范围的自动归零",
                 0x61 => "传感器超出范围",
-                0x62 => "EEPROM校准数据故障"
+                0x62 => "EEPROM校准数据故障",
+                _ => "测量模块错误，请重新测量"
             };
             bPressMrsStart = true;   //测量按钮状态切换
             measureViewModel.MeasureBtn_Img = "pack://application:,,,/Resources/Image/Measure/开始测量.jpg";
