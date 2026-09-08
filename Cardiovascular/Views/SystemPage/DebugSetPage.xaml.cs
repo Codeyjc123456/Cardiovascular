@@ -230,7 +230,7 @@ namespace CardioVascular.Views.SystemPage
 
         private void cmdOpenValve_Click(object sender, RoutedEventArgs e)
         {
-            if (workStatus == WorkStatus.NoWork || workStatus == WorkStatus.StartBPtest || workStatus == WorkStatus.PreStart)
+            if (workStatus == WorkStatus.NoWork || workStatus == WorkStatus.StartBPtest || workStatus == WorkStatus.PreStart || workStatus == WorkStatus.CloseValue)
             {
                 serialPortManager?.OpenControl(Bt_Pressureindex);
                 //打开阀门标志
@@ -363,7 +363,6 @@ namespace CardioVascular.Views.SystemPage
             if (code == MCErrorCode.NoError && dataList != null)
             {
                 //不同类型的帧分开存储
-                List<ReceiveDataStructure> dataValueAndTypePulse = new List<ReceiveDataStructure>();//脉搏波数据
                 for (int i = 0; i < dataList.Count; i++)
                 {
                     if (dataList[i].frameType == CommandWord.REQ_PWV_START)
@@ -372,10 +371,8 @@ namespace CardioVascular.Views.SystemPage
                         {
                             for (int k = 0; k < 14; k++)//每次传输14个脉搏波数据
                             {
-                                dataValueAndTypePulse.Add(dataList[i + 2 + k]);
                                 RpRawDataNum++;//计算心率需要用到的变量
                                 SampleNum++;
-                                //if (RpRawDataNum % 2 == 0)
                                 RpRawData.Add(dataList[i + 2 + k].dataValue);//把点保存起来采样率减少一半
                                 AIData.Add(dataList[i + 2 + k].dataValue);
                             }

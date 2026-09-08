@@ -380,8 +380,6 @@ namespace Cardio.Views.MeasurePage
                 FeaturePoint featurepoint = new ();
                 g_typeBpMrsValue.Sbp = FinalBpMrsValue.Sbp;
                 g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp;
-                //g_typeBpMrsValue.Sbp = 120;
-                //g_typeBpMrsValue.Dbp = 80;
                 try
                 {
                     if (featurepoint.Identify(g_typeBpMrsValue.Sbp, g_typeBpMrsValue.Dbp, RpRawData) == 0)//保存数据
@@ -725,7 +723,6 @@ namespace Cardio.Views.MeasurePage
                 if ((MinValue <= 100 && MaxValue - MinValue <= 800) || (MinValue > 100 && DifValue <= 850))
                 {
                     //放大倍数加1
-                    
                     if (!serialPortManager.SendData(CommandWord.REQ_PWV_INC_GAIN, 0x02))//桡动脉
                     {
                         measureViewModel.Tips = "脉搏波形幅度增加命令发送失败，请检查设备通信状况";
@@ -878,7 +875,6 @@ namespace Cardio.Views.MeasurePage
             if (code == MCErrorCode.NoError && dataList != null)
             {
                 //不同类型的帧分开存储
-                List<ReceiveDataStructure> dataValueAndTypePulse = new List<ReceiveDataStructure>();//脉搏波数据
                 for (int i = 0; i < dataList.Count; i++)
                 {
                     if (dataList[i].frameType == CommandWord.REQ_PWV_START_Back)
@@ -889,19 +885,16 @@ namespace Cardio.Views.MeasurePage
                             {
                                 iData[0] = dataList[i + 2 + p].dataValue;
                                 DataCount++;
-                                //if (DataCount % 2 == 0)
-                                {
-                                    measureViewModel.AIData.Add(iData[0]);
-                                    if (measureViewModel.AIData.Count % 4 == 0)
-                                        AiSeries.Refresh();
-                                    HandleAIPulseData(ref DataCount, ref iData[0]);
-                                }
+                                measureViewModel.AIData.Add(iData[0]);
+                                if (measureViewModel.AIData.Count % 4 == 0)
+                                    AiSeries.Refresh();
+                                HandleAIPulseData(ref DataCount, ref iData[0]);
                                 if (measureViewModel.AIData.Count >= 6000)
                                 {
                                     Dispatcher.BeginInvoke(new Action(() =>
                                     {
                                         DataCount = 0;
-                                        measureViewModel. AIData.Clear();
+                                        measureViewModel.AIData.Clear();
                                     }));
                                 }
                             }
