@@ -298,7 +298,7 @@ namespace Cardio.Views.MeasurePage
                     }
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        measureViewModel.Tips = "温馨提示：心血管功能测量完成！";
+                        measureViewModel.Tips = "温馨提示：桡动脉功能测量完成！";
                     }));
                     workStatus = WorkStatus.NoWork;
                     pulsedata.AI_num = 1;
@@ -390,7 +390,7 @@ namespace Cardio.Views.MeasurePage
                         {
                             measureViewModel.Tips = "温馨提示：波形分析出错，请重新测量";
                         }));
-                        ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
+                        ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
                         SaveDataAfterAIAcquisitionFlag = false;
                         return false;
                     }
@@ -402,7 +402,7 @@ namespace Cardio.Views.MeasurePage
                         this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败:稳定段数据较少！";
                     }));
                     AITestIntit();
-                    ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
+                    ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
                     return false;
                 }
                 //心率值是否有误string result = ;//把数字字符串中的数字提取出来
@@ -436,7 +436,7 @@ namespace Cardio.Views.MeasurePage
                     measureViewModel.Tips = "温馨提示：脉搏波信号分析中";
                     //显示指标
                     DisplayAIIndex();
-                    ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
+                    ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
                 }));
                
 
@@ -479,7 +479,7 @@ namespace Cardio.Views.MeasurePage
                     this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败！";
                 }));
                 AITestIntit();
-                ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
+                ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
                 return false;
             }
         }
@@ -889,7 +889,7 @@ namespace Cardio.Views.MeasurePage
                             {
                                 iData[0] = dataList[i + 2 + p].dataValue;
                                 DataCount++;
-                                if (DataCount % 2 == 0)
+                                //if (DataCount % 2 == 0)
                                 {
                                     measureViewModel.AIData.Add(iData[0]);
                                     if (measureViewModel.AIData.Count % 4 == 0)
@@ -985,7 +985,7 @@ namespace Cardio.Views.MeasurePage
                                 }
                                 else
                                 {
-                                    strTip = "温馨提示：请点击心血管测量按钮继续测量!";
+                                    strTip = "温馨提示：请点击桡动脉测量按钮继续测量!";
                                     ChangeBtStyle(TestBtn, "BigBlueBtnStyle", "开始测量");
                                 }
                             }
@@ -1299,11 +1299,11 @@ namespace Cardio.Views.MeasurePage
             }
             else
             {
-                Growl.Info("心血管还未测试，请测试完成后再打开报表文件！");
+                Growl.Info("桡动脉还未测试，请测试完成后再打开报表文件！");
                 return;
             }
         }
-        //心血管测量
+        //桡动脉测量
         private void Pic_AI_test_Click(object sender, RoutedEventArgs e) //桡动脉测量开始
         {
             //workStatus = WorkStatus.NoWork;
@@ -1333,7 +1333,7 @@ namespace Cardio.Views.MeasurePage
                 {
                     workStatus = WorkStatus.NoWork;
                     SetAiMeasurementActive(false);
-                    LogUtil.Error("启动心血管测试", ex.ToString());
+                    LogUtil.Error("启动桡动脉测试", ex.ToString());
                     measureViewModel.Tips = "温馨提示：脉搏波测量启动失败，请检查设备连接！";
                     return;
                 }
@@ -1350,12 +1350,12 @@ namespace Cardio.Views.MeasurePage
                 }
                 workStatus = WorkStatus.NoWork;
                 SetAiMeasurementActive(false);
-                ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
+                ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
                 measureViewModel.Tips = "温馨提示：脉搏波测量结束！";
             }
             else
             {
-                Growl.Info("当前有其他任务正在执行，请稍后测试心血管功能。");
+                Growl.Info("当前有其他任务正在执行，请稍后测试桡动脉功能。");
             }
         }
         public void AITestIntit()
@@ -1372,7 +1372,7 @@ namespace Cardio.Views.MeasurePage
             DataOneSec.Clear();
             DataTwoSec.Clear();
             measureViewModel.TestStatus = "0";
-            ChangeBtStyle(AITest, "BigBlueBtnStyle", "心血管测试");
+            ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
         }
         private void SetAiMeasurementActive(bool active)
         {

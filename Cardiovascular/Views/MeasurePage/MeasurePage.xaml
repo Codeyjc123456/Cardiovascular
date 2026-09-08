@@ -362,7 +362,7 @@
                                 Height="65"
                                 Margin="0,0,0,0"
                                 Click="Pic_AI_test_Click"
-                                Content="心血管测试"
+                                Content="桡动脉测试"
                                 Style="{StaticResource BigBlueBtnStyle}" />
                             <Button
                                 x:Name="TestBtn"
