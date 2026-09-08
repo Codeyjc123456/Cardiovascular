@@ -892,7 +892,7 @@ namespace Cardio.Views.MeasurePage
                                 if (DataCount % 2 == 0)
                                 {
                                     measureViewModel.AIData.Add(iData[0]);
-                                    if (measureViewModel.AIData.Count % 50 == 0)
+                                    if (measureViewModel.AIData.Count % 4 == 0)
                                         AiSeries.Refresh();
                                     HandleAIPulseData(ref DataCount, ref iData[0]);
                                 }

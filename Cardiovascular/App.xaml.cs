@@ -14,18 +14,18 @@ namespace Cardiovascular
             base.OnStartup(e);
 
             // 加载 log4net 配置（配置文件已复制到输出目录）
-            try
-            {
-                string cfgPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
-                if (File.Exists(cfgPath))
-                {
-                    log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(cfgPath));
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("log4net 配置加载失败：" + ex.Message);
-            }
+            //try
+            //{
+            //    string cfgPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
+            //    if (File.Exists(cfgPath))
+            //    {
+            //        log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(cfgPath));
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("log4net 配置加载失败：" + ex.Message);
+            //}
         }
     }
 

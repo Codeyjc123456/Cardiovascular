@@ -9,6 +9,7 @@ using System.Drawing.Printing;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,11 +30,21 @@ namespace Cardio.Views.SystemPage
     public partial class FactorySetPage : Page
     {
         SerialPortManager serialPortManager = null;
+        private int awaitingPortCheck;
         private readonly APPSettingsViewModel viewModel = APPSettingsViewModel.getInstance();
         public FactorySetPage()
         {
             InitializeComponent();
             DataContext = viewModel;
+            Unloaded += (_, _) =>
+            {
+                Interlocked.Exchange(ref awaitingPortCheck, 0);
+                if (serialPortManager != null)
+                {
+                    serialPortManager.InformMsgEvnet -= ReciveAlarm;
+                    serialPortManager.InformDebugMsgEvnet -= msg;
+                }
+            };
         }
         private void Window_OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -57,18 +68,25 @@ namespace Cardio.Views.SystemPage
 
         private void ReciveAlarm(MCErrorCode code, List<ReceiveDataStructure> dataList)
         {
+            // NoError 是每批解析数据的通知，不是串口连接状态通知。
+            if (Volatile.Read(ref awaitingPortCheck) == 0) return;
+            string message;
             if (code == MCErrorCode.NoError)
             {
-                HandyControl.Controls.Growl.Info("串口识别成功！");
+                if (dataList == null || !dataList.Any(x => x.frameType == CommandWord.REQ_BP_CONTROL))
+                    return;
+                message = "串口识别成功！";
             }
-            else if (code == MCErrorCode.OpenSerialFail)
+            else if (code == MCErrorCode.OpenSerialFail || code == MCErrorCode.TimeLimited)
             {
-                HandyControl.Controls.Growl.Info("串口识别失败！");
+                message = "串口识别失败！";
             }
-            else if (code == MCErrorCode.TimeLimited)
+            else return;
+            if (Interlocked.Exchange(ref awaitingPortCheck, 0) == 0) return;
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                HandyControl.Controls.Growl.Info("串口识别失败！");
-            }
+                if (IsVisible) HandyControl.Controls.Growl.Info(message);
+            }));
         }
 
         private void Page_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -76,6 +94,7 @@ namespace Cardio.Views.SystemPage
             bool isVisible = (bool)e.NewValue;//判断当前界面是否可见
             if (!isVisible)
             {
+                Interlocked.Exchange(ref awaitingPortCheck, 0);
                 GC.Collect();//回收内存
             }
         }
@@ -122,6 +141,7 @@ namespace Cardio.Views.SystemPage
                 List<byte> SendDataBytes = new List<byte>();
                 SendDataBytes.Add(0x02);
                 SendDataBytes.Add(0x05);
+                Interlocked.Exchange(ref awaitingPortCheck, 1);
                 bool result = serialPortManager.SendDataToMCU(CommandWord.REQ_BP_CONTROL, SendDataBytes, viewModel.ShortWaitTime);
                 if (result)
                 {
@@ -129,12 +149,14 @@ namespace Cardio.Views.SystemPage
                 }
                 else
                 {
-                    HandyControl.Controls.Growl.Info("打开串口失败" );
+                    if (Interlocked.Exchange(ref awaitingPortCheck, 0) != 0)
+                        HandyControl.Controls.Growl.Info("打开串口失败" );
                 }
             }
             else
             {
                 HandyControl.Controls.Growl.Info("关闭！"+ COM);
+                Interlocked.Exchange(ref awaitingPortCheck, 0);
             }
 
         }

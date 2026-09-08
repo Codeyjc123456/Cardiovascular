@@ -372,8 +372,6 @@ namespace CardioVascular.Views.SystemPage
                         {
                             for (int k = 0; k < 14; k++)//每次传输14个脉搏波数据
                             {
-                                //if (k == 13)
-                                { }    
                                 dataValueAndTypePulse.Add(dataList[i + 2 + k]);
                                 RpRawDataNum++;//计算心率需要用到的变量
                                 SampleNum++;
@@ -383,21 +381,9 @@ namespace CardioVascular.Views.SystemPage
                             }
                             i += 15;
 
-                            if (AIData.Count % 20 == 0)
+                            if (AIData.Count % 4 == 0)
                             {
                                 zg_ai.Refresh();
-                                //if (AIData.Count % 32 == 0)
-                                //{
-                                //    timeDifference = DateTime.Now - SampleStartTime;//计算时间差
-                                //    secondsDifference = timeDifference.TotalSeconds;//获取时间差的秒数
-                                //    debugViewModel.Number = secondsDifference.ToString("f2"); //Number： 采样时间
-                                //    if (RpRawDataNum % 28 == 0)
-                                //    {
-                                //        rate = SampleNum / secondsDifference;
-                                //        debugViewModel.Rate = rate.ToString("f2");  //Rate :采样频率
-
-                                //    }
-                                //}
                             }
                             if (AIData.Count >= 6000)
                             {
@@ -514,7 +500,7 @@ namespace CardioVascular.Views.SystemPage
                                "0X" + dataList[2].dataValue.ToString("X") + "," +
                                "0X" + dataList[6].dataValue.ToString("X") + "," +
                                "0X" + dataList[10].dataValue.ToString("X");
-                        Dispatcher.BeginInvoke(new Action(() =>
+                        Dispatcher.Invoke(new Action(() =>
                         {
                             debugViewModel.SBP = (dataList[1].dataValue - Convert.ToDouble(APPSettingUtil. APP_CorSbp)).ToString();
                             debugViewModel.DBP = (dataList[2].dataValue - Convert.ToDouble(APPSettingUtil.APP_CorDbp)).ToString();
@@ -531,7 +517,7 @@ namespace CardioVascular.Views.SystemPage
                     }
                     else if (dataList[i].frameType == CommandWord.REQ_BP_PRESSURE)
                     {
-                        Dispatcher.BeginInvoke(new Action(() => {
+                        Dispatcher.Invoke(new Action(() => {
                             debugViewModel.RealPressure = dataList[i + 1].dataValue.ToString();
                         }));
                         if (dataList[i + 1].dataValue <= 1)
@@ -751,7 +737,7 @@ namespace CardioVascular.Views.SystemPage
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     debugViewModel.Period = (HeartRate * 2).ToString(); // Assuming txtPeriod is a TextBox control
-                    HeartRate = (int)((60.0 * 1000) / (HeartRate * 2));
+                    HeartRate = (int)((60.0 * GlobalVariable.Sample_Rate) / (HeartRate * 2));
                     debugViewModel.DebugHR = HeartRate.ToString();
                 }));
             }

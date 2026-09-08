@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Cardio.Model;
+using Cardio.Util;
+using log4net.Core;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using Cardio.Model;
-using Cardio.Util;
-using log4net.Core;
 
 /*
  * 自定义串口管理类，线程安全的单例模式，全局维护和使用
@@ -37,12 +38,18 @@ namespace Cardio.SPCL
         public int SendTimes = 1;
         private readonly int ShortWaitTime = 3;
 
+
+        private readonly System.Timers.Timer _readTimer = new System.Timers.Timer(28);
+        private readonly object _readLock = new object();
         //定义构造函数 初始化一些操作
         private SerialPortManager() 
         {
             serialPort = new SerialPort();
             serialPortRecive_timer.Elapsed += new System.Timers.ElapsedEventHandler(ReciveCountAccurate);
-            serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(serialPort_DataReceived);//绑定串口接收事件
+            //serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(serialPort_DataReceived);//绑定串口接收事件
+            _readTimer.AutoReset = true;
+            _readTimer.Elapsed += ReadTimer_Elapsed;
+            _readTimer.Start();
         }
         /// <summary>
         /// 定义静态方法获取唯一对象
@@ -148,6 +155,53 @@ namespace Cardio.SPCL
             return isSuccess;
         }
         //串口接收数据
+        private void ReadTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            // 防止重入
+            if (!Monitor.TryEnter(_readLock)) return;
+            {
+                try
+                {
+                    // 检查串口是否打开
+                    if (!serialPort.IsOpen) return;
+
+                    serialPortRecive_timer.Enabled = false;
+                    reciveCounter = 0;
+                    // 检查是否有数据可读
+                    int byteToRead = serialPort.BytesToRead;
+                    if (byteToRead == 0) return;
+
+                    // 限制每次最大读取 2048 字节，防止一次处理过多
+                    int bytesToRead = Math.Min(byteToRead, 2048);
+                    byte[] bufferTemp = new byte[bytesToRead];
+                    int actualRead = serialPort.Read(bufferTemp, 0, bytesToRead);
+
+                    if (actualRead > 0)
+                    {
+                        // 只有实际读到字节才解除等待，空轮询不能掩盖真实超时。
+                        
+                        // 添加到缓存
+                        myReadBuffer.AddRange(bufferTemp);
+
+                        List<ReceiveDataStructure> dataValueAndTypes = ExtractData.GetUsefullInfos(myReadBuffer);
+                        // 触发事件
+                        if (dataValueAndTypes.Count > 0)
+                        {
+                            InformMsgEvnet?.Invoke(MCErrorCode.NoError, dataValueAndTypes);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogUtil.Error("定时读取串口异常", ex.Message);
+                }
+                finally
+                {
+                    Monitor.Exit(_readLock);
+                }
+            }
+        }
+
         private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             // 关定时器
@@ -156,14 +210,13 @@ namespace Cardio.SPCL
             //读取数据到自定义的用户缓存中，下面处理对象全是针对用户缓存myReadBuffer
             int byteToRead = serialPort.BytesToRead;
             if (byteToRead==0)//huoqushebeide length ,开始时间和结束时间放宽一点，
-            {
-                return;
-            }
+            { return; }
             byte[] bufferTemp = new byte[byteToRead];
             serialPort.Read(bufferTemp, 0, byteToRead);
             myReadBuffer.AddRange(bufferTemp);
             //提取数据中的有用信息，按照结构体类型放到dataValueAndType中
             List<ReceiveDataStructure> dataValueAndTypes = ExtractData.GetUsefullInfos(myReadBuffer);
+            
             if (dataValueAndTypes.Count > 0)
             {
                 InformMsgEvnet?.Invoke(MCErrorCode.NoError, dataValueAndTypes);//串口每次触发datareceived事件时裁剪好的数据都会被复制//串口每次触发datareceived事件时裁剪好的数据都会被复制
