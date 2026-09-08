@@ -39,7 +39,7 @@ namespace Cardio.SPCL
         private readonly int ShortWaitTime = 3;
 
 
-        private readonly System.Timers.Timer _readTimer = new System.Timers.Timer(28);
+        private readonly System.Timers.Timer _readTimer = new System.Timers.Timer(28);//下位机采样频率为28ms一次
         private readonly object _readLock = new object();
         //定义构造函数 初始化一些操作
         private SerialPortManager() 
