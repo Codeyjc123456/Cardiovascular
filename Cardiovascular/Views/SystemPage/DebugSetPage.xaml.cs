@@ -219,10 +219,9 @@ namespace CardioVascular.Views.SystemPage
                 }));
                 ChangeBtStyle(PreStart, "BigBlueBtnStyle", "压力测试");
                 Task.Delay(500);
-                serialPortManager?.SendData(CommandWord.REQ_BP_STOP, Bt_Pressureindex);
-                workStatus = WorkStatus.CloseValue;//给出工作状态“关闭阀门”下一步就是执行该命令
-                                                   //关闭阀门标志
-                Bp_ACK_Flag = -3;
+                serialPortManager?.CloseControl(Bt_Pressureindex);
+                workStatus = WorkStatus.CloseValue;//给出工作状态“关闭阀门”下一步就是执行该命令             
+                Bp_ACK_Flag = -3;//关闭阀门标志
             }
             else
                 HandyControl.Controls.Growl.Info("当前有任务正在执行，");
