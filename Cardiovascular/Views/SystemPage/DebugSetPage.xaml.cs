@@ -210,7 +210,7 @@ namespace CardioVascular.Views.SystemPage
         }
         private void cmdCloseValve_Click(object sender, RoutedEventArgs e)
         {
-            if (workStatus == WorkStatus.NoWork || workStatus == WorkStatus.StartBPtest || workStatus == WorkStatus.PreStart || workStatus == WorkStatus.CloseValue)
+            if (workStatus == WorkStatus.NoWork || workStatus == WorkStatus.StartBPtest || workStatus == WorkStatus.PreStart)
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -234,6 +234,7 @@ namespace CardioVascular.Views.SystemPage
                 serialPortManager?.OpenControl(Bt_Pressureindex);
                 //打开阀门标志
                 Bp_ACK_Flag = -2;
+                workStatus = WorkStatus.NoWork;
             }
         }
 
