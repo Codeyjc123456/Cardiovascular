@@ -46,10 +46,10 @@ namespace Cardio.SPCL
         {
             serialPort = new SerialPort();
             serialPortRecive_timer.Elapsed += new System.Timers.ElapsedEventHandler(ReciveCountAccurate);
-            serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(serialPort_DataReceived);//绑定串口接收事件
-            //_readTimer.AutoReset = true;
-            //_readTimer.Elapsed += ReadTimer_Elapsed; // 定时器接收串口数据
-            //_readTimer.Start();
+            //serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(serialPort_DataReceived);//绑定串口接收事件
+            _readTimer.AutoReset = true;
+            _readTimer.Elapsed += ReadTimer_Elapsed; // 定时器接收串口数据
+            _readTimer.Start();
         }
         /// <summary>
         /// 定义静态方法获取唯一对象
