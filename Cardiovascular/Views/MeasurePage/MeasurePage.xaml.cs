@@ -1,4 +1,4 @@
-﻿using Cardio.Algorithm;
+using Cardio.Algorithm;
 using Cardio.BLL;
 using Cardio.DAL;
 using Cardio.Model;
@@ -302,9 +302,9 @@ namespace Cardio.Views.MeasurePage
                     }));
                     workStatus = WorkStatus.NoWork;
                     pulsedata.AI_num = 1;
-                    // 结果可用：先把 AI 诊断结果回填到记录，再自动打开医师诊断界面（保存时入库/更新）
-                    pulsedata.AIDiagnosisResult = strAIDiagnosisResult;
-                    pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
+                    // 先把桡动脉分析结果(指标+原始波形+诊断)写入 pulsedata，
+                    // 否则 Diagnosis 里点“保存”时入库的将是一堆全0的字段
+                    FillAIResultToPulseData();
                     Dispatcher.BeginInvoke(new Action(async () =>
                     {
                         // 必须走 GetResultAsync：HandyControl 会在此时把 CloseAction 注入到 DataContext，
@@ -319,14 +319,12 @@ namespace Cardio.Views.MeasurePage
                 }
             }
         }
-        private void UpdataToDatabase()
+        /// <summary>
+        /// 把桡动脉(AI)分析结果与原始波形写入 pulsedata，
+        /// 供 Diagnosis 保存入库与 Commit(UpdataToDatabase) 两处共用，避免保存时AI字段全为0
+        /// </summary>
+        private void FillAIResultToPulseData()
         {
-            //保存数据
-            int RawDataNum_Record;
-            RawDataNum_Record = 12 * GlobalVariable.Sample_Rate;
-            string RawPackData = "";
-            RawPackData = stringMerge.MergeString(RpRawData);
-            string str = "TestDateTime = '" + g_strDateTime + " '";
             pulsedata.Sbp = FinalBpMrsValue.Sbp;
             pulsedata.Dbp = FinalBpMrsValue.Dbp;
             pulsedata.Pp = FinalBpMrsValue.Sbp - FinalBpMrsValue.Dbp;
@@ -338,9 +336,14 @@ namespace Cardio.Views.MeasurePage
             pulsedata.Dpti = g_typeCardiacIndex.Dpti;
             pulsedata.Sevr = g_typeCardiacIndex.Sevr;
             pulsedata.EdPct = g_typeCardiacIndex.EdPct * 100;
-            pulsedata.RpRawData = RawPackData;
+            pulsedata.RpRawData = stringMerge.MergeString(RpRawData);
             pulsedata.AIDiagnosisResult = strAIDiagnosisResult;
             pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
+        }
+        private void UpdataToDatabase()
+        {
+            //保存数据：先填充完整AI结果
+            FillAIResultToPulseData();
             string Str_Testdate;
             Str_Testdate = string.Format("{0:yyyyMMddHHmmssffff}", g_strDateTime);
             Variable.MrsIndexValue.Upload_Report_Name = userInfo.UserId + "_" + Str_Testdate + ".pdf";//As100681....2022091302_.pdf
@@ -1287,7 +1290,7 @@ namespace Cardio.Views.MeasurePage
             }
             if (pulsedata.AI_num == 1)
             {
-                UpdataToDatabase();
+                //UpdataToDatabase();
                 this.NavigationService.Navigate(new OpenReportPage(pulsedata, ReportAction));
             }
             else

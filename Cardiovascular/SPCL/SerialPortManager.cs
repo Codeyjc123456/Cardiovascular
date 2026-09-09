@@ -1,4 +1,4 @@
-﻿using Cardio.Model;
+﻿﻿using Cardio.Model;
 using Cardio.Util;
 using log4net.Core;
 using System;
