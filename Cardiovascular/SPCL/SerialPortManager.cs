@@ -46,10 +46,10 @@ namespace Cardio.SPCL
         {
             serialPort = new SerialPort();
             serialPortRecive_timer.Elapsed += new System.Timers.ElapsedEventHandler(ReciveCountAccurate);
-            //serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(serialPort_DataReceived);//绑定串口接收事件
-            _readTimer.AutoReset = true;
-            _readTimer.Elapsed += ReadTimer_Elapsed;
-            _readTimer.Start();
+            serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(serialPort_DataReceived);//绑定串口接收事件
+            //_readTimer.AutoReset = true;
+            //_readTimer.Elapsed += ReadTimer_Elapsed; // 定时器接收串口数据
+            //_readTimer.Start();
         }
         /// <summary>
         /// 定义静态方法获取唯一对象
@@ -213,15 +213,18 @@ namespace Cardio.SPCL
             { return; }
             byte[] bufferTemp = new byte[byteToRead];
             serialPort.Read(bufferTemp, 0, byteToRead);
-            myReadBuffer.AddRange(bufferTemp);
-            //提取数据中的有用信息，按照结构体类型放到dataValueAndType中
-            List<ReceiveDataStructure> dataValueAndTypes = ExtractData.GetUsefullInfos(myReadBuffer);
-            
-            if (dataValueAndTypes.Count > 0)
-            {
-                InformMsgEvnet?.Invoke(MCErrorCode.NoError, dataValueAndTypes);//串口每次触发datareceived事件时裁剪好的数据都会被复制//串口每次触发datareceived事件时裁剪好的数据都会被复制
-            }
 
+            myReadBuffer.AddRange(bufferTemp);
+            if(myReadBuffer.Count > 5)
+            {
+                //提取数据中的有用信息，按照结构体类型放到dataValueAndType中
+                List<ReceiveDataStructure> dataValueAndTypes = ExtractData.GetUsefullInfos(myReadBuffer);
+
+                if (dataValueAndTypes.Count > 0)
+                {
+                    InformMsgEvnet?.Invoke(MCErrorCode.NoError, dataValueAndTypes);//串口每次触发datareceived事件时裁剪好的数据都会被复制//串口每次触发datareceived事件时裁剪好的数据都会被复制
+                } 
+            }
         }
         //发送设定预期压力
         public void InitSet(int Wvalue_temp, int whichOne)

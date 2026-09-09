@@ -232,9 +232,9 @@ namespace CardioVascular.Views.SystemPage
             if (workStatus == WorkStatus.NoWork || workStatus == WorkStatus.StartBPtest || workStatus == WorkStatus.PreStart || workStatus == WorkStatus.CloseValue)
             {
                 serialPortManager?.OpenControl(Bt_Pressureindex);
+                workStatus = WorkStatus.OpenValue;
                 //打开阀门标志
                 Bp_ACK_Flag = -2;
-                workStatus = WorkStatus.NoWork;
             }
         }
 
@@ -553,7 +553,7 @@ namespace CardioVascular.Views.SystemPage
                                 "0X" + dataList[3].dataValue.ToString("X");
                                 strTip = "温馨提示：正在关闭阀门.... :";
                                 DisPlayTips(strTip + strDebug);
-
+                                workStatus = WorkStatus.NoWork;
                             }
                             else if (Bp_ACK_Flag == -2)
                             {
@@ -565,6 +565,7 @@ namespace CardioVascular.Views.SystemPage
                                 "0X" + dataList[3].dataValue.ToString("X");
                                 strTip = "温馨提示：正在打开阀门.... :";
                                 DisPlayTips(strTip + strDebug);
+                                workStatus = WorkStatus.NoWork;
                             }
                         }
                         else if ((dataList[1].dataValue == 75) && (dataList[2].dataValue == 115))////收到响应指令“K”
