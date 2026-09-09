@@ -213,9 +213,9 @@ namespace Cardio.SPCL
             { return; }
             byte[] bufferTemp = new byte[byteToRead];
             serialPort.Read(bufferTemp, 0, byteToRead);
-
             myReadBuffer.AddRange(bufferTemp);
-            if(myReadBuffer.Count > 5)
+            //LogUtil.Info("接收到串口数据，长度：" + myReadBuffer.Count);
+            if (myReadBuffer.Count > 3)
             {
                 //提取数据中的有用信息，按照结构体类型放到dataValueAndType中
                 List<ReceiveDataStructure> dataValueAndTypes = ExtractData.GetUsefullInfos(myReadBuffer);
