@@ -79,14 +79,14 @@ namespace CardioVascular.Views.SystemPage
         }
         private void InitTimer()
         {
-            TimerGetRealPressure?.Interval = 200;//1s 执行一次
+            TimerGetRealPressure?.Interval = 500;//1s 执行一次
             TimerGetRealPressure?.Enabled = false;
             TimerGetRealPressure?.AutoReset = true;
             TimerGetRealPressure?.Elapsed += new System.Timers.ElapsedEventHandler(TimerGetRealPressure_Tick);
-            LoopPressureOpen?.Interval = TimeSpan.FromMilliseconds(30000);//30s  启动一次
-            LoopPressureOpen?.Tick += LoopPressureOpen_Tick;
-            LoopPressureOpen?.Start();
-            LoopPressureOpen?.Stop();
+            //LoopPressureOpen?.Interval = TimeSpan.FromMilliseconds(30000);//30s  启动一次
+            //LoopPressureOpen?.Tick += LoopPressureOpen_Tick;
+            //LoopPressureOpen?.Start();
+            //LoopPressureOpen?.Stop();
         }
         private void LoopPressureOpen_Tick(object sender, EventArgs e)
         {

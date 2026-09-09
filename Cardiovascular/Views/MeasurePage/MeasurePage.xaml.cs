@@ -979,7 +979,7 @@ namespace Cardio.Views.MeasurePage
                                 else
                                 {
                                     strTip = "温馨提示：请点击桡动脉测量按钮继续测量!";
-                                    ChangeBtStyle(TestBtn, "BigBlueBtnStyle", "开始测量");
+                                    ChangeBtStyle(TestBtn, "BigBlueBtnStyle", "血压测量");
                                 }
                             }
                         }
