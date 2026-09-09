@@ -254,7 +254,7 @@ namespace Cardio.Views.MeasurePage
         }
         #endregion
 
-        private async Task ProcessData()
+        private void ProcessData()
         {
             //判断是保存血压数据还是脉搏波
             if (WaitForAck == MrsWaitForAck.MrsBP)
@@ -571,7 +571,7 @@ namespace Cardio.Views.MeasurePage
                         CompleteABIMeasurement();
                         WaitForAck = MrsWaitForAck.MrsBP;
                         Task.Delay(1000);
-                        _ = ProcessData();
+                        ProcessData();
                     }
 
                 }
@@ -591,7 +591,7 @@ namespace Cardio.Views.MeasurePage
                 CompleteABIMeasurement();
                 //判断下一步应该执行什么操作
                 Task.Delay(1000);
-                _ = ProcessData();
+                ProcessData();
 
             }
         }
@@ -1097,7 +1097,7 @@ namespace Cardio.Views.MeasurePage
                                     measureViewModel.Tips = strTip;
                                 })); 
                                 Task.Delay(1000);
-                                _ = ProcessData();
+                                ProcessData();
                                 bPressMrsStart = true;
                                 PWVStopFist = true;
                                 Task.Delay(200);
