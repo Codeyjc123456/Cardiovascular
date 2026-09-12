@@ -518,7 +518,7 @@ namespace Cardio.Views.MeasurePage
                 Validate(() => Convert.ToDouble(measureViewModel.Dpti), 2300, 3500, v => Dptiup.Visibility = v, b => Dpti.Foreground = b, p => measureViewModel.DptiUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Pp), 30, 45, v => Ppup.Visibility = v, b => PP.Foreground = b, p => measureViewModel.PpUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Cap), 85, 110, v => SBp2up.Visibility = v, b => Cap.Foreground = b, p => measureViewModel.CapUp = p);
-                Validate(() => Convert.ToDouble(measureViewModel.AIx), 0.75, 99, v => AIxup.Visibility = v, b => AIx.Foreground = b, p => measureViewModel.AIxUp = p);
+                Validate(() => Convert.ToDouble(measureViewModel.AIx), 0, 0.75, v => AIxup.Visibility = v, b => AIx.Foreground = b, p => measureViewModel.AIxUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Sbp), 90, 130, v => SBpup.Visibility = v, b => SBP.Foreground = b, p => measureViewModel.SBpUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Dbp), 60, 90, v => DBpup.Visibility = v, b => DBP.Foreground = b, p => measureViewModel.DBpUp = p);
             }));
