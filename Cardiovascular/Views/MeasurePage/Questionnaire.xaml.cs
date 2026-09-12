@@ -1,6 +1,5 @@
+using Cardio.DAL;
 using Cardio.Model;
-using Cardio.SPCL;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,85 +8,73 @@ namespace Cardio.Views.MeasurePage
     /// <summary>
     /// 健康问卷（登录完成后优先填写）：只采集心血管危险因素与既往心血管疾病，
     /// 不含医师判断/操作医师/医师建议（这些内容在 Diagnosis 页面填写）。
-    /// 保存后写入 Variable.CardiovascularFactors / Variable.CardiovascularDis，
-    /// 测量开始时带入 pulsedata，Diagnosis 打开即可自动回显。
+    /// 勾选项直接存进 UserInfoEntity 的 int 字段（1=有，0=无），
+    /// “疾病说明”存 OtherDisease，便于直接从数据库/实体带入。
     /// </summary>
     public partial class Questionnaire : Border
     {
         private readonly MeasureViewModel questionnaireViewModel = new ();
+        private readonly UserInfoEntity userInfo;
 
-        public Questionnaire()
+        public Questionnaire(UserInfoEntity userInfo)
         {
             InitializeComponent();
+            this.userInfo = userInfo;
             DataContext = questionnaireViewModel;
         }
 
         private void Border_Load(object sender, RoutedEventArgs e)
         {
-            PrefillFromSaved();
+            PrefillFromEntity();
         }
 
         /// <summary>
-        /// 若已有保存过的问卷内容则回显（再次进入时保持上次选择）
+        /// 从 UserInfoEntity 回显（1=有，0=无）
         /// </summary>
-        private void PrefillFromSaved()
+        private void PrefillFromEntity()
         {
-            string factors = Variable.CardiovascularFactors ?? "";
-            questionnaireViewModel.Smoke = factors.Contains("吸烟");
-            questionnaireViewModel.HighBP = factors.Contains("高血压");
-            questionnaireViewModel.Tangniaobing = factors.Contains("糖尿病");
-            questionnaireViewModel.Xuezhi = factors.Contains("血脂异常");
+            questionnaireViewModel.Smoke = userInfo.RiskSmoking == 1;
+            questionnaireViewModel.HighBP = userInfo.RiskHypertension == 1;
+            questionnaireViewModel.Tangniaobing = userInfo.RiskDiabetes == 1;
+            questionnaireViewModel.Xuezhi = userInfo.RiskDyslipidemia == 1;
 
-            // 勾选项只用于回显勾选，不写进“疾病说明”
-            string checkedDis = Variable.CardiovascularDiseaseChecked ?? "";
-            questionnaireViewModel.Guanxinbing = checkedDis.Contains("冠心病");
-            questionnaireViewModel.Naozuzhong = checkedDis.Contains("脑卒中");
-            questionnaireViewModel.Xinlishuaijie = checkedDis.Contains("心力衰竭");
-            questionnaireViewModel.Xinjiaotong = checkedDis.Contains("心绞痛");
-            questionnaireViewModel.Shenzangbing = checkedDis.Contains("肾脏病");
-            questionnaireViewModel.Xinjigengsi = checkedDis.Contains("心肌梗死");
+            questionnaireViewModel.Guanxinbing = userInfo.CoronaryDiease == 1;
+            questionnaireViewModel.Naozuzhong = userInfo.Stroke == 1;
+            questionnaireViewModel.Xinlishuaijie = userInfo.HeartFailure == 1;
+            questionnaireViewModel.Xinjiaotong = userInfo.Angina == 1;
+            questionnaireViewModel.Shenzangbing = userInfo.KidneyDiease == 1;
+            questionnaireViewModel.Xinjigengsi = userInfo.MvocardialInfarction == 1;
 
-            // “疾病说明”只显示手写内容
-            questionnaireViewModel.CardiovascularDIS = Variable.CardiovascularDis ?? "";
+            questionnaireViewModel.CardiovascularDIS = userInfo.OtherDisease ?? "";
         }
 
         /// <summary>
-        /// 保存：勾选项与“疾病说明”分别保存，互不混入
+        /// 保存：把勾选写回 UserInfoEntity（1/0），并标记问卷已填写
         /// </summary>
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            Variable.CardiovascularFactors = BuildFactors();
-            Variable.CardiovascularDiseaseChecked = BuildCheckedDiseases();
-            Variable.CardiovascularDis = questionnaireViewModel.CardiovascularDIS ?? "";
+            userInfo.RiskSmoking = questionnaireViewModel.Smoke ? 1 : 0;
+            userInfo.RiskHypertension = questionnaireViewModel.HighBP ? 1 : 0;
+            userInfo.RiskDiabetes = questionnaireViewModel.Tangniaobing ? 1 : 0;
+            userInfo.RiskDyslipidemia = questionnaireViewModel.Xuezhi ? 1 : 0;
+
+            userInfo.CoronaryDiease = questionnaireViewModel.Guanxinbing ? 1 : 0;
+            userInfo.Stroke = questionnaireViewModel.Naozuzhong ? 1 : 0;
+            userInfo.HeartFailure = questionnaireViewModel.Xinlishuaijie ? 1 : 0;
+            userInfo.Angina = questionnaireViewModel.Xinjiaotong ? 1 : 0;
+            userInfo.KidneyDiease = questionnaireViewModel.Shenzangbing ? 1 : 0;
+            userInfo.MvocardialInfarction = questionnaireViewModel.Xinjigengsi ? 1 : 0;
+
+            userInfo.OtherDisease = questionnaireViewModel.CardiovascularDIS ?? "";
+            userInfo.IsSurveryed = 1;
+
             questionnaireViewModel.CloseAction?.Invoke();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            // 取消：不保存，保留上次内容
+            // 取消：不写入实体
             questionnaireViewModel.CloseAction?.Invoke();
-        }
-
-        private string BuildFactors()
-        {
-            var list = new List<string>();
-            if (questionnaireViewModel.Smoke) list.Add("吸烟");
-            if (questionnaireViewModel.HighBP) list.Add("高血压");
-            if (questionnaireViewModel.Tangniaobing) list.Add("糖尿病");
-            if (questionnaireViewModel.Xuezhi) list.Add("血脂异常");
-            return string.Join("；", list);
-        }
-
-        private string BuildCheckedDiseases()
-        {
-            var list = new List<string>();
-            if (questionnaireViewModel.Guanxinbing) list.Add("冠心病");
-            if (questionnaireViewModel.Naozuzhong) list.Add("脑卒中");
-            if (questionnaireViewModel.Xinlishuaijie) list.Add("心力衰竭");
-            if (questionnaireViewModel.Xinjiaotong) list.Add("心绞痛");
-            if (questionnaireViewModel.Shenzangbing) list.Add("肾脏病");
-            if (questionnaireViewModel.Xinjigengsi) list.Add("心肌梗死");
-            return string.Join("；", list);
         }
     }
 }

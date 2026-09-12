@@ -24,6 +24,7 @@ namespace Cardio.Views.MeasurePage
         private volatile bool aiMeasurementActive;
         private string LastMsg = "";
         private PulseDataLocalDAL pulsedataDAL = null;
+        private UserInfoDAL userInfoDAL = null;
         private PulseDataLocalEntity pulsedata = new();
         private UserInfoEntity userInfo = new ();
         //定义串口
@@ -130,11 +131,16 @@ namespace Cardio.Views.MeasurePage
             pulsedata.OperationgDoctor = userInfo.OperatingDoctor;
             pulsedata.orgId = userInfo.OrgId;
 
-            // 登录进入测量页后优先填写健康问卷（危险因素/既往心血管疾病），
-            // 结果保存在 Variable 中，测量开始时带入 pulsedata，Diagnosis 打开即可回显
+            // 登录进入测量页后优先填写健康问卷（危险因素/既往心血管疾病）。
+            // 问卷内容直接写入 UserInfoEntity 的 int 字段（1=有，0=无），保存后同步到本地库，
+            // 后续测量与 Diagnosis 直接读实体/数据库带入，无需再依赖静态缓存
             Dispatcher.BeginInvoke(new Action(async () =>
             {
-                await HandyControl.Controls.Dialog.Show(new Questionnaire()).GetResultAsync<string>();
+                await HandyControl.Controls.Dialog.Show(new Questionnaire(userInfo)).GetResultAsync<string>();
+                if (userInfo.Id > 0)
+                {
+                    userInfoDAL.Update(userInfo);
+                }
             }));
 
             //Ready.Visibility = Visibility.Hidden;
@@ -176,6 +182,7 @@ namespace Cardio.Views.MeasurePage
         private void InitComponent()
         {
             pulsedataDAL = PulseDataLocalDAL.getInstance();
+            userInfoDAL = UserInfoDAL.getInstance();
             Timer_ABIDelay = new System.Timers.Timer();
             TimerBPTest = new System.Timers.Timer();
 
@@ -205,8 +212,8 @@ namespace Cardio.Views.MeasurePage
                 measureViewModel.UserName = userInfo.UserName;
                 measureViewModel.UserSex = userInfo.UserSex;
                 measureViewModel.BirthDay = userInfo.UserBirthday.ToString();
-                Ready.Visibility = Visibility.Hidden;
-                AITest.Visibility = Visibility.Visible;
+                Ready.Visibility = Visibility.Visible;
+                AITest.Visibility = Visibility.Hidden;
                 OpenReport.Visibility = Visibility.Hidden;
                 Hrup.Visibility = Visibility.Hidden;
                 Edup.Visibility = Visibility.Hidden;
@@ -310,8 +317,8 @@ namespace Cardio.Views.MeasurePage
                     workStatus = WorkStatus.NoWork;
                     pulsedata.AI_num = 1;
                     // 兜底：确保健康问卷内容一定带入记录（即使 pulsedata 不是由“开始测量”新建的那一个）
-                    pulsedata.CardiovascularFactors = Variable.CardiovascularFactors ?? "";
-                    pulsedata.CardiovascularDis = Variable.CardiovascularDis ?? "";
+                    pulsedata.CardiovascularFactors = GetRiskFactors(userInfo);
+                    pulsedata.CardiovascularDis = userInfo.OtherDisease ?? "";
                     // 先把桡动脉分析结果(指标+原始波形+诊断)写入 pulsedata，
                     // 否则 Diagnosis 里点“保存”时入库的将是一堆全0的字段
                     FillAIResultToPulseData();
@@ -319,7 +326,7 @@ namespace Cardio.Views.MeasurePage
                     {
                         // 必须走 GetResultAsync：HandyControl 会在此时把 CloseAction 注入到 DataContext，
                         // 否则 Diagnosis 内点“保存/取消”时 CloseAction?.Invoke() 为空，无法自动关闭回到本页
-                        await HandyControl.Controls.Dialog.Show(new Diagnosis(pulsedata)).GetResultAsync<string>();
+                        await HandyControl.Controls.Dialog.Show(new Diagnosis(pulsedata, userInfo)).GetResultAsync<string>();
                     }));
                 }
                 finally
@@ -328,6 +335,18 @@ namespace Cardio.Views.MeasurePage
                     SetAiMeasurementActive(false);
                 }
             }
+        }
+        /// <summary>
+        /// 由 UserInfoEntity 的 int 字段（1=有，0=无）拼出“心血管危险因素”串，供报告/诊断使用
+        /// </summary>
+        private static string GetRiskFactors(UserInfoEntity u)
+        {
+            List<string> factors = new List<string>();
+            if (u.RiskSmoking == 1) factors.Add("吸烟");
+            if (u.RiskHypertension == 1) factors.Add("高血压");
+            if (u.RiskDiabetes == 1) factors.Add("糖尿病");
+            if (u.RiskDyslipidemia == 1) factors.Add("血脂异常");
+            return string.Join("；", factors);
         }
         /// <summary>
         /// 把桡动脉(AI)分析结果与原始波形写入 pulsedata，
@@ -391,8 +410,8 @@ namespace Cardio.Views.MeasurePage
             try
             {
                 FeaturePoint featurepoint = new ();
-                g_typeBpMrsValue.Sbp = 116;
-                g_typeBpMrsValue.Dbp = 90;
+                g_typeBpMrsValue.Sbp = FinalBpMrsValue.Sbp;
+                g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp;
                 try
                 {
                     if (featurepoint.Identify(g_typeBpMrsValue.Sbp, g_typeBpMrsValue.Dbp, RpRawData) == 0)//保存数据
@@ -1251,9 +1270,9 @@ namespace Cardio.Views.MeasurePage
             if (bPressMrsStart)
             {
                 pulsedata = new PulseDataLocalEntity();//初始化测试数据实体
-                // 带入健康问卷填写内容，供后续 Diagnosis 回显
-                pulsedata.CardiovascularFactors = Variable.CardiovascularFactors;
-                pulsedata.CardiovascularDis = Variable.CardiovascularDis;
+                // 带入健康问卷填写内容（来自 UserInfoEntity 的 int 字段），供后续 Diagnosis 回显
+                pulsedata.CardiovascularFactors = GetRiskFactors(userInfo);
+                pulsedata.CardiovascularDis = userInfo.OtherDisease ?? "";
                 InitMreasureRelatedControls();
                 InitMreasureRelatedVariables();
                 Initialize();

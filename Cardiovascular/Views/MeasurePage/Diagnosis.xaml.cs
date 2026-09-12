@@ -22,10 +22,14 @@ namespace Cardio.Views.MeasurePage
         PulseDataLocalDAL dataDAL = null;
         PulseDataLocalEntity pulsedata = new ();
         List<DoctorInfoEntity> doctorlist = new();
-        public Diagnosis(PulseDataLocalEntity testData)
+        // 健康问卷来源：登录进入测量页时填写的用户实体（int 字段 1=有，0=无）；
+        // 数据管理查看历史报告时没有该实体，传 null
+        private readonly UserInfoEntity userInfo;
+        public Diagnosis(PulseDataLocalEntity testData, UserInfoEntity userInfo = null)
         {
             InitializeComponent();
             pulsedata = testData;
+            this.userInfo = userInfo;
             DataContext = doctorViewModel;
         }
         private void AddDoctor(object sender, RoutedEventArgs e)
@@ -71,23 +75,48 @@ namespace Cardio.Views.MeasurePage
             {
                 doctorViewModel.Doctordiagnosis = pulsedata.AIDiagnosisProposal ?? "";
             }
-            // 注意：Intshow() 内部的 CardiovascularFactorsShow() 会把 pulsedata.CardiovascularFactors 清空，
-            // 所以必须在调用之前先把问卷带入的内容取出来
-            string questionnaireFactors = pulsedata.CardiovascularFactors;
-            string questionnaireDis = pulsedata.CardiovascularDis;      //“疾病说明”（手写内容）
-            string diseaseChecked = "";
-            if (pulsedata.Id == 0)
-            {
-                // 测量流程的新记录：记录为空时退回当前问卷缓存(Variable)兜底
-                if (string.IsNullOrEmpty(questionnaireFactors)) questionnaireFactors = Variable.CardiovascularFactors;
-                diseaseChecked = Variable.CardiovascularDiseaseChecked ?? "";
-                if (string.IsNullOrEmpty(questionnaireDis)) questionnaireDis = Variable.CardiovascularDis;
-            }
-            if (string.IsNullOrEmpty(diseaseChecked))
-                diseaseChecked = questionnaireDis ?? "";   // 兼容旧记录：从疾病串解析勾选
+            // 注意：Intshow() 内部的 CardiovascularFactorsShow() 会按旧逻辑重算/清空 pulsedata.CardiovascularFactors，
+            // 所以问卷回显统一放在 Intshow() 之后，由实体（int 字段 1=有/0=无）直接带入
             Intshow();
-            PrefillQuestionnaire(questionnaireFactors, diseaseChecked, questionnaireDis);
+            if (userInfo != null)
+            {
+                // 测量流程：直接用登录时填写的 UserInfoEntity 带入问卷内容
+                PrefillFromUserInfo(userInfo);
+            }
+            else
+            {
+                // 数据管理查看历史报告：没有用户实体，退回按记录中保存的问卷串回显
+                PrefillQuestionnaire(pulsedata.CardiovascularFactors, pulsedata.CardiovascularDis, pulsedata.CardiovascularDis);
+            }
+        }
+        /// <summary>
+        /// 从 UserInfoEntity 的 int 字段（1=有，0=无）带入健康问卷内容
+        /// </summary>
+        private void PrefillFromUserInfo(UserInfoEntity u)
+        {
+            if (u.RiskSmoking == 1) { doctorViewModel.Smoke = true; doctorViewModel.ImgSelect = CheckImgPath; }
+            if (u.RiskHypertension == 1) { doctorViewModel.HighBP = true; doctorViewModel.ImgHighBP = CheckImgPath; }
+            if (u.RiskDiabetes == 1) { doctorViewModel.Tangniaobing = true; doctorViewModel.ImgTang = CheckImgPath; }
+            if (u.RiskDyslipidemia == 1) { doctorViewModel.Xuezhi = true; doctorViewModel.ImgXuezhi = CheckImgPath; }
 
+            if (u.CoronaryDiease == 1) { doctorViewModel.Guanxinbing = true; doctorViewModel.ImgGuan = CheckImgPath; }
+            if (u.Stroke == 1) { doctorViewModel.Naozuzhong = true; doctorViewModel.ImgNaozu = CheckImgPath; }
+            if (u.HeartFailure == 1) { doctorViewModel.Xinlishuaijie = true; doctorViewModel.ImgXinli = CheckImgPath; }
+            if (u.Angina == 1) { doctorViewModel.Xinjiaotong = true; doctorViewModel.ImgXinjiaotong = CheckImgPath; }
+            if (u.KidneyDiease == 1) { doctorViewModel.Shenzangbing = true; doctorViewModel.ImgShenzang = CheckImgPath; }
+            if (u.MvocardialInfarction == 1) { doctorViewModel.Xinjigengsi = true; doctorViewModel.ImgXinji = CheckImgPath; }
+
+            // “疾病说明”文本框显示问卷中填写的内容
+            doctorViewModel.CardiovascularDIS = u.OtherDisease ?? "";
+
+            // 恢复被 CardiovascularFactorsShow() 重算掉的记录字段（医师若取消保存，报告中仍保留问卷内容）
+            List<string> factors = new List<string>();
+            if (u.RiskSmoking == 1) factors.Add("吸烟");
+            if (u.RiskHypertension == 1) factors.Add("高血压");
+            if (u.RiskDiabetes == 1) factors.Add("糖尿病");
+            if (u.RiskDyslipidemia == 1) factors.Add("血脂异常");
+            pulsedata.CardiovascularFactors = string.Join("；", factors);
+            pulsedata.CardiovascularDis = u.OtherDisease ?? "";
         }
         /// <summary>
         /// 回显问卷内容：factors=危险因素；diseaseChecked=既往疾病勾选项（只用于勾选）；

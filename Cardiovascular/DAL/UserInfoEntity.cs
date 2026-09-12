@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +34,7 @@ namespace Cardio.DAL
         public int RiskSmoking { get; set; }
         public int RiskHypertension { get; set; }
         public int RiskDyslipidemia { get; set; }
+        public int RiskDiabetes { get; set; }
         public int CoronaryDiease { get; set; }
         public int Stroke { get; set; }
         public int KidneyDiease { get; set; }
