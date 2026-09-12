@@ -391,7 +391,7 @@ namespace Cardio.Views.MeasurePage
                         {
                             measureViewModel.Tips = "温馨提示：波形分析出错，请重新测量";
                         }));
-                        ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
+                        ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测量");
                         SaveDataAfterAIAcquisitionFlag = false;
                         return false;
                     }
@@ -403,7 +403,7 @@ namespace Cardio.Views.MeasurePage
                         this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败:稳定段数据较少！";
                     }));
                     AITestIntit();
-                    ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
+                    ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测量");
                     return false;
                 }
                 //心率值是否有误string result = ;//把数字字符串中的数字提取出来
@@ -437,7 +437,7 @@ namespace Cardio.Views.MeasurePage
                     measureViewModel.Tips = "温馨提示：脉搏波信号分析中";
                     //显示指标
                     DisplayAIIndex();
-                    ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
+                    ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测量");
                 }));
                
 
@@ -480,7 +480,7 @@ namespace Cardio.Views.MeasurePage
                     this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败！";
                 }));
                 AITestIntit();
-                ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
+                ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测量");
                 return false;
             }
         }
@@ -723,7 +723,7 @@ namespace Cardio.Views.MeasurePage
                 MaxValue = (int)DataOneSec.Max();
                 MinValue = (int)DataOneSec.Min();
                 DifValue = MaxValue - MinValue;
-                if (DifValue <= 650)
+                if (DifValue <= 800)
                 {
                     //放大倍数加1
                     if (!serialPortManager.SendData(CommandWord.REQ_PWV_INC_GAIN, 0x02))//桡动脉
@@ -1347,7 +1347,7 @@ namespace Cardio.Views.MeasurePage
                 }
                 workStatus = WorkStatus.NoWork;
                 SetAiMeasurementActive(false);
-                ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
+                ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测量");
                 measureViewModel.Tips = "温馨提示：脉搏波测量结束！";
             }
             else
@@ -1369,7 +1369,7 @@ namespace Cardio.Views.MeasurePage
             DataOneSec.Clear();
             DataTwoSec.Clear();
             measureViewModel.TestStatus = "0";
-            ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测试");
+            ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测量");
         }
         private void SetAiMeasurementActive(bool active)
         {
