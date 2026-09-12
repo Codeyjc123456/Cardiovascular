@@ -371,7 +371,7 @@
                                 Height="65"
                                 Margin="0,0,0,0"
                                 Click="Pic_test_Click"
-                                Content="开始测量"
+                                Content="血压测量"
                                 Style="{StaticResource BigBlueBtnStyle}" />
                         </Grid>
 
