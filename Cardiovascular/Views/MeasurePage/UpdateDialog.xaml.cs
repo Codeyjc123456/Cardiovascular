@@ -1,4 +1,4 @@
-﻿using Cadio.CustomRule;
+using Cadio.CustomRule;
 using System.Globalization;
 using Cardio.CustomRule;
 using Cardio.DAL;
@@ -30,7 +30,9 @@ namespace Cardio.Views.MeasurePage
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            userinfo.UserId = "";
+            // 返回：不修改 userinfo（否则会把 UserId 清空），标记为取消，
+            // 由 LoginPage 判断取消就留在登录页，不进入测量页
+            userViewModel.Result = "cancel";
             userViewModel.CloseAction?.Invoke();
             tabAction.Invoke();
         }
@@ -51,7 +53,9 @@ namespace Cardio.Views.MeasurePage
                 return;
             }
 
-            if (userViewModel.UserName == "" || userViewModel.UserID == "" || userViewModel.BirthDay == "")
+            if (userViewModel.UserName == "" || userViewModel.UserID == "" || userViewModel.BirthDay == ""
+                || string.IsNullOrWhiteSpace(userViewModel.UserSex)
+                || userViewModel.UserHeight <= 0 || userViewModel.UserWeight <= 0)
             {
                 HandyControl.Controls.Growl.Info("请将信息填写完整！", "Update");
                 return;
@@ -83,6 +87,7 @@ namespace Cardio.Views.MeasurePage
 
             // 不写本地数据库：信息已回填到 userinfo 实体（与调用方是同一引用），
             // 关闭对话框跳回 LoginPage，由 LoginPage 使用补全后的 userinfo
+            userViewModel.Result = "ok";
             userViewModel.CloseAction?.Invoke();
             tabAction.Invoke();
         }

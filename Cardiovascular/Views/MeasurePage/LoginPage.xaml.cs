@@ -1,4 +1,4 @@
-﻿using Cardio.BLL;
+using Cardio.BLL;
 using Cardio.DAL;
 using Cardio.Model;
 using Cardio.SPCL;
@@ -115,6 +115,19 @@ namespace Cardio.Views.MeasurePage
             userInfo = userInfoDAL.Find(conditionStr);
             if (userInfo != null)
             {
+                // 本地已有该用户：信息不完整时先弹补全界面；点“返回/取消”就留在登录页，不进入测量页
+                if (IsUserInfoIncomplete(userInfo))
+                {
+                    string dialogResult = await Dialog.Show(new UpdateDialog(userInfo, tabAction)).GetResultAsync<string>();
+                    if (dialogResult != "ok")
+                        return;
+                    if (IsUserInfoIncomplete(userInfo))
+                    {
+                        Growl.Warning("用户信息未填写完整，无法开始测量！");
+                        return;
+                    }
+                    userInfoDAL.Update(userInfo);   // 补全后的信息写回本地库
+                }
                 this.NavigationService.Navigate(new MeasureReePage(userInfo));
             }
             else
@@ -123,8 +136,23 @@ namespace Cardio.Views.MeasurePage
                 UserInfoEntity u = new UserInfoEntity();
                 u.UserId = loginViewModel.UserID;
                 await Dialog.Show(new RegisterDialog(u, tabAction)).GetResultAsync<string>();
+                // “返回”时 RegisterDialog 会清空 UserId，这里统一按信息是否完整来判断是否允许进入测量页
+                if (IsUserInfoIncomplete(u))
+                {
+                    Growl.Warning("用户信息未填写完整，无法开始测量！");
+                    return;
+                }
                 this.NavigationService.Navigate(new MeasureReePage(u));
             }
+        }
+        /// <summary>
+        /// 判断用户信息是否不完整（缺账号/姓名/性别/生日/身高/体重任意一项）
+        /// </summary>
+        private static bool IsUserInfoIncomplete(UserInfoEntity userInfo)
+        {
+            return userInfo.UserId.IsNullOrEmpty() || userInfo.UserName.IsNullOrEmpty()
+                || userInfo.UserSex.IsNullOrEmpty() || userInfo.UserBirthday.IsNullOrEmpty()
+                || userInfo.UserHeight <= 0 || userInfo.UserWeight <= 0;
         }
         private void CloseBtn(object sender, RoutedEventArgs e)
         {
