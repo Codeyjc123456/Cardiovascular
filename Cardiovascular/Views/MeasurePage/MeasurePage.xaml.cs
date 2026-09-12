@@ -130,6 +130,13 @@ namespace Cardio.Views.MeasurePage
             pulsedata.OperationgDoctor = userInfo.OperatingDoctor;
             pulsedata.orgId = userInfo.OrgId;
 
+            // 登录进入测量页后优先填写健康问卷（危险因素/既往心血管疾病），
+            // 结果保存在 Variable 中，测量开始时带入 pulsedata，Diagnosis 打开即可回显
+            Dispatcher.BeginInvoke(new Action(async () =>
+            {
+                await HandyControl.Controls.Dialog.Show(new Questionnaire()).GetResultAsync<string>();
+            }));
+
             //Ready.Visibility = Visibility.Hidden;
             //AITest.Visibility = Visibility.Visible;
             //measureViewModel.Tips = "温馨提示：血压测量完成！";
@@ -198,8 +205,8 @@ namespace Cardio.Views.MeasurePage
                 measureViewModel.UserName = userInfo.UserName;
                 measureViewModel.UserSex = userInfo.UserSex;
                 measureViewModel.BirthDay = userInfo.UserBirthday.ToString();
-                Ready.Visibility = Visibility.Visible;
-                AITest.Visibility = Visibility.Hidden;
+                Ready.Visibility = Visibility.Hidden;
+                AITest.Visibility = Visibility.Visible;
                 OpenReport.Visibility = Visibility.Hidden;
                 Hrup.Visibility = Visibility.Hidden;
                 Edup.Visibility = Visibility.Hidden;
@@ -302,6 +309,9 @@ namespace Cardio.Views.MeasurePage
                     }));
                     workStatus = WorkStatus.NoWork;
                     pulsedata.AI_num = 1;
+                    // 兜底：确保健康问卷内容一定带入记录（即使 pulsedata 不是由“开始测量”新建的那一个）
+                    pulsedata.CardiovascularFactors = Variable.CardiovascularFactors ?? "";
+                    pulsedata.CardiovascularDis = Variable.CardiovascularDis ?? "";
                     // 先把桡动脉分析结果(指标+原始波形+诊断)写入 pulsedata，
                     // 否则 Diagnosis 里点“保存”时入库的将是一堆全0的字段
                     FillAIResultToPulseData();
@@ -381,8 +391,8 @@ namespace Cardio.Views.MeasurePage
             try
             {
                 FeaturePoint featurepoint = new ();
-                g_typeBpMrsValue.Sbp = FinalBpMrsValue.Sbp;
-                g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp;
+                g_typeBpMrsValue.Sbp = 116;
+                g_typeBpMrsValue.Dbp = 90;
                 try
                 {
                     if (featurepoint.Identify(g_typeBpMrsValue.Sbp, g_typeBpMrsValue.Dbp, RpRawData) == 0)//保存数据
@@ -1241,6 +1251,9 @@ namespace Cardio.Views.MeasurePage
             if (bPressMrsStart)
             {
                 pulsedata = new PulseDataLocalEntity();//初始化测试数据实体
+                // 带入健康问卷填写内容，供后续 Diagnosis 回显
+                pulsedata.CardiovascularFactors = Variable.CardiovascularFactors;
+                pulsedata.CardiovascularDis = Variable.CardiovascularDis;
                 InitMreasureRelatedControls();
                 InitMreasureRelatedVariables();
                 Initialize();

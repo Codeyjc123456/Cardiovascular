@@ -1,4 +1,5 @@
 using Cardio.Model;
+using Cardio.SPCL;
 using System.Windows;
 using System.Windows.Controls;
 using Cardio.DAL;
@@ -70,8 +71,48 @@ namespace Cardio.Views.MeasurePage
             {
                 doctorViewModel.Doctordiagnosis = pulsedata.AIDiagnosisProposal ?? "";
             }
+            // 注意：Intshow() 内部的 CardiovascularFactorsShow() 会把 pulsedata.CardiovascularFactors 清空，
+            // 所以必须在调用之前先把问卷带入的内容取出来
+            string questionnaireFactors = pulsedata.CardiovascularFactors;
+            string questionnaireDis = pulsedata.CardiovascularDis;      //“疾病说明”（手写内容）
+            string diseaseChecked = "";
+            if (pulsedata.Id == 0)
+            {
+                // 测量流程的新记录：记录为空时退回当前问卷缓存(Variable)兜底
+                if (string.IsNullOrEmpty(questionnaireFactors)) questionnaireFactors = Variable.CardiovascularFactors;
+                diseaseChecked = Variable.CardiovascularDiseaseChecked ?? "";
+                if (string.IsNullOrEmpty(questionnaireDis)) questionnaireDis = Variable.CardiovascularDis;
+            }
+            if (string.IsNullOrEmpty(diseaseChecked))
+                diseaseChecked = questionnaireDis ?? "";   // 兼容旧记录：从疾病串解析勾选
             Intshow();
+            PrefillQuestionnaire(questionnaireFactors, diseaseChecked, questionnaireDis);
 
+        }
+        /// <summary>
+        /// 回显问卷内容：factors=危险因素；diseaseChecked=既往疾病勾选项（只用于勾选）；
+        /// diseaseText=“疾病说明”文本框内容（只显示手写说明，不含勾选项）
+        /// </summary>
+        private const string CheckImgPath = "pack://application:,,,/Resources/Image/Measure/Check.png";
+        private void PrefillQuestionnaire(string factors, string diseaseChecked, string diseaseText)
+        {
+            factors ??= "";
+            diseaseChecked ??= "";
+            diseaseText ??= "";
+            if (factors.Contains("吸烟")) { doctorViewModel.Smoke = true; doctorViewModel.ImgSelect = CheckImgPath; }
+            if (factors.Contains("高血压")) { doctorViewModel.HighBP = true; doctorViewModel.ImgHighBP = CheckImgPath; }
+            if (factors.Contains("糖尿病")) { doctorViewModel.Tangniaobing = true; doctorViewModel.ImgTang = CheckImgPath; }
+            if (factors.Contains("血脂异常")) { doctorViewModel.Xuezhi = true; doctorViewModel.ImgXuezhi = CheckImgPath; }
+
+            if (diseaseChecked.Contains("冠心病")) { doctorViewModel.Guanxinbing = true; doctorViewModel.ImgGuan = CheckImgPath; }
+            if (diseaseChecked.Contains("脑卒中")) { doctorViewModel.Naozuzhong = true; doctorViewModel.ImgNaozu = CheckImgPath; }
+            if (diseaseChecked.Contains("心力衰竭")) { doctorViewModel.Xinlishuaijie = true; doctorViewModel.ImgXinli = CheckImgPath; }
+            if (diseaseChecked.Contains("心绞痛")) { doctorViewModel.Xinjiaotong = true; doctorViewModel.ImgXinjiaotong = CheckImgPath; }
+            if (diseaseChecked.Contains("肾脏病")) { doctorViewModel.Shenzangbing = true; doctorViewModel.ImgShenzang = CheckImgPath; }
+            if (diseaseChecked.Contains("心肌梗死")) { doctorViewModel.Xinjigengsi = true; doctorViewModel.ImgXinji = CheckImgPath; }
+
+            // 文本框只显示“疾病说明”的手写内容
+            doctorViewModel.CardiovascularDIS = diseaseText;
         }
         private void Intshow()
         {   //Contain

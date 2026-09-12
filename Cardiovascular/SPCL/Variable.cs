@@ -66,6 +66,11 @@ namespace Cardio.SPCL
         public static DateTime ErrorTime;
 
         public static string base64pdf;//报告的base64位数据
+
+        //健康问卷（登录后优先填写）：危险因素与既往心血管疾病，测量开始时带入 pulsedata，供 Diagnosis 带出
+        public static string CardiovascularFactors = "";
+        public static string CardiovascularDiseaseChecked = "";   //既往心血管疾病勾选项（仅用于回显勾选，不进入“疾病说明”）
+        public static string CardiovascularDis = "";              //“疾病说明”文本框手写内容
         //动脉弹性功能
         public struct MrsIndexValue
         {
