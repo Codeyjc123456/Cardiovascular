@@ -723,7 +723,7 @@ namespace Cardio.Views.MeasurePage
                 MaxValue = (int)DataOneSec.Max();
                 MinValue = (int)DataOneSec.Min();
                 DifValue = MaxValue - MinValue;
-                if ((MinValue <= 100 && MaxValue - MinValue <= 800) || (MinValue > 100 && DifValue <= 850))
+                if (DifValue <= 650)
                 {
                     //放大倍数加1
                     if (!serialPortManager.SendData(CommandWord.REQ_PWV_INC_GAIN, 0x02))//桡动脉
@@ -735,7 +735,7 @@ namespace Cardio.Views.MeasurePage
                 if (MaxValue >= 3900 || DifValue > 3700)
                 {
                     //放大倍数减一
-                    
+
                     if (!serialPortManager.SendData(CommandWord.REQ_PWV_DEC_GAIN, 0x02)) //桡动脉
                     {
                         measureViewModel.Tips = "脉搏波形幅度减小命令发送失败，请检查设备";
@@ -745,6 +745,7 @@ namespace Cardio.Views.MeasurePage
                 AICountOneSec = 0;
                 DataOneSec.Clear();
             }
+            
             //----------------------------------2秒钟筛选一次波形---------------------------------------------
             if (AICountTwoSec >= 1 && AICountTwoSec == GlobalVariable.Sample_Rate)
             {
@@ -758,7 +759,7 @@ namespace Cardio.Views.MeasurePage
                     }
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        measureViewModel.TestStatus = (Convert.ToDouble(nMarkSelect) / 12 * 100).ToString("f2");
+                        measureViewModel.TestStatus = (Convert.ToDouble(nMarkSelect) / 9 * 100).ToString("f2");
                     }));
 
                     Console.WriteLine("nMarkSelect" + nMarkSelect);
@@ -819,7 +820,7 @@ namespace Cardio.Views.MeasurePage
                 AcquireData clsAcquisition;
                 clsAcquisition = new AcquireData();
                 //对每次获取的2秒脉搏波数据进行判断处理
-                if (nMarkSelect < 2 && MinValue > 50 && DifValue > 600 && DifValue < 3700 && MaxValue < 3900)
+                if (nMarkSelect < 2 && MinValue > 50 && DifValue > 400 && DifValue < 3700 && MaxValue < 3900)
                 {
                     if (clsAcquisition.SelectWaveform(DataTwoSec, GlobalVariable.Sample_Rate) == 1)
                     {
@@ -890,7 +891,7 @@ namespace Cardio.Views.MeasurePage
                                 DataCount++;
                                 measureViewModel.AIData.Add(iData[0]);
                                 if (measureViewModel.AIData.Count % 4 == 0)
-                                    AiSeries.Refresh();
+                                { AiSeries.Refresh(); }
                                 HandleAIPulseData(ref DataCount, ref iData[0]);
                                 if (measureViewModel.AIData.Count >= 6000)
                                 {
