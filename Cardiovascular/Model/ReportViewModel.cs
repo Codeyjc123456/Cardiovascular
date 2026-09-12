@@ -127,7 +127,6 @@ namespace Cardio.Model
             SetTxtWithMark("txt_DPTI", testResult.Dpti, 2300, 3500, "f0");
             SetTxtWithMark("txt_SEVR", testResult.Sevr, 1.0, 4,    "f2");
             SetTxtWithMark("txt_SBP",  testResult.Sbp,  90, 130,  "f0");
-            SetTxt("txt_title", APPSettingUtil.APP_OwnerSet);
             SetTxt("txt_SBP1", testResult.Sbp.ToString() + "mmHg");
             SetTxtWithMark("txt_DBP",  testResult.Dbp,  60, 90,   "f0");
             SetTxt("txt_DBP1", testResult.Dbp.ToString() + "mmHg");
@@ -141,6 +140,7 @@ namespace Cardio.Model
                 ? (testResult.AIDiagnosisProposal?.ToString() ?? "")
                 : testResult.DoctorDiagnosis;
             SetTxt("txt_AIDiagnosisProposal", proposal);
+            // 标题叠加在模板背景图片顶部的蓝色栏中。
             SetTxt("txt_title", APPSettingUtil.APP_CompaneTitle);
         }
         public void SetTitlePic()
