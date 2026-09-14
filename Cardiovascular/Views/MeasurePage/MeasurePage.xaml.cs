@@ -360,7 +360,7 @@ namespace Cardio.Views.MeasurePage
             pulsedata.Ed = g_typeCardiacIndex.Ed * 100;
             pulsedata.Sbp2 = g_typeVascularIndex.Cap;
             pulsedata.AIx = g_typeVascularIndex.AIx;
-            pulsedata.Hr = get_bp_hr;
+            pulsedata.Hr = FinalBpMrsValue.Hr;
             pulsedata.Spti = Convert.ToInt32(g_typeCardiacIndex.Spti);
             pulsedata.Dpti = g_typeCardiacIndex.Dpti;
             pulsedata.Sevr = g_typeCardiacIndex.Sevr;
@@ -412,6 +412,7 @@ namespace Cardio.Views.MeasurePage
                 FeaturePoint featurepoint = new ();
                 g_typeBpMrsValue.Sbp = FinalBpMrsValue.Sbp;
                 g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp;
+                g_typeBpMrsValue.Hr = FinalBpMrsValue.Hr;
                 try
                 {
                     if (featurepoint.Identify(g_typeBpMrsValue.Sbp, g_typeBpMrsValue.Dbp, RpRawData) == 0)//保存数据
@@ -436,7 +437,7 @@ namespace Cardio.Views.MeasurePage
                     return false;
                 }
                 //心率值是否有误string result = ;//把数字字符串中的数字提取出来
-                g_typeCardiacIndex.Hr = Convert.ToInt16(featurepoint.index[1, 0]);
+                g_typeCardiacIndex.Hr = g_typeBpMrsValue.Hr;
                 if (g_typeCardiacIndex.Hr < 40)
                 {
                     Dispatcher.BeginInvoke(new Action(() =>
@@ -451,7 +452,7 @@ namespace Cardio.Views.MeasurePage
                 g_typeVascularIndex.Pp = g_typeBpMrsValue.Sbp - g_typeBpMrsValue.Dbp;
                 g_typeCardiacIndex.SBp = g_typeVascularIndex.Sbp;
                 g_typeCardiacIndex.DBp = g_typeVascularIndex.Dbp;
-                g_typeCardiacIndex.Hr = Convert.ToInt16(featurepoint.index[1, 0]);
+                
                 g_typeCardiacIndex.EdPct = Convert.ToSingle(featurepoint.index[1, 1]);
                 g_typeCardiacIndex.Spti = Convert.ToInt16(featurepoint.index[1, 2]);
                 g_typeCardiacIndex.Dpti = Convert.ToInt16(featurepoint.index[1, 3]);
@@ -519,7 +520,7 @@ namespace Cardio.Views.MeasurePage
             measureViewModel.Sevr = g_typeCardiacIndex.Sevr.ToString("f2");
             g_typeCardiacIndex.EdPct *= 100;
             measureViewModel.EdPct = g_typeCardiacIndex.EdPct.ToString("f2");
-            measureViewModel.Hr = get_bp_hr.ToString("");
+            measureViewModel.Hr = g_typeCardiacIndex.Hr.ToString("");
             measureViewModel.Sbp = g_typeCardiacIndex.SBp.ToString("");
             measureViewModel.Dbp = g_typeCardiacIndex.DBp.ToString("");
             measureViewModel.Spti = g_typeCardiacIndex.Spti.ToString("");
@@ -573,6 +574,7 @@ namespace Cardio.Views.MeasurePage
                     arrGetBpHandle[NumOfBpMrs].Sbp = FourLimbBp.Sbp;
                     arrGetBpHandle[NumOfBpMrs].Dbp = FourLimbBp.Dbp;
                     arrGetBpHandle[NumOfBpMrs].Map = FourLimbBp.Map;
+                    arrGetBpHandle[NumOfBpMrs].Hr = FourLimbBp.Hr;
                     arrGetBpSave[NumOfBpMrs] = arrGetBpHandle[NumOfBpMrs];
                     if (NumOfBpMrs < 1)
                     {
@@ -589,6 +591,7 @@ namespace Cardio.Views.MeasurePage
                             FinalBpMrsValue.Sbp = (arrGetBpHandle[0].Sbp + arrGetBpHandle[1].Sbp) / 2;
                             FinalBpMrsValue.Dbp = (arrGetBpHandle[0].Dbp + arrGetBpHandle[1].Dbp) / 2;
                             FinalBpMrsValue.Map = (arrGetBpHandle[0].Map + arrGetBpHandle[1].Map) / 2;
+                            FinalBpMrsValue.Hr = (arrGetBpHandle[0].Hr + arrGetBpHandle[1].Hr) / 2;
                         }
                         catch (Exception ex)
                         {
@@ -1046,7 +1049,7 @@ namespace Cardio.Views.MeasurePage
                     {
                         get_bp.Sbp = dataList[1 + i].dataValue;
                         get_bp.Dbp = dataList[2 + i].dataValue;
-                        get_bp_hr = dataList[5 + i].dataValue;
+                        get_bp.Hr = dataList[5 + i].dataValue;
                         get_bp.Map = dataList[6 + i].dataValue;
                         //当四肢全采到血压值后进入，对血压值进行处理
                         string fault = "";

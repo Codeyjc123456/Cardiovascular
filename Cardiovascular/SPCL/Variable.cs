@@ -91,6 +91,7 @@ namespace Cardio.SPCL
             public int Sbp;
             public int Dbp;
             public int Map;
+            public int Hr;
         };
     }
     //数据缓存
