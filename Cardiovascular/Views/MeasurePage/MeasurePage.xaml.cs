@@ -212,8 +212,8 @@ namespace Cardio.Views.MeasurePage
                 measureViewModel.UserName = userInfo.UserName;
                 measureViewModel.UserSex = userInfo.UserSex;
                 measureViewModel.BirthDay = userInfo.UserBirthday.ToString();
-                Ready.Visibility = Visibility.Hidden;
-                AITest.Visibility = Visibility.Visible;
+                Ready.Visibility = Visibility.Visible;
+                AITest.Visibility = Visibility.Hidden;
                 OpenReport.Visibility = Visibility.Hidden;
                 Hrup.Visibility = Visibility.Hidden;
                 Edup.Visibility = Visibility.Hidden;
@@ -411,9 +411,9 @@ namespace Cardio.Views.MeasurePage
             try
             {
                 FeaturePoint featurepoint = new ();
-                g_typeBpMrsValue.Sbp = 116;
-                g_typeBpMrsValue.Dbp = 80;
-                g_typeBpMrsValue.Hr = 80;
+                g_typeBpMrsValue.Sbp = FinalBpMrsValue.Sbp;
+                g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp;
+                g_typeBpMrsValue.Hr = FinalBpMrsValue.Hr;
                 try
                 {
                     if (featurepoint.Identify(g_typeBpMrsValue.Sbp, g_typeBpMrsValue.Dbp, RpRawData) == 0)//保存数据
