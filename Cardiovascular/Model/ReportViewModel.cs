@@ -122,7 +122,7 @@ namespace Cardio.Model
             SetTxt("TestDate", testResult.TestDateTime);
             // 指标异常标注：超出正常范围显示 ↑/↓ 并变红（范围与测量界面一致）
             SetTxtWithMark("txt_HR",   testResult.Hr,   60, 100,   "f0");
-            SetTxtWithMark("txt_ED",   testResult.EdPct,   30, 45,    "f2");
+            SetTxtWithPctMark("txt_ED",   testResult.EdPct,   30, 45,    "f2");
             SetTxtWithMark("txt_SPTI", testResult.Spti, 1800, 2500, "f0");
             SetTxtWithMark("txt_DPTI", testResult.Dpti, 2300, 3500, "f0");
             SetTxtWithMark("txt_SEVR", testResult.Sevr, 1.0, 4,    "f2");
@@ -212,6 +212,18 @@ namespace Cardio.Model
             bool low = value < min;
             string arrow = high ? "↑" : (low ? "↓" : "");
             txt.Text = value.ToString(format) + (arrow.Length > 0 ? " " + arrow : "");
+            txt.TextColor = (high || low) ? SDColor.Red : SDColor.Black;
+        }
+
+        private void SetTxtWithPctMark(string key, double value, double min, double max, string format)
+        {
+            TextObject txt = pReport?.FindObject(key) as TextObject;
+            if (txt == null)
+                return;
+            bool high = value > max;
+            bool low = value < min;
+            string arrow = high ? "↑" : (low ? "↓" : "");
+            txt.Text = value.ToString(format) + "%" + (arrow.Length > 0 ?  arrow : "");
             txt.TextColor = (high || low) ? SDColor.Red : SDColor.Black;
         }
         private void SetPic(string key, string pic)

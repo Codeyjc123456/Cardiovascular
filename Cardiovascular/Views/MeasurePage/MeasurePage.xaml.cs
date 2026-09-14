@@ -520,7 +520,7 @@ namespace Cardio.Views.MeasurePage
         {
             measureViewModel.Sevr = g_typeCardiacIndex.Sevr.ToString("f2");
             g_typeCardiacIndex.EdPct *= 100;
-            measureViewModel.EdPct = g_typeCardiacIndex.EdPct.ToString("f2");
+            measureViewModel.EdPct = g_typeCardiacIndex.EdPct.ToString("f2")+ "%";
             measureViewModel.Hr = g_typeCardiacIndex.Hr.ToString("");
             measureViewModel.Sbp = g_typeCardiacIndex.SBp.ToString("");
             measureViewModel.Dbp = g_typeCardiacIndex.DBp.ToString("");
@@ -544,7 +544,7 @@ namespace Cardio.Views.MeasurePage
             {
                 Validate(() => Convert.ToDouble(measureViewModel.Sevr), 1.0, 4, v => Sevrup.Visibility = v, b => lblSevr.Foreground = b, p => measureViewModel.SevrUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Hr), 60, 100, v => Hrup.Visibility = v, b => Hr.Foreground = b, p => measureViewModel.HrUp = p);
-                Validate(() => Convert.ToDouble(measureViewModel.EdPct), 30, 45, v => Edup.Visibility = v, b => EdPct.Foreground = b, p => measureViewModel.EdUp = p);
+                Validate(() => Math.Round(g_typeCardiacIndex.EdPct, 2), 30, 45, v => Edup.Visibility = v, b => EdPct.Foreground = b, p => measureViewModel.EdUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Spti), 1800, 2500, v => Sptiup.Visibility = v, b => Spti.Foreground = b, p => measureViewModel.SptiUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Dpti), 2300, 3500, v => Dptiup.Visibility = v, b => Dpti.Foreground = b, p => measureViewModel.DptiUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Pp), 30, 45, v => Ppup.Visibility = v, b => PP.Foreground = b, p => measureViewModel.PpUp = p);
@@ -555,6 +555,7 @@ namespace Cardio.Views.MeasurePage
             }));
             //显示波形
             strTip = "温馨提示：脉脉搏数据采集完成，正在保存... ...";
+            
             measureViewModel.AIData.Clear();
             for (int i = 0; i < RpRawData.Count; i++)
             {

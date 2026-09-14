@@ -14,15 +14,15 @@
       <TextObject Name="txt_userWeight" Left="491.4" Top="105.84" Width="74.5" Height="22.68" HorzAlign="Center" VertAlign="Center" Font="宋体, 13pt, style=Bold"/>
       <TextObject Name="txt_Sbp1" Left="661.5" Top="75.6" Width="94.5" Height="22.68" HorzAlign="Center" VertAlign="Center" Font="宋体, 13pt, style=Bold"/>
       <TextObject Name="txt_dbp1" Left="661.5" Top="105.84" Width="94.5" Height="22.68" HorzAlign="Center" VertAlign="Center" Font="宋体, 13pt, style=Bold"/>
-      <TextObject Name="txt_HR" Left="144.4" Top="362.88" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
-      <TextObject Name="txt_ED" Left="144.4" Top="388.58" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
-      <TextObject Name="txt_SPTI" Left="144.4" Top="413.15" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
-      <TextObject Name="txt_DPTI" Left="144.4" Top="438.48" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
-      <TextObject Name="txt_SEVR" Left="144.4" Top="463.81" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
-      <TextObject Name="txt_SBP" Left="506.52" Top="362.88" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
-      <TextObject Name="txt_DBP" Left="506.52" Top="388.58" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
-      <TextObject Name="txt_PP" Left="506.52" Top="413.15" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
-      <TextObject Name="txt_SBP2" Left="506.52" Top="438.48" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
+      <TextObject Name="txt_HR" Left="144.4" Top="362.88" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
+      <TextObject Name="txt_ED" Left="144.4" Top="388.58" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
+      <TextObject Name="txt_SPTI" Left="144.4" Top="413.15" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
+      <TextObject Name="txt_DPTI" Left="144.4" Top="438.48" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
+      <TextObject Name="txt_SEVR" Left="144.4" Top="463.81" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
+      <TextObject Name="txt_SBP" Left="506.52" Top="362.88" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
+      <TextObject Name="txt_DBP" Left="506.52" Top="388.58" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
+      <TextObject Name="txt_PP" Left="506.52" Top="413.15" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
+      <TextObject Name="txt_SBP2" Left="506.52" Top="438.48" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 11pt, style=Bold"/>
       <TextObject Name="txt_AI" Left="506.52" Top="463.81" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
       <TextObject Name="txt_AIDiagnosisResult" Left="37.8" Top="548.1" Width="349.65" Height="113.4" Font="宋体, 12pt"/>
       <TextObject Name="txt_AIDiagnosisProposal" Left="406.35" Top="548.1" Width="349.65" Height="113.4" Font="宋体, 12pt"/>
