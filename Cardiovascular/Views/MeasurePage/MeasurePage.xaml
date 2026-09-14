@@ -15,7 +15,7 @@
     Loaded="Window_OnLoaded"
     mc:Ignorable="d">
     <Page.Background>
-        <ImageBrush ImageSource="/Resources/Image/Measure/testback.png" Stretch="Fill" />
+        <ImageBrush ImageSource="/Resources/Image/Measure/testback1.png" Stretch="Fill" />
     </Page.Background>
     <hc:TransitioningContentControl TransitionStoryboard="{StaticResource FadeTransition}">
         <Grid>
@@ -130,9 +130,9 @@
                                 Name="EdPct"
                                 Width="75"
                                 Height="40"
-                                Margin="370,11,0,0"
+                                Margin="370,13,0,0"
                                 HorizontalAlignment="Left"
-                                FontSize="28"
+                                FontSize="21"
                                 Foreground="#0A80C6 "
                                 Text="{Binding EdPct}"
                                 TextAlignment="Center" />
