@@ -357,14 +357,15 @@ namespace Cardio.Views.MeasurePage
             pulsedata.Sbp = FinalBpMrsValue.Sbp;
             pulsedata.Dbp = FinalBpMrsValue.Dbp;
             pulsedata.Pp = FinalBpMrsValue.Sbp - FinalBpMrsValue.Dbp;
-            pulsedata.Ed = g_typeCardiacIndex.Ed * 100;
+            pulsedata.Hr = FinalBpMrsValue.Hr;
+
+            pulsedata.Ed = Math.Round(g_typeCardiacIndex.Ed * 100, 2);
             pulsedata.Sbp2 = g_typeVascularIndex.Cap;
             pulsedata.AIx = g_typeVascularIndex.AIx;
-            pulsedata.Hr = FinalBpMrsValue.Hr;
             pulsedata.Spti = Convert.ToInt32(g_typeCardiacIndex.Spti);
             pulsedata.Dpti = g_typeCardiacIndex.Dpti;
             pulsedata.Sevr = g_typeCardiacIndex.Sevr;
-            pulsedata.EdPct = g_typeCardiacIndex.EdPct * 100;
+            pulsedata.EdPct = Math.Round(g_typeCardiacIndex.EdPct,2);
             pulsedata.RpRawData = stringMerge.MergeString(RpRawData);
             pulsedata.AIDiagnosisResult = strAIDiagnosisResult;
             pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
@@ -716,7 +717,7 @@ namespace Cardio.Views.MeasurePage
             pulsedata.Dbp = Record_Index.Dbp;
             pulsedata.Pp = Record_Index.Sbp - Record_Index.Dbp;
             pulsedata.Map = g_typeBpMrsValue.Map;
-            pulsedata.BpHr = get_bp_hr;
+            pulsedata.BpHr = g_typeBpMrsValue.Hr;
             pulsedata.FristBraBP = strFirBraBp;
             pulsedata.SecondBraBP = strSecBraBp;
             pulsedata.HaveUpload = "N";

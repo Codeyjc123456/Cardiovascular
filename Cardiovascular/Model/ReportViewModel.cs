@@ -122,7 +122,7 @@ namespace Cardio.Model
             SetTxt("TestDate", testResult.TestDateTime);
             // 指标异常标注：超出正常范围显示 ↑/↓ 并变红（范围与测量界面一致）
             SetTxtWithMark("txt_HR",   testResult.Hr,   60, 100,   "f0");
-            SetTxtWithMark("txt_ED",   testResult.EdPct/100,   30, 45,    "f2");
+            SetTxtWithMark("txt_ED",   testResult.EdPct,   30, 45,    "f2");
             SetTxtWithMark("txt_SPTI", testResult.Spti, 1800, 2500, "f0");
             SetTxtWithMark("txt_DPTI", testResult.Dpti, 2300, 3500, "f0");
             SetTxtWithMark("txt_SEVR", testResult.Sevr, 1.0, 4,    "f2");

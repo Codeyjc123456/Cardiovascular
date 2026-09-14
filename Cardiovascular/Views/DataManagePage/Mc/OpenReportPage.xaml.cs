@@ -146,7 +146,7 @@ namespace Cardio.Views.DataManagePage.Mc
                     { "pp", model.testResult.Pp },
                     { "cap", model.testResult.Sbp2},
                     { "ai", model.testResult.AIx },
-                    { "ed", model.testResult.Ed/100 },
+                    { "ed", model.testResult.EdPct /100 },
                     { "spti", model.testResult.Spti },
                     { "dpti", model.testResult.Dpti },
                     { "sevr", model.testResult.Sevr },
