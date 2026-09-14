@@ -1,8 +1,9 @@
+using Cardio.DAL;
 using Cardio.Model;
 using Cardio.SPCL;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using Cardio.DAL;
 
 namespace Cardio.Views.MeasurePage
 {
@@ -40,6 +41,7 @@ namespace Cardio.Views.MeasurePage
                 if (doctorInfoDAL.Insert(doctorInfo) > 0)
                 {
                     HandyControl.Controls.Growl.Success("医师添加成功！", "SuccessMsg");
+                    CbDoctor.Items.Add(doctorInfo.DoctorName);
                     {
                         GC.Collect();
                     }
