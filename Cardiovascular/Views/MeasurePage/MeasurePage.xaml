@@ -128,11 +128,11 @@
                             </TextBlock>
                             <TextBlock
                                 Name="EdPct"
-                                Width="75"
+                                Width="150"
                                 Height="40"
-                                Margin="370,13,0,0"
+                                Margin="320,11,0,0"
                                 HorizontalAlignment="Left"
-                                FontSize="21"
+                                FontSize="28"
                                 Foreground="#0A80C6 "
                                 Text="{Binding EdPct}"
                                 TextAlignment="Center" />
