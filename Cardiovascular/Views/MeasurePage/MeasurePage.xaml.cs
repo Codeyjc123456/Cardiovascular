@@ -365,7 +365,9 @@ namespace Cardio.Views.MeasurePage
             pulsedata.Spti = Convert.ToInt32(g_typeCardiacIndex.Spti);
             pulsedata.Dpti = g_typeCardiacIndex.Dpti;
             pulsedata.Sevr = g_typeCardiacIndex.Sevr;
-            pulsedata.EdPct = Math.Round(g_typeCardiacIndex.EdPct,2);
+            // 报告(正常范围 30~45)与数据管理都按百分比展示，这里统一按百分比入库，
+            // EdPct 原始值是 0~1 的比值，需要 ×100
+            pulsedata.EdPct = Math.Round(g_typeCardiacIndex.EdPct * 100, 2);
             pulsedata.RpRawData = stringMerge.MergeString(RpRawData);
             pulsedata.AIDiagnosisResult = strAIDiagnosisResult;
             pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
@@ -519,8 +521,10 @@ namespace Cardio.Views.MeasurePage
         private void DisplayAIIndex()
         {
             measureViewModel.Sevr = g_typeCardiacIndex.Sevr.ToString("f2");
-            g_typeCardiacIndex.EdPct *= 100;
-            measureViewModel.EdPct = g_typeCardiacIndex.EdPct.ToString("f2")+ "%";
+            // g_typeCardiacIndex.EdPct 是 0~1 的比值，这里只用于界面展示，换算成百分比用局部变量，
+            // 不能改字段本身，否则入库/报告会跟着变成 28 倍或 0.28 倍（两者单位不一致）
+            double edPctDisplay = g_typeCardiacIndex.EdPct * 100;
+            measureViewModel.EdPct = edPctDisplay.ToString("f2")+ "%";
             measureViewModel.Hr = g_typeCardiacIndex.Hr.ToString("");
             measureViewModel.Sbp = g_typeCardiacIndex.SBp.ToString("");
             measureViewModel.Dbp = g_typeCardiacIndex.DBp.ToString("");
@@ -544,7 +548,7 @@ namespace Cardio.Views.MeasurePage
             {
                 Validate(() => Convert.ToDouble(measureViewModel.Sevr), 1.0, 4, v => Sevrup.Visibility = v, b => lblSevr.Foreground = b, p => measureViewModel.SevrUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Hr), 60, 100, v => Hrup.Visibility = v, b => Hr.Foreground = b, p => measureViewModel.HrUp = p);
-                Validate(() => Math.Round(g_typeCardiacIndex.EdPct, 2), 30, 45, v => Edup.Visibility = v, b => EdPct.Foreground = b, p => measureViewModel.EdUp = p);
+                Validate(() => Math.Round(edPctDisplay, 2), 30, 45, v => Edup.Visibility = v, b => EdPct.Foreground = b, p => measureViewModel.EdUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Spti), 1800, 2500, v => Sptiup.Visibility = v, b => Spti.Foreground = b, p => measureViewModel.SptiUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Dpti), 2300, 3500, v => Dptiup.Visibility = v, b => Dpti.Foreground = b, p => measureViewModel.DptiUp = p);
                 Validate(() => Convert.ToDouble(measureViewModel.Pp), 30, 45, v => Ppup.Visibility = v, b => PP.Foreground = b, p => measureViewModel.PpUp = p);
