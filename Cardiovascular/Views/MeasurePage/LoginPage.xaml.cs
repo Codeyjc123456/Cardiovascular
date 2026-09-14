@@ -173,18 +173,35 @@ namespace Cardio.Views.MeasurePage
 
         private void GetID(object sender, RoutedEventArgs e)
         {
-            DateTime today = DateTime.Today;
-            DateTime todayStart = today.Date;
+            // 生成当天的新账号：yyyyMMdd + 三位流水号。
+            // 原来用 DateTime.Today/DateTime.Now.ToString() 拼 SQL 去比较 createTime，
+            // 这两个字符串受操作系统的区域设置影响，各台机器格式不一致时字符串比较就会失效
+            // （自己电脑上能取到号、上位机上取不到就是这个原因）。
+            // 改为直接取当天已有账号里最大的流水号，不依赖任何日期格式。
+            string todayPrefix = DateTime.Now.ToString("yyyyMMdd");
             int Temp_Num = 0;
-            string Temp_Str = DateTime.Now.Date.ToString("yyyyMMdd");//查询今天0点到现在时间的注册个数，定位Temp_Num; 
-            string conditionStr = " ( createTime > '" + todayStart + "' and createTime < '" + DateTime.Now.ToString() + " '" + ')';
-            List<UserInfoEntity> user = new List<UserInfoEntity>();
-            user = userInfoDAL.Finds(conditionStr); 
+            List<UserInfoEntity> user = userInfoDAL.Finds("1 = 1");
             if (user != null)
             {
-                Temp_Num = user.Count + 1;
+                foreach (UserInfoEntity item in user)
+                {
+                    string userId = item.UserId ?? "";
+                    if (userId.Length == todayPrefix.Length + 3 && userId.StartsWith(todayPrefix)
+                        && int.TryParse(userId.Substring(todayPrefix.Length), out int seq))
+                    {
+                        Temp_Num = Math.Max(Temp_Num, seq);
+                    }
+                }
             }
-            loginViewModel.UserID = Temp_Str + Temp_Num.ToString("000");
+            // 再逐个往后找没被占用的号，避免与手工录入的同号账号冲突
+            string newUserId;
+            do
+            {
+                Temp_Num++;
+                newUserId = todayPrefix + Temp_Num.ToString("000");
+            }
+            while (userInfoDAL.FindCount(" UserId ='" + newUserId + "'") > 0);
+            loginViewModel.UserID = newUserId;
         }
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
