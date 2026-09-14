@@ -134,7 +134,7 @@ namespace Cardio.Views.MeasurePage
             // 登录进入测量页后优先填写健康问卷（危险因素/既往心血管疾病）。
             // 问卷内容直接写入 UserInfoEntity 的 int 字段（1=有，0=无），保存后同步到本地库，
             // 后续测量与 Diagnosis 直接读实体/数据库带入，无需再依赖静态缓存
-            Dispatcher.BeginInvoke(new Action(async () =>
+            Dispatcher.Invoke(new Action(async () =>
             {
                 await HandyControl.Controls.Dialog.Show(new Questionnaire(userInfo)).GetResultAsync<string>();
                 if (userInfo.Id > 0)
@@ -322,7 +322,7 @@ namespace Cardio.Views.MeasurePage
                     // 先把桡动脉分析结果(指标+原始波形+诊断)写入 pulsedata，
                     // 否则 Diagnosis 里点“保存”时入库的将是一堆全0的字段
                     FillAIResultToPulseData();
-                    Dispatcher.BeginInvoke(new Action(async () =>
+                    Dispatcher.Invoke(new Action(async () =>
                     {
                         // 必须走 GetResultAsync：HandyControl 会在此时把 CloseAction 注入到 DataContext，
                         // 否则 Diagnosis 内点“保存/取消”时 CloseAction?.Invoke() 为空，无法自动关闭回到本页
@@ -360,7 +360,7 @@ namespace Cardio.Views.MeasurePage
             pulsedata.Ed = g_typeCardiacIndex.Ed * 100;
             pulsedata.Sbp2 = g_typeVascularIndex.Cap;
             pulsedata.AIx = g_typeVascularIndex.AIx;
-            pulsedata.Hr = g_typeCardiacIndex.Hr;
+            pulsedata.Hr = get_bp_hr;
             pulsedata.Spti = Convert.ToInt32(g_typeCardiacIndex.Spti);
             pulsedata.Dpti = g_typeCardiacIndex.Dpti;
             pulsedata.Sevr = g_typeCardiacIndex.Sevr;
@@ -519,7 +519,7 @@ namespace Cardio.Views.MeasurePage
             measureViewModel.Sevr = g_typeCardiacIndex.Sevr.ToString("f2");
             g_typeCardiacIndex.EdPct *= 100;
             measureViewModel.EdPct = g_typeCardiacIndex.EdPct.ToString("f2");
-            measureViewModel.Hr = g_typeCardiacIndex.Hr.ToString("");
+            measureViewModel.Hr = get_bp_hr.ToString("");
             measureViewModel.Sbp = g_typeCardiacIndex.SBp.ToString("");
             measureViewModel.Dbp = g_typeCardiacIndex.DBp.ToString("");
             measureViewModel.Spti = g_typeCardiacIndex.Spti.ToString("");
