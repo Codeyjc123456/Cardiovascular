@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Cardio.Model;
+using Cardio.SPCL;
+using HandyControl.Controls;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -11,12 +14,24 @@ namespace Cadio.BLL
 {
     public static class ImagePrinter
     {
+        static APPSettingsViewModel APPSettingUtil = APPSettingsViewModel.getInstance();
         public static void PrintImagesWithDialog(IList<string> imagePaths)
         {
             if (imagePaths == null || imagePaths.Count == 0) return;
 
             var printDialog = new PrintDialog();
-            if (printDialog.ShowDialog() != true) return;
+            try
+            {
+                if (!APPSettingUtil.APP_PrinterDialog.Contains("关闭"))
+                {
+                    if (printDialog.ShowDialog() != true) return;
+                }
+            }
+            catch 
+            {
+                Growl.Info("打印报告失败!!!");
+                return; 
+            }
 
             // 用户在系统对话框里选择的打印队列
             var selectedQueueFullName = printDialog.PrintQueue?.FullName;
