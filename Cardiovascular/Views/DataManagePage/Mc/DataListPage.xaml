@@ -101,7 +101,7 @@
                 <DataGridTextColumn
                     Width="0.7*"
                     Binding="{Binding Hr}"
-                    Header="脉率" />
+                    Header="HR" />
                 <DataGridTextColumn
                     Width="0.8*"
                     Binding="{Binding Sevr, StringFormat={}{0:N2}}"
