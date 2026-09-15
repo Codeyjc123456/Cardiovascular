@@ -100,7 +100,7 @@
                     Header="身高" />
                 <DataGridTextColumn
                     Width="0.7*"
-                    Binding="{Binding BpHr}"
+                    Binding="{Binding Hr}"
                     Header="脉率" />
                 <DataGridTextColumn
                     Width="0.8*"

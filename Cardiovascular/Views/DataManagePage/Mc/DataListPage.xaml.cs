@@ -288,7 +288,7 @@ namespace Cardio.Views.DataManagePage.Mc
                     {"身高",datalist[0].userHeight },
                     {"体重",datalist[0].userWeight },
                     {"HR",datalist[0].Hr },
-                    {"ED",datalist[0].Ed },
+                    {"ED",datalist[0].EdPct },
                     {"SPTI",datalist[0].Spti },
                     {"DPTI",datalist[0].Dpti },
                     {"SEVR",datalist[0].Sevr },
@@ -350,13 +350,13 @@ namespace Cardio.Views.DataManagePage.Mc
                 bool isSuccess = dataDAL.Delete(Convert.ToInt32(id));
                 if (isSuccess)
                 {
-                    Growl.Success("删除用户成功！");
+                    Growl.Success("删除记录成功！");
                     model.PageIndex = 1;
                     Search();
                 }
                 else
                 {
-                  Growl.Warning("删除用户失败！");
+                  Growl.Warning("删除记录失败！");
                 }
             }
             else
