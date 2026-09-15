@@ -298,7 +298,7 @@ namespace Cardio.Views.DataManagePage.Mc
                     {"SBP2",datalist[0].Sbp2 },
                     {"AI",datalist[0].AIx },
                     {"诊断结果",datalist[0].AIDiagnosisResult },
-                    {"指导建议",datalist[0].AIDiagnosisProposal },
+                    {"指导建议",datalist[0].DoctorDiagnosis },
                     {"测量时间",datalist[0].TestDateTime }
                 }
             };
