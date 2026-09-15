@@ -157,7 +157,11 @@ namespace Cardio.SPCL
 
         public void sendnull()
         {
-            serialPort.Write(new byte[] { 0x01 }, 0, 1);
+            bool result = OpenSerialPort();//打开串口
+            if (result)
+            {
+                serialPort.Write(new byte[] { 0x01 }, 0, 1);
+            }
         }
 
         //串口接收数据
