@@ -59,7 +59,8 @@ namespace Cardio.Views.MeasurePage
                 userInfo.UserId = obj["memberEntity"]["id"].ToString();
                 userInfo.UserCode = obj["memberEntity"]["code"].ToString();
                 userInfo.UserSex = obj["memberEntity"]["sex"].ToString() == "01" ? "男" : "女";
-                userInfo.UserBirthday = obj["memberEntity"]["birth"].ToString();
+                string raw = obj["memberEntity"]["birth"]?.ToString();
+                userInfo.UserBirthday = DateTime.Parse(raw).ToString("yyyy-MM-dd");
                 if (userInfo.UserName.IsNullOrEmpty() || userInfo.UserHeight.ToString().IsNullOrEmpty() || userInfo.UserWeight.ToString().IsNullOrEmpty()
                     || userInfo.UserSex.IsNullOrEmpty() || userInfo.UserBirthday.IsNullOrEmpty())
                 {

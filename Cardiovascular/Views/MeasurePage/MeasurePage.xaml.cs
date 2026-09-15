@@ -678,6 +678,8 @@ namespace Cardio.Views.MeasurePage
             g_strDateTime = DateTime.Now;
             Variable.ErrorTime = g_strDateTime;
             pulsedata.userId = userInfo.UserId;
+            pulsedata.userCode = userInfo.UserCode;
+            pulsedata.orgId = userInfo.OrgId;
             pulsedata.userName = userInfo.UserName;
             pulsedata.userSex = userInfo.UserSex;
             pulsedata.userAge = userInfo.UserAge;
