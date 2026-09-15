@@ -142,6 +142,7 @@ namespace Cardio.Model
             SetTxt("txt_AIDiagnosisProposal", proposal);
             // 标题叠加在模板背景图片顶部的蓝色栏中。
             SetTxt("txt_title", APPSettingUtil.APP_CompaneTitle);
+            SetTxt("txt_ownerset", APPSettingUtil.APP_OwnerSet);
         }
         public void SetTitlePic()
         {

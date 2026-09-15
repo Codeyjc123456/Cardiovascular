@@ -30,7 +30,7 @@
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition />
-                        <RowDefinition Height="190" />
+                        <RowDefinition Height="250" />
                         <RowDefinition Height="150" />
                     </Grid.RowDefinitions>
 
@@ -100,7 +100,7 @@
                         Grid.Row="1"
                         Style="{StaticResource CustomCard}">
 
-                        <StackPanel Margin="30,20,0,0">
+                        <StackPanel Margin="30,10,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Style="{StaticResource CustomMedianTextBlock}" Text="报表表头：" />
                                 <TextBox Style="{StaticResource CustomMedianLongTextBox}">
@@ -112,6 +112,17 @@
                                 </TextBox>
                             </StackPanel>
                             <TextBlock Style="{StaticResource CustomSmallTips}" Text="Tips：该信息会显示在报表表头" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource CustomMedianTextBlock}" Text="公司名称：" />
+                                <TextBox Style="{StaticResource CustomMedianLongTextBox}">
+                                    <TextBox.Text>
+                                        <Binding NotifyOnValidationError="True" Path="APP_OwnerSet" UpdateSourceTrigger="LostFocus">
+
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource CustomSmallTips}" Text="Tips：该信息会显示在报表表尾" />
                         </StackPanel>
 
                         <hc:Card.Header>

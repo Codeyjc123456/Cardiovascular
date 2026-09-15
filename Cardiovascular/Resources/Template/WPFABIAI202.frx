@@ -26,6 +26,7 @@
       <TextObject Name="txt_AI" Left="506.52" Top="463.81" Width="75.6" Height="18.9" HorzAlign="Center" Font="宋体, 12pt, style=Bold"/>
       <TextObject Name="txt_AIDiagnosisResult" Left="37.8" Top="548.1" Width="349.65" Height="113.4" Font="宋体, 12pt"/>
       <TextObject Name="txt_AIDiagnosisProposal" Left="406.35" Top="548.1" Width="349.65" Height="113.4" Font="宋体, 12pt"/>
+	  <TextObject Name="txt_ownerset" Left="37.8" Top="1000" Width="718.2" Height="30.24" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="宋体, 11pt, style=Bold" TextFill.Color="Black"/>
       <PictureObject Name="PictureAI" Left="37.8" Top="179.55" Width="718.2" Height="75.6" SizeMode="CenterImage" Image=""/>
     </DataBand>
     <DataBand Name="Data2" Top="1079.74" Width="793.8" Fill.Color="White"/>
