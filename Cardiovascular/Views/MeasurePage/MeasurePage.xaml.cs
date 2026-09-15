@@ -1,4 +1,4 @@
-﻿using Cardio.Algorithm;
+using Cardio.Algorithm;
 using Cardio.BLL;
 using Cardio.DAL;
 using Cardio.Model;
@@ -142,14 +142,6 @@ namespace Cardio.Views.MeasurePage
                     userInfoDAL.Update(userInfo);
                 }
             }));
-
-            //Ready.Visibility = Visibility.Hidden;
-            //AITest.Visibility = Visibility.Visible;
-            //measureViewModel.Tips = "温馨提示：血压测量完成！";
-            //measureViewModel.Sbp = "120";
-            //measureViewModel.Dbp = "80";
-
-            //measureViewModel.Map = FinalBpMrsValue.Map.ToString();
         }
         private void Initialize()
         {
@@ -372,6 +364,7 @@ namespace Cardio.Views.MeasurePage
             pulsedata.AIDiagnosisResult = strAIDiagnosisResult;
             pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
         }
+
         private void UpdataToDatabase()
         {
             //保存数据：先填充完整AI结果
@@ -614,7 +607,6 @@ namespace Cardio.Views.MeasurePage
                         Task.Delay(1000);
                         ProcessData();
                     }
-
                 }
 
             }
@@ -624,6 +616,7 @@ namespace Cardio.Views.MeasurePage
                 FinalBpMrsValue.Sbp = FourLimbBp.Sbp;
                 FinalBpMrsValue.Dbp = FourLimbBp.Dbp;
                 FinalBpMrsValue.Map = FourLimbBp.Map;
+                FinalBpMrsValue.Hr = FourLimbBp.Hr;
                 arrGetBpSave[0] = FinalBpMrsValue;
                 g_typeBpMrsValue = FinalBpMrsValue;
                 //'变量清零
@@ -633,7 +626,6 @@ namespace Cardio.Views.MeasurePage
                 //判断下一步应该执行什么操作
                 Task.Delay(1000);
                 ProcessData();
-
             }
         }
         private void InitABIMrsRelatedVariables()
@@ -1333,7 +1325,8 @@ namespace Cardio.Views.MeasurePage
             if (pulsedata.AI_num == 1)
             {
                 //UpdataToDatabase();
-                this.NavigationService.Navigate(new OpenReportPage(pulsedata, ReportAction));
+                // 报告页返回时直接回到注册用户界面（LoginPage），不再退回测量页
+                this.NavigationService.Navigate(new OpenReportPage(pulsedata, ReportAction, true));
             }
             else
             {

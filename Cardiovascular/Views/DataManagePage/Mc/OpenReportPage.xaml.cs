@@ -1,4 +1,4 @@
-﻿using Cadio.BLL;
+using Cadio.BLL;
 using Cardio.BLL;
 using Cardio.DAL;
 using Cardio.Model;
@@ -30,10 +30,13 @@ namespace Cardio.Views.DataManagePage.Mc
         string reportFile = "./Resources/Template/WPFABIAI202.frx";
         private readonly APPSettingsViewModel APPSettingUtil = APPSettingsViewModel.getInstance();
         List<string> fileUrls = new List<string>();
+        // 是否由测量页（MeasureReePage）的“打印报告”打开：返回时直接回到注册用户界面
+        private readonly bool returnToLoginPage;
 
-        public OpenReportPage(PulseDataLocalEntity testData, Action<string> tAction)
+        public OpenReportPage(PulseDataLocalEntity testData, Action<string> tAction, bool returnToLoginPage = false)
         {
             InitializeComponent();
+            this.returnToLoginPage = returnToLoginPage;
             //传入参数
             model.testResult = testData;
             DataContext = model;
@@ -211,6 +214,18 @@ namespace Cardio.Views.DataManagePage.Mc
 
         private void BackBtn(object sender, RoutedEventArgs e)
         {
+            if (!returnToLoginPage)
+            {
+                this.NavigationService.GoBack();
+                return;
+            }
+            // 测量流程的打印报告是最后一步：跳过测量页，直接返回到注册用户界面（LoginPage）。
+            // 这里先移除测量页这条历史记录再走 GoBack，而不是 Navigate 一个新的 LoginPage：
+            // Navigate 会把本页压入历史，而本页在不可见时会清空 Content，返回时就成了空白页
+            if (this.NavigationService.CanGoBack)
+            {
+                this.NavigationService.RemoveBackEntry();
+            }
             this.NavigationService.GoBack();
         }
 
