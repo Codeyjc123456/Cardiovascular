@@ -216,7 +216,7 @@ namespace Cardio.Views.DataManagePage.Mc
                 string startTime = "";
                 string endTime = "";
                 
-                Dispatcher.BeginInvoke(() => {
+                Dispatcher.Invoke(() => {
                     startTime = StartTime.Text;
                     endTime = EndTime.Text;
                 });
@@ -225,12 +225,12 @@ namespace Cardio.Views.DataManagePage.Mc
                 if (startTime != "")
                 {
                     date = DateTime.Parse(startTime);
-                    startTime = date.ToString("yyyy-MM-dd");
+                    startTime = date.ToString("yyyy-MM-dd 00:00:00");
                 }
                 if (endTime != "")
                 {
                     date = DateTime.Parse(endTime);
-                    endTime = date.ToString("yyyy-MM-dd");
+                    endTime = date.ToString("yyyy-MM-dd 23:59:59");
                 }
 
                 if (startTime == "" && endTime != "")

@@ -58,6 +58,7 @@ namespace CardioVascular.Views.SystemPage
             serialPortManager = SerialPortManager.getInstance();//串口管理的单例
             serialPortManager.InformMsgEvnet = new SerialPortManager.InformMsg(ReciveAlarm);
             serialPortManager.InformDebugMsgEvnet = new SerialPortManager.InformDebugMsg(msg);
+            serialPortManager.sendnull();
 
             TimerGetRealPressure = new Timer();
             LoopPressureOpen = new  DispatcherTimer();

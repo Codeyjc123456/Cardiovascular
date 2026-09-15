@@ -64,6 +64,7 @@ namespace Cardio.Views.SystemPage
             serialPortManager = SerialPortManager.getInstance();//串口业务
             serialPortManager.InformMsgEvnet = new SerialPortManager.InformMsg(ReciveAlarm);
             serialPortManager.InformDebugMsgEvnet = new SerialPortManager.InformDebugMsg(msg);
+            serialPortManager.sendnull();
         }
 
         private void ReciveAlarm(MCErrorCode code, List<ReceiveDataStructure> dataList)

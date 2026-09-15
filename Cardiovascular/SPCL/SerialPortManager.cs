@@ -154,6 +154,12 @@ namespace Cardio.SPCL
             }
             return isSuccess;
         }
+
+        public void sendnull()
+        {
+            serialPort.Write(new byte[] { 0x01 }, 0, 1);
+        }
+
         //串口接收数据
         private void ReadTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {

@@ -182,6 +182,7 @@ namespace Cardio.Views.MeasurePage
             serialPortManager.InformMsgEvnet = new SerialPortManager.InformMsg(ReciveAlarm);
             serialPortManager.InformDebugMsgEvnet = new SerialPortManager.InformDebugMsg(msg);
 
+            serialPortManager.sendnull();
             //serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
             //Task.Delay(500);
             //serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
@@ -683,7 +684,7 @@ namespace Cardio.Views.MeasurePage
             pulsedata.userHeight = userInfo.UserHeight;
             pulsedata.userWeight = userInfo.UserWeight;
             pulsedata.userBirthday = userInfo.UserBirthday.ToString();
-            pulsedata.TestDateTime = g_strDateTime.ToString();
+            pulsedata.TestDateTime = g_strDateTime.ToString("yyyy-MM-dd HH:mm:ss"); 
             pulsedata.ABI_num = 1;
             int totalSbp = 0, totalDbp = 0, count = 0;
             // 收集所有非零血压值
