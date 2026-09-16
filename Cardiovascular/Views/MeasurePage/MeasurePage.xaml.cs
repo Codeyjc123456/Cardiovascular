@@ -1328,8 +1328,8 @@ namespace Cardio.Views.MeasurePage
             if (pulsedata.AI_num == 1)
             {
                 //UpdataToDatabase();
-                // 报告页返回时直接回到注册用户界面（LoginPage），不再退回测量页
-                this.NavigationService.Navigate(new OpenReportPage(pulsedata, ReportAction, true));
+                // 测量页打开的报告：返回时直接回到注册用户界面，并按参数设置决定是否自动上传
+                this.NavigationService.Navigate(new OpenReportPage(pulsedata, ReportAction, fromMeasurePage: true));
             }
             else
             {

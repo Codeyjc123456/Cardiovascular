@@ -23,20 +23,20 @@ namespace Cardio.Views.DataManagePage.Mc
         /// <summary>
         /// 数据绑定
         /// </summary>
-        #region
-        #endregion
         private Report pReport = null;   //实例化一个Report报表; //新建一个私有变量
         ReportViewModel model = new ReportViewModel();
         string reportFile = "./Resources/Template/WPFABIAI202.frx";
         private readonly APPSettingsViewModel APPSettingUtil = APPSettingsViewModel.getInstance();
         List<string> fileUrls = new List<string>();
-        // 是否由测量页（MeasureReePage）的“打印报告”打开：返回时直接回到注册用户界面
-        private readonly bool returnToLoginPage;
+        // 是否由测量页（MeasureReePage）的“打印报告”打开：
+        // 是——返回时直接回到注册用户界面，且按参数设置判断是否自动上传；
+        // 否（数据管理页打开）——按原逻辑返回上一页，且永远不自动上传
+        private readonly bool fromMeasurePage;
 
-        public OpenReportPage(PulseDataLocalEntity testData, Action<string> tAction, bool returnToLoginPage = false)
+        public OpenReportPage(PulseDataLocalEntity testData, Action<string> tAction, bool fromMeasurePage = false)
         {
             InitializeComponent();
-            this.returnToLoginPage = returnToLoginPage;
+            this.fromMeasurePage = fromMeasurePage;
             //传入参数
             model.testResult = testData;
             DataContext = model;
@@ -60,6 +60,11 @@ namespace Cardio.Views.DataManagePage.Mc
                 model.ExprtReport();
             });
             thread.Start();
+            // 测量页打开的报告：参数设置为“自动上传”时，初始化即上传本次报告
+            if (fromMeasurePage && APPSettingUtil.APP_Network == "网络版" && APPSettingUtil.APP_AutoUpload == "自动")
+            {
+                ThreadAPIStart();
+            }
         }
         private void PrintBtn(object sender, RoutedEventArgs e)
         {
@@ -213,7 +218,7 @@ namespace Cardio.Views.DataManagePage.Mc
 
         private void BackBtn(object sender, RoutedEventArgs e)
         {
-            if (!returnToLoginPage)
+            if (!fromMeasurePage)
             {
                 this.NavigationService.GoBack();
                 return;
