@@ -62,7 +62,7 @@
                                 <scottplot:WpfPlot
                                     x:Name="zg_aichart"
                                     Width="800"
-                                    Height="50" />
+                                    Height="130" />
                             </Border>
                         </StackPanel>
                         <StackPanel  Panel.ZIndex="2" Background="White" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">

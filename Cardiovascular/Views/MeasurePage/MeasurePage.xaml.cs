@@ -922,11 +922,15 @@ namespace Cardio.Views.MeasurePage
                             for (int p = 0; p < 28; p++)
                             {
                                 iData[0] = dataList[i + 2 + p].dataValue;
-                                DataCount++;
-                                measureViewModel.AIData.Add(iData[0]);
-                                if (measureViewModel.AIData.Count % 4 == 0)
-                                { AiSeries.Refresh(); }
-                                HandleAIPulseData(ref DataCount, ref iData[0]);
+                                
+                                if (measureViewModel.AIData.Count % 2 == 0)
+                                {
+                                    DataCount++;
+                                    measureViewModel.AIData.Add(iData[0]); 
+                                    HandleAIPulseData(ref DataCount, ref iData[0]);
+                                    AiSeries.Refresh();
+                                }
+                                
                                 if (measureViewModel.AIData.Count >= 6000)
                                 {
                                     Dispatcher.BeginInvoke(new Action(() =>
