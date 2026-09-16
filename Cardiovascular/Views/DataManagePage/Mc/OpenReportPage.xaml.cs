@@ -155,7 +155,7 @@ namespace Cardio.Views.DataManagePage.Mc
                     { "sevr", model.testResult.Sevr },
                     { "Result", model.testResult.AIDiagnosisResult },
                     { "data", model.testResult.RpRawData },
-                    { "proposal", model.testResult.AIDiagnosisProposal },
+                    { "proposal", model.testResult.DoctorDiagnosis },
                 };
 
                 //var data = new Dictionary<string, object>
