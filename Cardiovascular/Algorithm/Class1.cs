@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cardio.Util;
 
 namespace Cardio.Algorithm
 {
@@ -120,7 +121,22 @@ namespace Cardio.Algorithm
     public class AcquireData
     {
         private int nMarkSelect;
+        /// <summary>
+        /// 波形筛选：与VB版本的errHandler保持一致，内部出错时返回0（视为本次波形不通过），不再向外抛异常
+        /// </summary>
         public int SelectWaveform(List<double> Data, int Sample_Rate)
+        {
+            try
+            {
+                return SelectWaveformCore(Data, Sample_Rate);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error("波形筛选出错", ex.Message);
+                return 0;
+            }
+        }
+        private int SelectWaveformCore(List<double> Data, int Sample_Rate)
         {
             int SelectWaveformBack = 0;
             double MaxValue;
@@ -219,7 +235,7 @@ namespace Cardio.Algorithm
             int NumOfError = 0;
             for (int i = 1; i <= DifSigMaxPointPosNum - 1; i++)
             {
-                if ((DifSigMaxPointPos[i] - DifSigMaxPointPos[i - 1] > 1.425 * Sample_Rate / 2) || (DifSigMaxPointPos[i] - DifSigMaxPointPos[i - 1] < 0.4 * Sample_Rate / 2) || (NumOfError > 0))
+                if ((DifSigMaxPointPos[i] - DifSigMaxPointPos[i - 1] > 1.2 * Sample_Rate / 2) || (DifSigMaxPointPos[i] - DifSigMaxPointPos[i - 1] < 0.4 * Sample_Rate / 2) || (NumOfError > 0))
                 {
                     NumOfError = NumOfError + 1;
                 }
@@ -237,11 +253,11 @@ namespace Cardio.Algorithm
             nMarkSelect = 0;
             if (NumOfError == 0)
             {
-                if ((NumOfPtoN > 0) && (NumOfPtoN <= 20) && (TempDataPeriod > 1.425 * Sample_Rate / 2))
+                if ((NumOfPtoN > 0) && (NumOfPtoN <= 20) && (TempDataPeriod > 1.2 * Sample_Rate / 2))
                 {
                     nMarkSelect = 1;
                 }
-                if ((NumOfPtoN > 0) && (NumOfPtoN <= 25) && (TempDataPeriod > 50) && (TempDataPeriod <= 1.425 * Sample_Rate / 2))
+                if ((NumOfPtoN > 0) && (NumOfPtoN <= 25) && (TempDataPeriod > 50) && (TempDataPeriod <= 1.2 * Sample_Rate / 2))
                 {
                     nMarkSelect = 1;
                 }

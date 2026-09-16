@@ -756,7 +756,8 @@ namespace Cardio.Views.MeasurePage
                 MaxValue = (int)DataOneSec.Max();
                 MinValue = (int)DataOneSec.Min();
                 DifValue = MaxValue - MinValue;
-                if (DifValue <= 800)
+                //与VB版本一致：低值且幅度小(≤800)时加增益；低值以上(>100)时放宽到850
+                if ((MinValue <= 100 && DifValue <= 800) || (MinValue > 100 && DifValue <= 850))
                 {
                     //放大倍数加1
                     if (!serialPortManager.SendData(CommandWord.REQ_PWV_INC_GAIN, 0x02))//桡动脉
@@ -853,7 +854,7 @@ namespace Cardio.Views.MeasurePage
                 AcquireData clsAcquisition;
                 clsAcquisition = new AcquireData();
                 //对每次获取的2秒脉搏波数据进行判断处理
-                if (nMarkSelect < 2 && MinValue > 50 && DifValue > 400 && DifValue < 3700 && MaxValue < 3900)
+                if (nMarkSelect < 2 && MinValue > 50 && DifValue > 600 && DifValue < 3800 && MaxValue < 3800)
                 {
                     if (clsAcquisition.SelectWaveform(DataTwoSec, GlobalVariable.Sample_Rate) == 1)
                     {
