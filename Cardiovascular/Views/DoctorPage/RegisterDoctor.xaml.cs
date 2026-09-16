@@ -1,4 +1,4 @@
-﻿using Cardio.DAL;
+using Cardio.DAL;
 using Cardio.Model;
 using HandyControl.Controls;
 using System;
@@ -68,8 +68,8 @@ namespace Cardio.Views.DoctorPage
                 Growl.Info("当前医师账号已被使用！", "RigisterDoctor");
                 return;
             }
-            entity.DoctorName = loginmodel.UserID;
-            entity.DoctorPwd = loginmodel.UserPWD;
+            entity.DoctorName = loginmodel.UserID.Trim();
+            entity.DoctorPwd = loginmodel.UserPWD.Trim();
             if (doctorDAL.Insert(entity) > 0)
             {
                 Growl.Success("医师注册成功！", "RigisterDoctor");
