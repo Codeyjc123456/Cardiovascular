@@ -918,7 +918,7 @@ namespace Cardio.Views.MeasurePage
                     {
                         if (dataList[i].dataValue == 1)   //桡动脉波形图
                         {
-                            for (int p = 0; p < 14; p++)
+                            for (int p = 0; p < 28; p++)
                             {
                                 iData[0] = dataList[i + 2 + p].dataValue;
                                 DataCount++;
@@ -935,7 +935,7 @@ namespace Cardio.Views.MeasurePage
                                     }));
                                 }
                             }
-                            i += 15;
+                            i += 29;
                         }
                     }
                     else if (dataList[i].frameType == CommandWord.REQ_PWV_INC_GAIN_Back)
