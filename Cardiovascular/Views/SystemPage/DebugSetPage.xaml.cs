@@ -736,7 +736,7 @@ namespace CardioVascular.Views.SystemPage
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     debugViewModel.Period = (HeartRate * 2).ToString(); // Assuming txtPeriod is a TextBox control
-                    HeartRate = (int)((60.0 * GlobalVariable.Sample_Rate) / HeartRate );
+                    HeartRate = (int)((60.0 * GlobalVariable.Sample_Rate) / (HeartRate * 2));
                     debugViewModel.DebugHR = HeartRate.ToString();
                 }));
             }
