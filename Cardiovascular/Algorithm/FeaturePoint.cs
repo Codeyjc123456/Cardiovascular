@@ -54,7 +54,7 @@ namespace Cardio.Algorithm
         private const int SEGMENT_NUM = 7;
         private const int SCALE1 = 25;
         private const int SCALE2 = 50;
-        private const int SAMPLE_RATE = 500; // 默认采样率
+        private const int SAMPLE_RATE = 1000; // 默认采样率
 
         private int _getSbp;
         private int _getDbp;

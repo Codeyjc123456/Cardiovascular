@@ -854,7 +854,7 @@ namespace Cardio.Views.MeasurePage
                 AcquireData clsAcquisition;
                 clsAcquisition = new AcquireData();
                 //对每次获取的2秒脉搏波数据进行判断处理
-                if (nMarkSelect < 2 && MinValue > 50 && DifValue > 600 && DifValue < 3800 && MaxValue < 3800)
+                if (nMarkSelect < 2 && MinValue > 50 && DifValue > 400 && DifValue < 3800 && MaxValue < 3800)
                 {
                     if (clsAcquisition.SelectWaveform(DataTwoSec, GlobalVariable.Sample_Rate) == 1)
                     {
@@ -922,14 +922,13 @@ namespace Cardio.Views.MeasurePage
                             for (int p = 0; p < 28; p++)
                             {
                                 iData[0] = dataList[i + 2 + p].dataValue;
-                                
+
+                                DataCount++;
+                                measureViewModel.AIData.Add(iData[0]);
+                                HandleAIPulseData(ref DataCount, ref iData[0]);
                                 if (measureViewModel.AIData.Count % 2 == 0)
-                                {
-                                    DataCount++;
-                                    measureViewModel.AIData.Add(iData[0]); 
-                                    HandleAIPulseData(ref DataCount, ref iData[0]);
-                                    AiSeries.Refresh();
-                                }
+                                { AiSeries.Refresh(); }
+                                
                                 
                                 if (measureViewModel.AIData.Count >= 6000)
                                 {
