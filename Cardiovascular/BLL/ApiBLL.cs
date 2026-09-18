@@ -309,37 +309,31 @@ namespace Cardio.BLL
                 // 2. 构建请求参数字典
                 var pulseData = new Dictionary<string, string>();
                 // 添加用户基础信息
-                pulseData.Add("userSn", data.userId ?? "");
+                pulseData.Add("userId", data.userId ?? "");
                 pulseData.Add("userName", data.userName ?? "");
                 pulseData.Add("userSex", data.userSex ?? "");
-                pulseData.Add("userAge", data.userAge.ToString());
+                pulseData.Add("userBirthday", data.userBirthday ?? "");
                 pulseData.Add("userHeight", data.userHeight.ToString());
                 pulseData.Add("userWeight", data.userWeight.ToString());
                 // 添加ABI相关
-                pulseData.Add("Sbp", data.Sbp.ToString());
-                pulseData.Add("Dbp", data.Dbp.ToString());
-                pulseData.Add("Pp", data.Pp.ToString());
-                pulseData.Add("Map", data.Map.ToString());
-                pulseData.Add("Hr", data.Hr.ToString());
-                pulseData.Add("BpHr", data.BpHr.ToString());
-                pulseData.Add("Distance", data.Distance.ToString());
-                pulseData.Add("Ed", data.Ed.ToString());
-                pulseData.Add("Spti", data.Spti.ToString());
-                pulseData.Add("Dpti", data.Dpti.ToString());
-                pulseData.Add("Sevr", data.Sevr.ToString());
-                pulseData.Add("AIx", data.AIx.ToString());
-                pulseData.Add("AIAssess", data.AIAssess.ToString());
-                pulseData.Add("AIDiagnosisReult", data.AIDiagnosisResult.ToString());
-                pulseData.Add("AIDiagnosisProposal", data.AIDiagnosisProposal.ToString());
-                pulseData.Add("lbPwv", data.Sbp2.ToString());
-                typeAsOrCa = 3;
+                pulseData.Add("testPulSbp", data.Sbp.ToString());
+                pulseData.Add("testPulDbp", data.Dbp.ToString());
+                pulseData.Add("testPulPp", data.Pp.ToString());
+                pulseData.Add("testPulCap", data.Sbp2.ToString());
+                pulseData.Add("testPulHr", data.Hr.ToString());
+                pulseData.Add("testPulEd", data.Ed.ToString());
+                pulseData.Add("testPulSpti", data.Spti.ToString());
+                pulseData.Add("testPulDpti", data.Dpti.ToString());
+                pulseData.Add("testPulSevr", data.Sevr.ToString());
+                pulseData.Add("testPulAi", data.AIx.ToString());
+                pulseData.Add("testPulData", data.AIAssess.ToString());
+                pulseData.Add("diagnosisResult", data.AIDiagnosisResult.ToString());
+                pulseData.Add("diagnosisProposal", data.AIDiagnosisProposal.ToString());
                 // 添加心脏指数相关
-                // 添加测试时间、类型、检查结果、报告Base64
-                pulseData.Add("TestDateTime", data.TestDateTime ?? "");
-                pulseData.Add("type", typeAsOrCa.ToString());
-                pulseData.Add("checkResult", "1");
-                //Variable.base64pdf = "1";
-                pulseData.Add("reportBase64", Variable.base64pdf);
+                // 添加测试时间、设备编号、检查结果、报告Base64
+                pulseData.Add("checkUpTime", data.TestDateTime ?? "");
+                pulseData.Add("base64Pdf", Variable.base64pdf);
+                //pulseData.Add("deviceNumber", );
                 // 3. 拼接请求参数（x-www-form-urlencoded格式）
                 var contentBuilder = new StringBuilder();
                 foreach (var key in pulseData.Keys)

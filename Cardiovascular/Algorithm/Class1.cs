@@ -10,8 +10,6 @@ namespace Cardio.Algorithm
 {
     public class FeatureExtraction
     {
-        #region  变量定义
-        #endregion
         //函数15
         //计算心率
         public double ProcessRpRawData(List<double> RpRawData, int RpRawDataNum)
@@ -374,6 +372,7 @@ namespace Cardio.Algorithm
             public int Cap;
         }
         #endregion
+
         #region 公共字段
         public string strDiagnosisResult = "";
         public string strDiagnosisProposal = "";
@@ -419,6 +418,7 @@ namespace Cardio.Algorithm
             strDiagnosisResult = result.Build() ?? NORMAL_DIAGNOSIS;
         }
         #endregion
+
         #region 初始化
         private void InitializeIndices(List<double> cardiac, List<double> vascular)
         {
@@ -441,6 +441,7 @@ namespace Cardio.Algorithm
             };
         }
         #endregion
+
         #region 诊断方法
         private string GetHeartRateDiagnosis()
         {
@@ -601,6 +602,7 @@ namespace Cardio.Algorithm
         };
         }
         #endregion
+
         #region 正常诊断补充
         private void AddNormalDiagnosisIfNeeded(ref DiagnosisResultBuilder result, string sex, int age)
         {
@@ -640,6 +642,7 @@ namespace Cardio.Algorithm
                    (sex == "女" && age > 40 && age < 60 && aix <= 0.85);
         }
         #endregion
+
         #region 指导建议
         private string GetFinalProposal()
         {
@@ -651,6 +654,7 @@ namespace Cardio.Algorithm
                 : strDiagnosisProposal;
         }
         #endregion
+
         #region 辅助类
         private class DiagnosisResultBuilder
         {

@@ -107,7 +107,6 @@ namespace Cardio.Algorithm
             }
         }
         #endregion
-
         #region ExecuteNonQuery
         /// <summary> 
         /// 执行命令 

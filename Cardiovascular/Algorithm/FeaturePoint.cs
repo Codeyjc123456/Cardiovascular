@@ -424,7 +424,6 @@ namespace Cardio.Algorithm
         }
 
         #endregion
-
         #region 基线去除与标定
 
         private void RemoveBaselineWanderAndCalibrateWaveform(int sbp, int dbp)
