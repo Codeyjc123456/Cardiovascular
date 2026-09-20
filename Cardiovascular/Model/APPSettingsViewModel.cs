@@ -132,9 +132,6 @@ namespace Cardio.Model
             get => _APP_PWD;
             set => SetProperty(ref _APP_PWD, value);
         }
-
-        #endregion
-
        
         private string _APP_Printer = "";
         public string APP_Printer
@@ -263,6 +260,29 @@ namespace Cardio.Model
             get => _APP_CorMap;
             set => SetProperty(ref _APP_CorMap, value);
         }
+
+        private string _APP_DeviceId;
+        public string APP_DeviceId
+        {
+            get => _APP_DeviceId;
+            set => SetProperty(ref _APP_DeviceId, value);
+        }
+
+        private string _APP_AppId;
+        public string APP_AppId
+        {
+            get => _APP_AppId;
+            set => SetProperty(ref _APP_AppId, value);
+        }
+
+        private string _APP_AppSecret;
+        public string APP_AppSecret
+        {
+            get => _APP_AppSecret;
+            set => SetProperty(ref _APP_AppSecret, value);
+        }
+
+        #endregion
         public bool LoadData()
         {
             SystemconfigEntity systemConfig = configDAL?.FindByID(1);
@@ -304,6 +324,11 @@ namespace Cardio.Model
                 APP_CorDbp = systemConfig.APP_CorDbp;
                 APP_CorMap = systemConfig.APP_CorMap;
                 APP_CorHr = systemConfig.APP_CorHr;
+
+                APP_DeviceId = systemConfig.APP_DeviceId;
+                APP_AppId = systemConfig.APP_AppId;
+                APP_AppSecret = systemConfig.APP_AppSecret;
+
                 return true;
             }
             else
@@ -353,6 +378,11 @@ namespace Cardio.Model
                 systemConfig.APP_CorSbp = APP_CorSbp;
                 systemConfig.APP_CorDbp = APP_CorDbp;
                 systemConfig.APP_CorMap = APP_CorMap;
+
+                systemConfig.APP_DeviceId = APP_DeviceId ;
+                systemConfig.APP_AppId = APP_AppId;
+                systemConfig.APP_AppSecret = APP_AppSecret;
+
                 return configDAL?.Update(systemConfig) ?? false;
             }
             return false;

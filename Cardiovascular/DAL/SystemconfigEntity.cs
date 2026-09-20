@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using DocumentFormat.OpenXml.Office.CoverPageProps;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,6 @@ namespace Cardio.DAL
 
         //系统设置界面的密码
         public string APP_PWD {  get; set; }
-
         public string APP_Network { get; set; }//单机 网络
 
         //网络版本 上传和获取用户接口
@@ -70,8 +70,10 @@ namespace Cardio.DAL
 
         //用于通信的COM口
         public string APP_BPPort {  get; set; }
+
         //打印 
         public string APP_PrinterDialog { get; set; }
+
         //默认打印机名称
         public string APP_Printer {  get; set; }
         public string APP_COMRate { get; set; }
@@ -80,5 +82,10 @@ namespace Cardio.DAL
         public string APP_CorDbp { get; set; }
         public string APP_CorMap { get; set; }
         public string APP_CorHr { get; set; }
+
+        //博谐内部系统上传配置参数
+        public string APP_DeviceId { get; set; }
+        public string APP_AppId { get; set; }
+        public string APP_AppSecret { get; set; }
     }
 }

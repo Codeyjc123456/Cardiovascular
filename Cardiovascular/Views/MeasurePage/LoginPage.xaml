@@ -44,8 +44,7 @@
                         VerticalAlignment="Top"
                         BorderBrush="{x:Null}"
                         BorderThickness="0"
-                        FontSize="36"
-                        TextChanged="TextBox_TextChanged">
+                        FontSize="36">
                         <TextBox.Text>
                             <Binding
                                 NotifyOnValidationError="True"

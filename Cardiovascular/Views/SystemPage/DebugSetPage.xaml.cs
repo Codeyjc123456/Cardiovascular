@@ -67,9 +67,6 @@ namespace CardioVascular.Views.SystemPage
             debugViewModel.CorrectLBSbp = "1";
             debugViewModel.CorrectLBDbp = "2";
 
-            //serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
-            //Task.Delay(500);
-            //serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
             IntChart();
             feature = new FeatureExtraction();
             APPSettingUtil.LoadData();
@@ -84,38 +81,8 @@ namespace CardioVascular.Views.SystemPage
             TimerGetRealPressure?.Enabled = false;
             TimerGetRealPressure?.AutoReset = true;
             TimerGetRealPressure?.Elapsed += new System.Timers.ElapsedEventHandler(TimerGetRealPressure_Tick);
-            //LoopPressureOpen?.Interval = TimeSpan.FromMilliseconds(30000);//30s  启动一次
-            //LoopPressureOpen?.Tick += LoopPressureOpen_Tick;
-            //LoopPressureOpen?.Start();
-            //LoopPressureOpen?.Stop();
         }
-        private void LoopPressureOpen_Tick(object sender, EventArgs e)
-        {
-            if (workStatus == WorkStatus.NoWork || workStatus == WorkStatus.StartBPtest || workStatus == WorkStatus.PreStart)
-            {
-                serialPortManager?.OpenControl(Bt_Pressureindex);
-            }
-            //打开阀门标志
-            Bp_ACK_Flag = -2;
-            Task.Delay(2000);
-            //在等待2s以后发送关闭阀门
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                TimerGetRealPressure?.Stop();//停止读取袖带指令，避免接受不到控制阀门的指令
-                PressStart = true;
-            }));
-            Task.Delay(500);
-            for(int i = 0; i < 3; i++)
-            {
-                serialPortManager?.OpenControl(Bt_Pressureindex);
-                workStatus = WorkStatus.CloseValue;//给出工作状态“关闭阀门”下一步就是执行该命令
-                Bp_ACK_Flag = -3;
-                DisPlayTips("关闭阀门中......");
-                Task.Delay(500);
-            }
-            //关闭阀门以后开始执行压力检测
-            TimerGetRealPressure?.Start();
-        }
+        
         private void SaveBtn(object sender, RoutedEventArgs e)
         {
             if (APPSettingUtil.RemoveAndAdd != 0)

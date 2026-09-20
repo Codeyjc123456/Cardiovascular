@@ -2,6 +2,7 @@
 using Cardio.Model;
 using Cardio.SPCL;
 using Cardio.Util;
+using DocumentFormat.OpenXml.Office.CoverPageProps;
 using HandyControl.Controls;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,167 +20,10 @@ namespace Cardio.BLL
 {
     public static class ApiBLL
     {
-        /// <summary>
-        /// 登录
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public async static Task<UserInfoEntity> LoginAPI(Dictionary<string, object> data)
-        {
-             
-            string url = APPSettingsViewModel.getInstance().APP_ApiUrlLogin;
-            try
-            {
-                UserInfoEntity userInfo = new UserInfoEntity();
-                var response = await HttpUtil.DoPost(url, data);
-                var response_json = (JObject)JsonConvert.DeserializeObject(response);
-                if ((string)response_json["code"] == "200")
-                {
-                    var data_json = (JObject)JsonConvert.DeserializeObject(response_json["data"].ToString());
-                    userInfo.UserHeight = Convert.ToDouble(data_json["UserHeight"]);
-                    userInfo.UserWeight = Convert.ToDouble(data_json["UserWeight"]);
-                    userInfo.UserName = data_json["UserName"].ToString();
-                    userInfo.UserId = data_json["UserID"].ToString();
-                    userInfo.UserSex = data_json["UserSex"].ToString();
-                    userInfo.UserAge = Convert.ToInt32(data_json["UserAge"].ToString());
-                    return userInfo;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Info("", ex.Message);
-                return null;
-            }
-        }
+        private static readonly HttpClient _httpClient = new HttpClient();
 
-        public async static Task<int> CommitDataAPI(PulseDataLocalEntity testData,string filePath)
-        {
-            string url = APPSettingsViewModel.getInstance().APP_ApiUrlData; ;
-            try
-            {
-                Dictionary<string, object> data = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(testData));
-                var response = await HttpUtil.DoPostDataAndFile(url, data,filePath);
-                var response_json = (JObject)JsonConvert.DeserializeObject(response);
-                if ((string)response_json["code"] == "200")
-                {
-                    return 200;
-                }
-                else
-                {
-                    return 300;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Info("", ex.Message);
-                return 400;
-            }
-        }
-        public static int CommitDataAPI(string url, Object testData, string filePath)
-        {
-            try
-            {
-                string JsonData = JsonConvert.SerializeObject(testData);
-                string base64PDF = ConvertPdfToBase64(filePath);
-                JsonData = JsonData.Replace("}", ",\"base64Pdf\":\"" + base64PDF + "\"}");
-                var response = DoPostBase64(url, JsonData);
-                var response_json = (JObject)JsonConvert.DeserializeObject(response);
-                if ((string)response_json["code"] == "200")
-                {
-                    return 200;
-                }
-                else
-                {
-                    return 300;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Info("", ex.Message);
-                return 400;
-            }
-        }
-        public static string ConvertPdfToBase64(string pdfFilePath)
-        {
-            byte[] pdfBytes;
-            using (FileStream pdfFile = new FileStream(pdfFilePath, FileMode.Open, FileAccess.Read))
-            {
-                pdfBytes = new byte[pdfFile.Length];
-                pdfFile.Read(pdfBytes, 0, pdfBytes.Length);
-            }
-            string base64Pdf = Convert.ToBase64String(pdfBytes);
-            return base64Pdf;
-        }
-        public static string DoPostBase64(string url, string data)
-        {
-            try
-            {
-                var request = new RestRequest(url, Method.Post);
-                using (HttpClient client = new HttpClient())
-                {
-                    var requestContent = new StringContent(data, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = client.PostAsync(url, requestContent).Result;
-                    string responseContent = response.Content.ReadAsStringAsync().Result;
-                    return responseContent;
-                }
-            }
-            catch (Exception e)
-            {
-                return "{'code':'400','data':'}" + e.Message + "'}";
-            }
-
-        }
-        public static string DoPostUser(string url, string data)
-        {
-            try
-            {
-                var request = new RestRequest(url, Method.Post);
-                using (HttpClient client = new HttpClient())
-                {
-                    var requestContent = new StringContent(data, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = client.PostAsync(url, requestContent).Result;
-                    string responseContent = response.Content.ReadAsStringAsync().Result;
-                    return responseContent;
-                }
-            }
-            catch (Exception e)
-            {
-                return "{'code':'400','data':'}" + e.Message + "'}";
-            }
-
-        }
-        public static string DoGetUser(string url, Dictionary<string, object> parameters = null)
-        {
-            try
-            {
-                // 构建带参数的完整URL
-                if (parameters != null && parameters.Count > 0)
-                {
-                    var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
-                    foreach (var param in parameters)
-                    {
-                        query[param.Key] = param.Value?.ToString();
-                    }
-                    url = $"{url}?{query}";
-                }
-
-                using (HttpClient client = new HttpClient())
-                {
-                    HttpResponseMessage response = client.GetAsync(url).Result;
-                    string responseContent = response.Content.ReadAsStringAsync().Result;
-                    return responseContent;
-                }
-            }
-            catch (Exception e)
-            {
-                return "{'code':'400','data':'}" + e.Message + "'}";
-            }
-        }
-        public static  (UserInfoEntity, string) GetUser(string url, string dataStic)
+        #region 圣乐
+        public static (UserInfoEntity, string) GetUser(string url, string dataStic)
         {
             UserInfoEntity userInfo = new UserInfoEntity();
             string callback = "";
@@ -286,13 +130,6 @@ namespace Cardio.BLL
             }
 
             return (userInfo, callback);
-        }
-        private static readonly HttpClient _httpClient = new HttpClient();
-        public static void DataUploadHelper()
-        {
-            // 初始化HTTP客户端
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            _httpClient.Timeout = TimeSpan.FromSeconds(30);
         }
         public static string UploadDataPost(string url, PulseDataLocalEntity data)
         {
@@ -429,56 +266,37 @@ namespace Cardio.BLL
                 return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
             }
         }
-        /// <returns>Base64编码字符串（失败返回空）</returns>
-        public static async Task<string> ConvertPdfToBase64Async(string pdfFilePath)
+        #endregion
+
+        #region 泽嘉
+        public static string DoGetUser_ZJ(string url, Dictionary<string, object> parameters = null)
         {
             try
             {
-                if (!File.Exists(pdfFilePath))
+                // 构建带参数的完整URL
+                if (parameters != null && parameters.Count > 0)
                 {
-                    await Application.Current.Dispatcher.BeginInvoke(() =>
+                    var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+                    foreach (var param in parameters)
                     {
-                        HandyControl.Controls.MessageBox.Show($"PDF文件不存在：{pdfFilePath}", "错误",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
-                    });
-                    return string.Empty;
+                        query[param.Key] = param.Value?.ToString();
+                    }
+                    url = $"{url}?{query}";
                 }
-                var fileExtension = Path.GetExtension(pdfFilePath).ToLower();
-                if (fileExtension != ".pdf")
+
+                using (HttpClient client = new HttpClient())
                 {
-                    await Application.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        HandyControl.Controls.MessageBox.Show($"文件不是PDF格式：{pdfFilePath}", "错误",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
-                    });
-                    return string.Empty;
+                    HttpResponseMessage response = client.GetAsync(url).Result;
+                    string responseContent = response.Content.ReadAsStringAsync().Result;
+                    return responseContent;
                 }
-                byte[] pdfBytes;
-                using (var fs = new FileStream(pdfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    pdfBytes = new byte[fs.Length];
-                    // 异步读取文件流
-                    await fs.ReadAsync(pdfBytes, 0, pdfBytes.Length);
-                }
-                string base64Str = Convert.ToBase64String(pdfBytes);
-                await Application.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    Growl.Info($"PDF转换Base64成功！\n文件大小：{pdfBytes.Length / 1024:F2} KB");
-                });
-                return base64Str;
             }
-            catch (IOException ex)
+            catch (Exception e)
             {
-                await Application.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    HandyControl.Controls.MessageBox.Show($"读取PDF文件失败：{ex.Message}\n可能文件被占用",
-                          "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
-                return string.Empty;
+                return "{'code':'400','data':'}" + e.Message + "'}";
             }
         }
-
-        public static async Task DoPostUpload(string url,Dictionary<string, object> data)
+        public static async Task DoPostUpload_ZJ(string url,Dictionary<string, object> data)
         {
             try
             {
@@ -499,5 +317,131 @@ namespace Cardio.BLL
                 LogUtil.Error("上传数据", ex.Message);
             }
         }
+        #endregion
+
+        #region 博谐内部
+        public static async Task<string> DoPostUserAsync_BX(BX_UploadSetting bx, string loginName)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // 1. 设置请求头
+                    client.DefaultRequestHeaders.Add("X-AppId", bx.appid);
+                    client.DefaultRequestHeaders.Add("X-Timestamp", bx.timestamp);
+                    client.DefaultRequestHeaders.Add("X-Nonce", bx.nonce);
+                    string secret = computeSign(bx.appid,bx.nonce,bx.timestamp,bx.secret);
+                    client.DefaultRequestHeaders.Add("X-Sign", secret);
+
+                    // 2. 构造请求体，参数为 login_name
+                    var body = new { login_name = loginName };
+                    string json = JsonConvert.SerializeObject(body);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    // 3. 发送 POST
+                    HttpResponseMessage response = await client.PostAsync(bx.url, content);
+                    response.EnsureSuccessStatusCode();
+
+                    // 4. 读取响应
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    return responseContent;
+                }
+            }
+            catch (Exception e)
+            {
+                // 返回合法 JSON
+                var error = new { code = "400", data = e.Message };
+                return JsonConvert.SerializeObject(error);
+            }
+        }
+        public static async Task DoPostUpload_BX(BX_UploadSetting bx, Object testData)
+        {
+            try
+            {
+                string JsonData = JsonConvert.SerializeObject(testData);
+                using (HttpClient client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("X-AppId", bx.appid);
+                    client.DefaultRequestHeaders.Add("X-Timestamp", bx.timestamp);
+                    client.DefaultRequestHeaders.Add("X-Nonce", bx.nonce);
+                    string secret = computeSign(bx.appid, bx.nonce, bx.timestamp, bx.secret);
+                    client.DefaultRequestHeaders.Add("X-Sign", secret);
+
+                    var requestContent = new StringContent(JsonData, Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PostAsync(bx.url, requestContent);
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    var response_json = (JObject)JsonConvert.DeserializeObject(responseContent);
+                    if ((string)response_json["code"] == "200")
+                    {
+                        Growl.Info("数据上传成功!");
+                    }
+                    else
+                    {
+                        Growl.Warning($"数据上传失败:{response_json["message"]}！");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Growl.Warning($"上传失败+{ex.Message}！");
+            }
+        }
+        public static string ConvertPdfToBase64(string pdfFilePath)
+        {
+            byte[] pdfBytes;
+            using (FileStream pdfFile = new FileStream(pdfFilePath, FileMode.Open, FileAccess.Read))
+            {
+                pdfBytes = new byte[pdfFile.Length];
+                pdfFile.Read(pdfBytes, 0, pdfBytes.Length);
+            }
+            string base64Pdf = Convert.ToBase64String(pdfBytes);
+            return base64Pdf;
+        }
+        
+        #endregion
+
+        #region 带文件post上传方法
+        public async static Task<int> CommitDataAPI(PulseDataLocalEntity testData, string filePath)
+        {
+            string url = APPSettingsViewModel.getInstance().APP_ApiUrlData; ;
+            try
+            {
+                Dictionary<string, object> data = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(testData));
+                var response = await HttpUtil.DoPostDataAndFile(url, data, filePath);
+                var response_json = (JObject)JsonConvert.DeserializeObject(response);
+                if ((string)response_json["code"] == "200")
+                {
+                    return 200;
+                }
+                else
+                {
+                    return 300;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Info("", ex.Message);
+                return 400;
+            }
+        }
+        #endregion
+
+        public static string computeSign(string appid,string nonce,string timestamp,string secret)
+        {
+            string signSource = appid + nonce + timestamp + secret;
+            return CalculateMD5Hash(signSource);
+        }
+    }
+
+    public class BX_UploadSetting
+    {
+        public string url { get; set; }
+
+        public string appid { get; set; }
+        public string nonce { get; set; }
+        public string timestamp { get; set; }
+        public string secret { get; set; }
+        
+        public string deviceid { get; set; }
     }
 }

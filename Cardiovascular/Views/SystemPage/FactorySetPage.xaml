@@ -115,11 +115,45 @@
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="270" />
+                        <RowDefinition Height="310" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
 
-                    <hc:Card Grid.Row="0" Style="{StaticResource CustomCard}" />
+                    <hc:Card Grid.Row="0" Style="{StaticResource CustomCard}">
+                        <StackPanel Margin="30,20,0,0">
+                            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                                <TextBlock
+                                        Width="110"
+                                        Style="{StaticResource CustomMedianTextBlock}"
+                                        Text="编号：" />
+                                <TextBox Style="{StaticResource CustomMedianLongTextBox}" Text="{Binding APP_DeviceId}" />
+                            </StackPanel>
+
+
+                            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                                <TextBlock
+                                        Width="110"
+                                        Style="{StaticResource CustomMedianTextBlock}"
+                                        Text="单位编码：" />
+                                <TextBox Style="{StaticResource CustomMedianLongTextBox}" Text="{Binding APP_AppId}" />
+                            </StackPanel>
+
+
+                            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                                <TextBlock
+                                        Width="110"
+                                        Style="{StaticResource CustomMedianTextBlock}"
+                                        Text="签名：" />
+                                <TextBox Style="{StaticResource CustomMedianLongTextBox}" Text="{Binding APP_AppSecret}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <hc:Card.Header>
+                            <StackPanel Margin="10" Orientation="Horizontal">
+                                <Rectangle Style="{StaticResource CustomSmallOrangeRectangle}" />
+                                <TextBlock Style="{StaticResource CustomSmallTitle}" Text="上传设置" />
+                            </StackPanel>
+                        </hc:Card.Header>
+                    </hc:Card>
 
                     <hc:Card Grid.Row="1" Style="{StaticResource CustomCard}" />
                 </Grid>
