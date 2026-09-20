@@ -100,7 +100,7 @@
 
                 <Grid Grid.Column="0">
                     <Grid Margin="30,60,30,20" Visibility="Visible">
-                        <scottplot:WpfPlot x:Name="AiSeries" Panel.ZIndex="9999" />
+                        <scottplot:WpfPlot x:Name="AiSeries" Panel.ZIndex="9999" IsEnabled="False"/>
                     </Grid>
                 </Grid>
                 <Grid Grid.Row="1" Margin="0,0,0,0">
