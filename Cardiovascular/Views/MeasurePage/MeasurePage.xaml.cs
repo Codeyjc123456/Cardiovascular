@@ -366,38 +366,6 @@ namespace Cardio.Views.MeasurePage
             pulsedata.AIDiagnosisProposal = strAIDiagnosisProposal;
         }
 
-        private void UpdataToDatabase()
-        {
-            //保存数据：先填充完整AI结果
-            FillAIResultToPulseData();
-            string Str_Testdate;
-            Str_Testdate = string.Format("{0:yyyyMMddHHmmssffff}", g_strDateTime);
-            Variable.MrsIndexValue.Upload_Report_Name = userInfo.UserId + "_" + Str_Testdate + ".pdf";//As100681....2022091302_.pdf
-            pulsedata.Report_Name = Variable.MrsIndexValue.Upload_Report_Name;
-            pulsedata.IsReportPrinted = "N";
-            pulsedata.IsPDFReportPrinted = "N";
-            string tips="";
-            if (pulsedataDAL.Insert(pulsedata) > 0)
-            {
-                tips = "温馨提示：数据保存成功！";
-                
-            }
-            else
-            {
-                tips = "温馨提示：数据保存失败！该次测试结果已保存到日志文件。"; 
-                string testData = JsonConvert.SerializeObject(pulsedata);
-                LogUtil.Info(testData);
-            }
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                measureViewModel.Tips = tips;
-                measureViewModel.MeasureBtn_Img = "pack://application:,,,/Resources/Image/Measure/开始测量.jpg";
-                TestBtn.IsEnabled = true;
-                Variable.Test_ABI_num = 0;
-                Variable.Test_AI_num = 0;
-            }));
-        }
-
         /// <summary>
         /// AI波形采集完成后处理原始数据，然后在分析数据
         /// </summas>
