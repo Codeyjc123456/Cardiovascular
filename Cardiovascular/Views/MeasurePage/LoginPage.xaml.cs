@@ -65,9 +65,9 @@ namespace Cardio.Views.MeasurePage
                 }
                 else
                 {
-                    //LoginAPI_ZJ();  //泽嘉内部系统
+                    LoginAPI_ZJ();  //泽嘉内部系统
                     //LoginAPPID();   //圣乐版本获取用户信息
-                    LoginAPI_BX();    //博谐内部系统
+                    //LoginAPI_BX();    //博谐内部系统
                 }
             }
             catch (Exception ex) { Growl.Warning("登录异常：" + ex.Message); }

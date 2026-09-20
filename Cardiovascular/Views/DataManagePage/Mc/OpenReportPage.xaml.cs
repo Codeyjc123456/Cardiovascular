@@ -169,10 +169,10 @@ namespace Cardio.Views.DataManagePage.Mc
                     Upload.IsEnabled = false;
                 }));
 
-                
-                
-                //await Upload_ZJ();
-                await Upload_BX();
+
+
+                await Upload_ZJ();
+                //await Upload_BX();
 
 
                 Dispatcher.Invoke(new Action(() => {
