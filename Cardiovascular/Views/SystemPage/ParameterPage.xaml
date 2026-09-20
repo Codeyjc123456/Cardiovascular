@@ -38,54 +38,55 @@
                     <hc:Card
                         Grid.Row="0"
                         Style="{StaticResource CustomCard}">
-                        <StackPanel Margin="5">
-                            <StackPanel Orientation="Horizontal" Margin="2">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="DataType：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_dataType}"/>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="5">
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="DataType：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_dataType}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="CheckNo：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}" Text="{Binding APP_checkNo}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="Doctor：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}" Text="{Binding APP_checkDoctor}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="Department：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_checkDepartment}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="Time：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_checkTime}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="deviceModel：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_deviceModel}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="Result：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}"   Text="{Binding APP_checkResult}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="ResultText：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}"   Text="{Binding APP_checkResultText}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="manufacturer：" />
+                                    <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_manufacturer}" />
+                                </StackPanel>
+
                             </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="2">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="CheckNo：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}" Text="{Binding APP_checkNo}"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="2">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="Doctor：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}" Text="{Binding APP_checkDoctor}"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="2">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="Department：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_checkDepartment}"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="2">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="Time：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_checkTime}" />
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="2">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="deviceModel：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_deviceModel}"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="Result：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}"   Text="{Binding APP_checkResult}" />
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="2">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="ResultText：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}"   Text="{Binding APP_checkResultText}"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="2">
-                                <TextBlock Style="{StaticResource CustomMedianTextBlock2}" Text="manufacturer：" />
-                                <TextBox Style="{StaticResource CustomMedianLongTextBox}"  Text="{Binding APP_manufacturer}" />
-                            </StackPanel>
-
-                        </StackPanel>
-
+                        </ScrollViewer>
                         <hc:Card.Header>
                             <StackPanel Margin="10" Orientation="Horizontal">
                                 <Rectangle Style="{StaticResource CustomSmallOrangeRectangle}" />
