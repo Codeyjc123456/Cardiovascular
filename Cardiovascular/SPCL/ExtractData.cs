@@ -369,9 +369,9 @@ namespace Cardio.SPCL
                 else if (dataTemp[3] == 1)//桡动脉数据
                 {
                     //56字节数据区按2字节步长取，共28个点（与脉搏波分支一致），加前两条共30个条目
-                    for (int i = 0; i <= 27; i++)
+                    for (int i = 0; i <= 13; i++)
                     {
-                        data.dataValue = dataTemp[i * 2 + 5] * 256 + dataTemp[i * 2 + 6];
+                        data.dataValue = dataTemp[i * 4 + 5] * 256 + dataTemp[i * 4 + 6];
                         data.dataType = CommandWord.Data_Radial_Pulse;
                         usefullInfo.Add(data);
                     }

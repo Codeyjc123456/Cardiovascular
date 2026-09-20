@@ -337,14 +337,14 @@ namespace CardioVascular.Views.SystemPage
                     {
                         if (dataList[i].dataValue == 1)//桡动脉
                         {
-                            for (int k = 0; k < 28; k++)//每次传输28个脉搏波数据
+                            for (int k = 0; k < 14; k++)//每次传输28个脉搏波数据
                             {
                                 RpRawDataNum++;//计算心率需要用到的变量
                                 SampleNum++;
                                 RpRawData.Add(dataList[i + 2 + k].dataValue);
                                 AIData.Add(dataList[i + 2 + k].dataValue);
                             }
-                            i += 29;
+                            i += 13;
 
                             if (AIData.Count % 4 == 0)
                             {
