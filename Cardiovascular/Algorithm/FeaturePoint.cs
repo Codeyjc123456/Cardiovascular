@@ -19,6 +19,7 @@ namespace Cardio.Algorithm
         public object varFPointPos;
         public object varGPointPos;
         public object varCalibration;
+        public string LastError { get; private set; } = string.Empty;
 
         // 各项指标值
         public int Hr;           // 心率
@@ -55,6 +56,7 @@ namespace Cardio.Algorithm
         private const int SCALE1 = 25;
         private const int SCALE2 = 50;
         private const int SAMPLE_RATE = 500; // 默认采样率
+        private const int ANALYSIS_SAMPLE_COUNT = 12 * SAMPLE_RATE - 12;
 
         private int _getSbp;
         private int _getDbp;
@@ -62,32 +64,49 @@ namespace Cardio.Algorithm
         #region 主入口
         public int Identify(int sbp, int dbp, List<double> arrTemp)
         {
+            ResetState();
             _getSbp = sbp;
             _getDbp = dbp;
-            if (sbp is < 40 or > 200 || dbp is < 40 or > 200 || arrTemp.Count < 1000)
-                return 0;
-            _pulseData = arrTemp;
+            if (sbp is < 40 or > 200 || dbp is < 40 or > 200)
+                return Fail("血压值超出分析范围");
+            if (arrTemp == null || arrTemp.Count < ANALYSIS_SAMPLE_COUNT)
+                return Fail($"波形数据不足{ANALYSIS_SAMPLE_COUNT}点");
+            // 保持原算法分析前5988点的范围；滤波不能修改调用方的原始数据。
+            _pulseData = arrTemp.Take(ANALYSIS_SAMPLE_COUNT).ToList();
+            if (_pulseData.Any(value => !double.IsFinite(value)))
+                return Fail("波形包含非有限数值");
             SmoothData();
+            if (_pulseData.Any(value => !double.IsFinite(value)))
+                return Fail("滤波结果无效");
             SearchDifSigMaxPointPos();
             SearchFootPointPos();
-            if (_footPos.Count == 0) return 0;
+            if (_footPos.Count < 2) return Fail("未识别到完整周期");
             // 计算平均周期
             _period.Clear();
             for (int i = 1; i < _footPos.Count; i++)
+            {
+                if (_footPos[i] <= _footPos[i - 1] || _footPos[i] >= _pulseData.Count)
+                    return Fail("起点位置或顺序无效");
                 _period.Add(_footPos[i] - _footPos[i - 1]);
+            }
 
             float avgPeriod = (float)_period.Average();
-            if (avgPeriod < 100) return 0;
+            if (avgPeriod < 100) return Fail("波形周期过短");
 
-            SearchPeakPointPos();
+            if (!SearchPeakPointPos()) return Fail("部分周期未识别到峰值点");
             CalculateUpstrokeTime();
             RemoveBaselineWanderAndCalibrateWaveform(_getSbp, _getDbp);
+            if (_normalization.Any(value => !double.IsFinite(value)) ||
+                _calibration.Any(value => !double.IsFinite(value)))
+                return Fail("波形标定失败，幅度或标定分母无效");
             SearchDicroticPointPos();//重搏波G点
             SearchDicroticNotchPointPos();//寻找重搏波切迹
+            if (!HasValidCyclePoints(_gPointPos) || !HasValidCyclePoints(_fPointPos))
+                return Fail("重搏波特征点位置无效");
             //F点到起始点的距离
             _fPointToFootDis = _fPointPos.Zip(_footPos, (f, foot) => f - foot).ToList();
-            SearchReflectionPointPos();//寻找反射点E点
-            CalculateIndexValue();
+            if (!SearchReflectionPointPos()) return Fail("部分周期未识别到反射点E点");
+            if (!CalculateIndexValue()) return Fail("指标计算失败，分母或计算结果无效");
             CorrectAiByHeartRate();
             ClampIndexValues();
             BuildResultArray();
@@ -95,11 +114,41 @@ namespace Cardio.Algorithm
             return 1;
         }
 
+        private int Fail(string reason)
+        {
+            LastError = reason;
+            Hr = Spti = Dpti = Cap = 0;
+            Ed = EdPct = Sevr = Ai = 0;
+            return 0;
+        }
+
+        private void ResetState()
+        {
+            LastError = string.Empty;
+            index = new string[2, 8];
+            IndexValue = null;
+            varFootPos = varPeakPos = varEPointPos = varFPointPos = varGPointPos = varCalibration = null;
+            Hr = Spti = Dpti = Cap = 0;
+            Ed = EdPct = Sevr = Ai = 0;
+            // 替换列表，避免下次调用清空之前已返回给调用方的结果。
+            _footPos = []; _peakPos = []; _ePointPos = []; _fPointPos = []; _gPointPos = [];
+            _fPointToFootDis = []; _difSigMaxPointPos = []; _period = [];
+            _pulseData = []; _difSig = []; _curvature = []; _calibration = []; _normalization = [];
+        }
+
+        private bool HasValidCyclePoints(List<int> points)
+        {
+            if (points.Count != _period.Count) return false;
+            for (int i = 0; i < points.Count; i++)
+                if (points[i] < _footPos[i] || points[i] >= _footPos[i + 1]) return false;
+            return true;
+        }
+
         #endregion
         #region 滤波
         private void SmoothData()
         {
-            int counter = 12 * SAMPLE_RATE - 13;
+            int counter = _pulseData.Count - 1;
             var tempData = new List<double>();
             for (int iter = 1; iter <= 24; iter++)
             {
@@ -123,7 +172,7 @@ namespace Cardio.Algorithm
         #region 差分信号极大值点
         private void SearchDifSigMaxPointPos()
         {
-            int counter = 12 * SAMPLE_RATE - 13;
+            int counter = _pulseData.Count - 1;
             var firstDrt = new List<double>();
             var denominator = new List<double>();
             // 一阶导数
@@ -140,7 +189,7 @@ namespace Cardio.Algorithm
             // 差分信号
             _difSig = new List<double> { 0, 0 };
             for (int i = 2; i <= counter - 2; i++)
-                _difSig.Add(_pulseData[i + 1] - _pulseData[i - 1] + 2 * (_pulseData[i - 2] - _pulseData[i - 2])); // 注意：原代码可能有误，保持原样
+                _difSig.Add(_pulseData[i + 1] - _pulseData[i - 1] + 2 * (_pulseData[i + 2] - _pulseData[i - 2]));
             _difSig.Add(0);
             _difSig.Add(0);
             // 分段计算阈值
@@ -204,7 +253,8 @@ namespace Cardio.Algorithm
 
             if (lastPeriod > 1.05 * prevPeriod)
             {
-                for (int i = _pulseData.Count - 2; i >= _footPos[lastIdx] - 1; i--)
+                // 最后两项是补零，不是真实差分；也不能重复添加已有起点。
+                for (int i = _pulseData.Count - 3; i >= Math.Max(3, _footPos[lastIdx] + 1); i--)
                 {
                     if (_difSig[i] >= 0 && _difSig[i - 1] < 0)
                     {
@@ -216,21 +266,25 @@ namespace Cardio.Algorithm
         }
         #endregion
         #region 峰值点
-        private void SearchPeakPointPos()
+        private bool SearchPeakPointPos()
         {
             _peakPos.Clear();
             for (int i = 0; i < _footPos.Count - 1; i++)
             {
-                for (int j = _footPos[i]; j < _footPos[i + 1]; j++)
+                int peak = -1;
+                for (int j = _footPos[i]; j <= _footPos[i + 1] && j + 1 <= _pulseData.Count - 3; j++)
                 {
                     if (j + 1 < _difSig.Count && _difSig[j] >= 0 && _difSig[j + 1] < 0)
                     {
-                        int peak = FindMaxInRange(j, j + 38, _pulseData);
-                        _peakPos.Add(peak);
+                        peak = FindMaxInRange(j, j + 38, _pulseData);
                         break;
                     }
                 }
+                // 不允许缺点后压缩列表，造成后续周期按下标错配。
+                if (peak < _footPos[i] || peak >= _footPos[i + 1]) return false;
+                _peakPos.Add(peak);
             }
+            return true;
         }
         private static int FindMaxInRange(int start, int end, List<double> data)
         {
@@ -374,30 +428,35 @@ namespace Cardio.Algorithm
         }
         #endregion
         #region 反射点
-        private void SearchReflectionPointPos()
+        private bool SearchReflectionPointPos()
         {
+            if (!HasValidCyclePoints(_peakPos)) return false;
             // 简化：使用卷积找过零点
             int num = _footPos[^1] - _footPos[0];
             var scale1Conv = Convolve(_calibration.Skip(_footPos[0]).Take(num).ToList(), SCALE1);
             var scale2Conv = Convolve(scale1Conv, SCALE2);
 
             _ePointPos.Clear();
-            int offset = _footPos[0] < _peakPos[0] ? 0 : 1;
+            int offset = _footPos[0];
 
-            for (int i = offset; i < _footPos.Count - 1; i++)
+            for (int i = 0; i < _footPos.Count - 1; i++)
             {
-                int start = _peakPos[i];
-                int end = _footPos[i + 1];
+                int start = Math.Max(1, _peakPos[i] - offset);
+                int end = Math.Min(_footPos[i + 1] - offset, scale2Conv.Count - 2);
+                int ePoint = -1;
 
-                for (int j = start; j < end && j < scale2Conv.Count; j++)
+                for (int j = start; j <= end; j++)
                 {
                     if (j > 0 && j + 1 < scale2Conv.Count && scale2Conv[j - 1] < 0 && scale2Conv[j + 1] > 0)
                     {
-                        _ePointPos.Add(j);
+                        ePoint = j + offset;
                         break;
                     }
                 }
+                if (ePoint < _peakPos[i] || ePoint >= _footPos[i + 1]) return false;
+                _ePointPos.Add(ePoint);
             }
+            return true;
         }
 
         private List<double> Convolve(List<double> signal, int scale)
@@ -485,8 +544,13 @@ namespace Cardio.Algorithm
         }
         #endregion
         #region 指标计算
-        private void CalculateIndexValue()
+        private bool CalculateIndexValue()
         {
+            if (_period.Count == 0 || !HasValidCyclePoints(_peakPos) ||
+                !HasValidCyclePoints(_ePointPos) || !HasValidCyclePoints(_fPointPos) ||
+                _fPointToFootDis.Count != _period.Count ||
+                _normalization.Count <= _footPos[^1] || _calibration.Count <= _footPos[^1])
+                return false;
             var arrSpti = new List<double>();
             var arrDpti = new List<double>();
             var arrSevr = new List<double>();
@@ -503,6 +567,7 @@ namespace Cardio.Algorithm
                     if (j < _fPointPos[i]) ss += _calibration[j + 1];
                     else sd += _calibration[j + 1];
                 }
+                if (ss == 0 || _normalization[_peakPos[i]] == 0) return false;
                 arrSpti.Add(ss * 60 / _period[i]);
                 arrDpti.Add(sd * 60 / _period[i]);
                 arrSevr.Add(sd / ss);
@@ -511,16 +576,27 @@ namespace Cardio.Algorithm
                 arrEd.Add((double)_fPointToFootDis[i] / SAMPLE_RATE);
                 arrEToPeak.Add((double)(_ePointPos[i] - _peakPos[i]) / SAMPLE_RATE);
             }
+            if (arrSpti.Concat(arrDpti).Concat(arrSevr).Concat(arrAi).Any(value => !double.IsFinite(value)))
+                return false;
             // 剔除异常值后取平均
-            Hr = (int)TrimmedAverage(arrHr);
-            Spti = (int)TrimmedAverage(arrSpti);
-            Dpti = (int)TrimmedAverage(arrDpti);
+            double hr = TrimmedAverage(arrHr);
+            double spti = TrimmedAverage(arrSpti);
+            double dpti = TrimmedAverage(arrDpti);
             Ai = TrimmedAverage(arrAi);
             Ed = TrimmedAverage(arrEd);
             Sevr = TrimmedAverage(arrSevr);
             EdPct = TrimmedAverage(arrEd.Select(e => e / (_period[0] / (double)SAMPLE_RATE)).ToList());
             double eToPeak = TrimmedAverage(arrEToPeak);
-            Cap = (int)(_getDbp + Ai * (_getSbp - _getDbp));
+            double cap = _getDbp + Ai * (_getSbp - _getDbp);
+            // 调用页面用Int16读取这几项，越界结果不能作为成功输出。
+            if (new[] { hr, spti, dpti, cap }.Any(value => !double.IsFinite(value) || value < short.MinValue || value > short.MaxValue) ||
+                !double.IsFinite(Ed) || !double.IsFinite(EdPct) || !double.IsFinite(Sevr) || !double.IsFinite(Ai))
+                return false;
+            Hr = (int)hr;
+            Spti = (int)spti;
+            Dpti = (int)dpti;
+            Cap = (int)cap;
+            return true;
         }
         private static double TrimmedAverage(List<double> values)
         {
@@ -565,6 +641,7 @@ namespace Cardio.Algorithm
             varPeakPos = _peakPos;
             varEPointPos = _ePointPos;
             varFPointPos = _fPointPos;
+            varGPointPos = _gPointPos;
             varCalibration = _calibration;
         }
 
