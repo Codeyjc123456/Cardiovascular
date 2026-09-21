@@ -397,6 +397,22 @@ namespace Cardio.Views.MeasurePage
                     {
                         this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败:稳定段数据较少！";
                     }));
+                    try
+                    {
+                        // 1. 拼接目录：当前运行目录/error
+                        string errorDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "error");
+                        if (!System.IO.Directory.Exists(errorDir))
+                            System.IO.Directory.CreateDirectory(errorDir);
+
+                        // 2. 文件名：年-月-日 时-分.dat（避免 Windows 不允许的字符）
+                        string fileName = DateTime.Now.ToString("yyyy-MM-dd HH-mm") + ".dat";
+                        string filePath = System.IO.Path.Combine(errorDir, fileName);
+
+                        // 3. 写入数据（每行一个 double）
+                        System.IO.File.WriteAllLines(filePath,
+                            RpRawData.Select(d => d.ToString("F1")).ToArray());
+                    }
+                    catch  { }
                     AITestIntit();
                     ChangeBtStyle(AITest, "BigBlueBtnStyle", "桡动脉测量");
                     return false;
