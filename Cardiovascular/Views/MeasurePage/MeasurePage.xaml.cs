@@ -395,7 +395,7 @@ namespace Cardio.Views.MeasurePage
                 {
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败:稳定段数据较少！";
+                        this.measureViewModel.Tips = "温馨提示：分析桡动脉测量数据失败！";
                     }));
                     try
                     {
