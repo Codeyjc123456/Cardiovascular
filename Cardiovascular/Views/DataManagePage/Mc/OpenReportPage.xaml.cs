@@ -224,9 +224,9 @@ namespace Cardio.Views.DataManagePage.Mc
             pulseData.Add("diagnosis_proposal", model.testResult.DoctorDiagnosis);
             // 添加心脏指数相关
             // 添加测试时间、设备编号、检查结果、报告Base64
-            pulseData.Add("checkUpTime", model.testResult.TestDateTime ?? "");
+            pulseData.Add("check_up_time", model.testResult.TestDateTime ?? "");
 
-            pulseData.Add("base64Pdf", base64Pdf);
+            pulseData.Add("base64PdfString", base64Pdf);
             pulseData.Add("deviceId",APPSettingUtil.APP_DeviceId);
             pulseData.Add("id",model.testResult.Id.ToString());
 
