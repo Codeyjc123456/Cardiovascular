@@ -474,7 +474,6 @@ namespace Cardio.Views.MeasurePage
                     }));
                     return false;
                 }
-                g_typeCardiacIndex.EdPct = edpct;
                 g_typeCardiacIndex.Spti = Convert.ToInt16(featurepoint.index[1, 2]);
                 g_typeCardiacIndex.Dpti = Convert.ToInt16(featurepoint.index[1, 3]);
                 g_typeCardiacIndex.Sevr = Convert.ToSingle(featurepoint.index[1, 4]);
