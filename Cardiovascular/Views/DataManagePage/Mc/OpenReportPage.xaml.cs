@@ -9,6 +9,7 @@ using FastReport.Export.PdfSimple;
 using Microsoft.Win32;
 using SqlSugar;
 using System.IO;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
@@ -255,7 +256,7 @@ namespace Cardio.Views.DataManagePage.Mc
                 { "userId", model.testResult.userId },
                 { "userCode", model.testResult.userCode },
                 { "userName", model.testResult.userName },
-                { "userSex", model.testResult.userSex },
+                { "userSex", model.testResult.userSex.Contains("男") ? "01" : "00" },
                 { "userBirthday", model.testResult.userBirthday },
                 { "userHeight", model.testResult.userHeight },
                 { "userWeight", model.testResult.userWeight },
@@ -276,6 +277,7 @@ namespace Cardio.Views.DataManagePage.Mc
                 { "data", model.testResult.RpRawData },
                 { "proposal", model.testResult.DoctorDiagnosis },
             };
+
             string url = APPSettingUtil.APP_ApiUrlData;
             await ApiBLL.DoPostUpload_ZJ(url, data);
         }
