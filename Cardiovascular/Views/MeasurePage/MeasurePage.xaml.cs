@@ -157,7 +157,38 @@ namespace Cardio.Views.MeasurePage
                 measureViewModel.Pp = "--";
                 measureViewModel.Cap = "--";
                 measureViewModel.AIx = "--";
+                //上一次测量遗留的异常标记（红字+箭头）要一起清掉，否则会带到本次测量结果上
+                ResetResultMark();
             }));
+        }
+        /// <summary>
+        /// 清除指标异常标记：隐藏升降箭头、字体颜色恢复黑色、箭头图片恢复为默认的“升高”
+        /// </summary>
+        private void ResetResultMark()
+        {
+            Hrup.Visibility = Visibility.Hidden;
+            Edup.Visibility = Visibility.Hidden;
+            Sptiup.Visibility = Visibility.Hidden;
+            Dptiup.Visibility = Visibility.Hidden;
+            Sevrup.Visibility = Visibility.Hidden;
+            SBpup.Visibility = Visibility.Hidden;
+            DBpup.Visibility = Visibility.Hidden;
+            Ppup.Visibility = Visibility.Hidden;
+            SBp2up.Visibility = Visibility.Hidden;
+            AIxup.Visibility = Visibility.Hidden;
+
+            Hr.Foreground = Brushes.Black;
+            EdPct.Foreground = Brushes.Black;
+            Spti.Foreground = Brushes.Black;
+            Dpti.Foreground = Brushes.Black;
+            lblSevr.Foreground = Brushes.Black;
+            SBP.Foreground = Brushes.Black;
+            DBP.Foreground = Brushes.Black;
+            PP.Foreground = Brushes.Black;
+            Cap.Foreground = Brushes.Black;
+            AIx.Foreground = Brushes.Black;
+
+            measureViewModel.ResetUpArrows();
         }
         //用户信息更新，
         private void UserInformationShow()
