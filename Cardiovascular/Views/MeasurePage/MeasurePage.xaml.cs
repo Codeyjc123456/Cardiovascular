@@ -465,7 +465,16 @@ namespace Cardio.Views.MeasurePage
                 g_typeCardiacIndex.SBp = g_typeVascularIndex.Sbp;
                 g_typeCardiacIndex.DBp = g_typeVascularIndex.Dbp;
                 
-                g_typeCardiacIndex.EdPct = Convert.ToSingle(featurepoint.index[1, 1]);
+                double edpct = Convert.ToSingle(featurepoint.index[1, 1]);
+                if(edpct > 1)
+                {
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        measureViewModel.Tips = $"温馨提示：测量波形有误，请重新测量!";//直接退出检测
+                    }));
+                    return false;
+                }
+                g_typeCardiacIndex.EdPct = edpct;
                 g_typeCardiacIndex.Spti = Convert.ToInt16(featurepoint.index[1, 2]);
                 g_typeCardiacIndex.Dpti = Convert.ToInt16(featurepoint.index[1, 3]);
                 g_typeCardiacIndex.Sevr = Convert.ToSingle(featurepoint.index[1, 4]);
