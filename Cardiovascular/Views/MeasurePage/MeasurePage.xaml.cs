@@ -464,9 +464,9 @@ namespace Cardio.Views.MeasurePage
                 g_typeVascularIndex.Pp = g_typeBpMrsValue.Sbp - g_typeBpMrsValue.Dbp;
                 g_typeCardiacIndex.SBp = g_typeVascularIndex.Sbp;
                 g_typeCardiacIndex.DBp = g_typeVascularIndex.Dbp;
-                
-                double edpct = Convert.ToSingle(featurepoint.index[1, 1]);
-                if(edpct > 1)
+
+                g_typeCardiacIndex.EdPct = Convert.ToSingle(featurepoint.index[1, 1]);
+                if (g_typeCardiacIndex.EdPct > 1)
                 {
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
