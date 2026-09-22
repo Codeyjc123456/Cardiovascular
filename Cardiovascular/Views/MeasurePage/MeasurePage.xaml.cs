@@ -448,8 +448,10 @@ namespace Cardio.Views.MeasurePage
                 g_typeCardiacIndex.SBp = g_typeVascularIndex.Sbp;
                 g_typeCardiacIndex.DBp = g_typeVascularIndex.Dbp;
 
-                double edpct = Convert.ToSingle(featurepoint.index[1, 1]);
-                if (edpct > 1)
+                // 原来是只取到局部变量做范围判断，忘了写回 g_typeCardiacIndex.EdPct，
+                // 导致界面/入库/报告的 EdPct 一直是 0
+                g_typeCardiacIndex.EdPct = Convert.ToSingle(featurepoint.index[1, 1]);
+                if (g_typeCardiacIndex.EdPct > 1)
                 {
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
