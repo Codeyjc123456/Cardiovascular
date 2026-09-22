@@ -175,6 +175,15 @@ namespace Cardio.Model
             set => SetProperty(ref sevrup, value);
         }
 
+        /// <summary>
+        /// 把10个指标的箭头图片恢复成默认的“升高”箭头。
+        /// 重新测量时需要调用，否则上一轮判定为“偏低”时留下的向下箭头会一直保留到本轮结果上
+        /// </summary>
+        public void ResetUpArrows()
+        {
+            HrUp = EdUp = SptiUp = DptiUp = SevrUp = SBpUp = DBpUp = PpUp = CapUp = AIxUp
+                = "pack://application:,,,/Resources/Image/Measure/升高.png";
+        }
 
         private string aiTest_Img = "pack://application:,,,/Resources/Image/Measure/心血管测试.png";
         public string AITest_Img

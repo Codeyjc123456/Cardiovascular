@@ -254,7 +254,7 @@ namespace Cardio.Views.DataManagePage.Mc
                 { "userId", model.testResult.userId },
                 { "userCode", model.testResult.userCode },
                 { "userName", model.testResult.userName },
-                { "userSex", model.testResult.userSex },
+                { "userSex", model.testResult.userSex.Contains("男") ? "01" : "00" },
                 { "userBirthday", model.testResult.userBirthday },
                 { "userHeight", model.testResult.userHeight },
                 { "userWeight", model.testResult.userWeight },

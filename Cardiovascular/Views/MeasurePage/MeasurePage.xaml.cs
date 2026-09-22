@@ -157,7 +157,37 @@ namespace Cardio.Views.MeasurePage
                 measureViewModel.Pp = "--";
                 measureViewModel.Cap = "--";
                 measureViewModel.AIx = "--";
+                ResetResultMark();
             }));
+        }
+        /// <summary>
+        /// 清除指标异常标记：隐藏升降箭头、字体颜色恢复黑色、箭头图片恢复为默认的“升高”
+        /// </summary>
+        private void ResetResultMark()
+        {
+            Hrup.Visibility = Visibility.Hidden;
+            Edup.Visibility = Visibility.Hidden;
+            Sptiup.Visibility = Visibility.Hidden;
+            Dptiup.Visibility = Visibility.Hidden;
+            Sevrup.Visibility = Visibility.Hidden;
+            SBpup.Visibility = Visibility.Hidden;
+            DBpup.Visibility = Visibility.Hidden;
+            Ppup.Visibility = Visibility.Hidden;
+            SBp2up.Visibility = Visibility.Hidden;
+            AIxup.Visibility = Visibility.Hidden;
+
+            Hr.Foreground = Brushes.Black;
+            EdPct.Foreground = Brushes.Black;
+            Spti.Foreground = Brushes.Black;
+            Dpti.Foreground = Brushes.Black;
+            lblSevr.Foreground = Brushes.Black;
+            SBP.Foreground = Brushes.Black;
+            DBP.Foreground = Brushes.Black;
+            PP.Foreground = Brushes.Black;
+            Cap.Foreground = Brushes.Black;
+            AIx.Foreground = Brushes.Black;
+
+            measureViewModel.ResetUpArrows();
         }
         //用户信息更新，
         private void UserInformationShow()
@@ -417,8 +447,16 @@ namespace Cardio.Views.MeasurePage
                 g_typeVascularIndex.Pp = g_typeBpMrsValue.Sbp - g_typeBpMrsValue.Dbp;
                 g_typeCardiacIndex.SBp = g_typeVascularIndex.Sbp;
                 g_typeCardiacIndex.DBp = g_typeVascularIndex.Dbp;
-                
-                g_typeCardiacIndex.EdPct = Convert.ToSingle(featurepoint.index[1, 1]);
+
+                double edpct = Convert.ToSingle(featurepoint.index[1, 1]);
+                if (edpct > 1)
+                {
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        measureViewModel.Tips = $"温馨提示：测量波形有误，请重新测量!";//直接退出检测
+                    }));
+                    return false;
+                }
                 g_typeCardiacIndex.Spti = Convert.ToInt16(featurepoint.index[1, 2]);
                 g_typeCardiacIndex.Dpti = Convert.ToInt16(featurepoint.index[1, 3]);
                 g_typeCardiacIndex.Sevr = Convert.ToSingle(featurepoint.index[1, 4]);
