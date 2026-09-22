@@ -119,8 +119,8 @@
                         <RowDefinition />
                     </Grid.RowDefinitions>
 
-                    <hc:Card Grid.Row="0" Style="{StaticResource CustomCard}">
-                        <StackPanel Margin="30,20,0,0">
+                    <hc:Card Grid.Row="0" Style="{StaticResource CustomCard}" >
+                        <StackPanel Margin="30,20,0,0" Visibility="Collapsed">
                             <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
                                 <TextBlock
                                         Width="110"
@@ -148,7 +148,7 @@
                             </StackPanel>
                         </StackPanel>
                         <hc:Card.Header>
-                            <StackPanel Margin="10" Orientation="Horizontal">
+                            <StackPanel Margin="10" Orientation="Horizontal" Visibility="Collapsed">
                                 <Rectangle Style="{StaticResource CustomSmallOrangeRectangle}" />
                                 <TextBlock Style="{StaticResource CustomSmallTitle}" Text="上传设置" />
                             </StackPanel>
