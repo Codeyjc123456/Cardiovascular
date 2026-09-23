@@ -101,7 +101,16 @@ namespace Cardio.Views.DataManagePage.Mc
         {
             if (model.pReport == null)
                 return;
-            ImagePrinter.PrintImagesWithDialog(model.fileUrls);
+            try
+            {
+                ImagePrinter.PrintImagesWithDialog(model.fileUrls);
+                HandyControl.Controls.Growl.Info("打印成功！");
+            }
+            catch
+            {
+                HandyControl.Controls.Growl.Warning("打印失败，请检查打印机连接！");
+            }
+
         }
 
         private void SaveBtn(object sender, RoutedEventArgs e)

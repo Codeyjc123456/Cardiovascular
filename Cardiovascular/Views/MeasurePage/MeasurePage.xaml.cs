@@ -213,9 +213,6 @@ namespace Cardio.Views.MeasurePage
             serialPortManager.InformDebugMsgEvnet = new SerialPortManager.InformDebugMsg(msg);
 
             serialPortManager.sendnull();
-            //serialPortManager.SendData(CommandWord.REQ_PWV_START, 0x01);
-            //Task.Delay(500);
-            //serialPortManager.SendData(CommandWord.REQ_PWV_STOP, 0x01);
         }
         /// <summary>
         /// 初始化 定时器
