@@ -950,11 +950,20 @@ namespace Cardio.Views.MeasurePage
                     else if (dataList[i].frameType == CommandWord.REQ_PWV_INC_GAIN_Back)
                     {
                         i += 2;
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            measureViewModel.Tips = "温馨提示：脉搏波增益成功";
+                        }));
                     }
                     else if (dataList[i].frameType == CommandWord.REQ_PWV_DEC_GAIN_Back)
                     {
-                        i = i + 2;
+                        i += 2;
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            measureViewModel.Tips = "温馨提示：脉搏波减益成功";
+                        }));
                     }
+
                     else if (dataList[i].frameType == CommandWord.REQ_BP_INIT_SET)
                     {
                         Dispatcher.BeginInvoke(new Action(() =>
@@ -1089,6 +1098,7 @@ namespace Cardio.Views.MeasurePage
                         Real_press = dataList[i + 1].dataValue;
                         i += 3;
                     }
+
                     else if (dataList[i].frameType == CommandWord.REQ_BP_CONTROL_Back)
                     {
                         if (dataList[1 + i].dataValue == 0x4B && dataList[2 + i].dataValue == 0x73)//响应“O”"K"
@@ -1148,22 +1158,7 @@ namespace Cardio.Views.MeasurePage
                                 PWVStopFist = true;
                                 Task.Delay(200);
                             }
-                        }
                     }
-                    else if (dataList[i].frameType == CommandWord.REQ_PWV_INC_GAIN_Back)
-                    {
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            measureViewModel.Tips = "温馨提示：脉搏波增益成功";
-                        }));
-                    }
-                
-                    else if (dataList[i].frameType == CommandWord.REQ_PWV_DEC_GAIN_Back)
-                    {
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            measureViewModel.Tips = "温馨提示：脉搏波减益成功";
-                        }));
                     }
                 }
             }
