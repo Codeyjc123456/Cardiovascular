@@ -771,7 +771,7 @@ namespace Cardio.Views.MeasurePage
                         return false;
                     }
                 }
-                if (MaxValue >= 3900 || DifValue > 3700)
+                if (MaxValue >= 3800 || DifValue > 3700)
                 {
                     //放大倍数减一
 

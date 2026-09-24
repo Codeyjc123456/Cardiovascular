@@ -242,8 +242,8 @@ namespace Cardio.Model
             var AICurve = zg_ai.Plot.Add.Signal(AIData);
             AICurve.Color = ScottPlot.Colors.Red;
             AICurve.Axes.YAxis = zg_ai.Plot.Axes.Left;
-            zg_ai.Plot.Axes.Left.Min = 0;
-            zg_ai.Plot.Axes.Left.Max = 4400;
+            zg_ai.Plot.Axes.Left.Min = -50;
+            zg_ai.Plot.Axes.Left.Max = 4600;
             zg_ai.Plot.Axes.SetLimitsX(0, 6000);
             zg_ai.Plot.Axes.Bottom.IsVisible = false;
             zg_ai.Plot.Axes.Left.IsVisible = false;
