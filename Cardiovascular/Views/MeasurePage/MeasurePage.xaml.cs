@@ -774,13 +774,13 @@ namespace Cardio.Views.MeasurePage
             int MinValue;
             int DifValue;
             //放大倍数一秒调节一次
-            if (nMarkSelect < 2 && AICountOneSec >= 1 && AICountOneSec == GlobalVariable.Sample_Rate / 2)
+            if (nMarkSelect < 2 && AICountOneSec >= 1 && AICountOneSec == GlobalVariable.Sample_Rate / 4)
             {
                 MaxValue = (int)DataOneSec.Max();
                 MinValue = (int)DataOneSec.Min();
                 DifValue = MaxValue - MinValue;
                 //与VB版本一致：低值且幅度小(≤800)时加增益；低值以上(>100)时放宽到850
-                if ((MinValue <= 100 && DifValue <= 800) || (MinValue > 100 && DifValue <= 850))
+                if ((MinValue <= 100 && DifValue <= 800 && MaxValue < 3900) || (MinValue > 100 && DifValue <= 850 && MaxValue < 3900))
                 {
                     //放大倍数加1
                     if (!serialPortManager.SendData(CommandWord.REQ_PWV_INC_GAIN, 0x02))//桡动脉
