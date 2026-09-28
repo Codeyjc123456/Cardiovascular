@@ -4,14 +4,13 @@ using Cardio.DAL;
 using Cardio.Model;
 using Cardio.SPCL;
 using Cardio.Util;
+using Cardio.Views.DataManagePage.Mc;
 using HandyControl.Controls;
 using HandyControl.Tools.Extension;
 using Newtonsoft.Json;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
-using Cardio.Views.DataManagePage.Mc;
 
 namespace Cardio.Views.MeasurePage
 {
@@ -405,7 +404,7 @@ namespace Cardio.Views.MeasurePage
         {
             try
             {
-                FeaturePoint featurepoint = new ();
+                FeaturePoint.FeaturePoint featurepoint = new ();
                 g_typeBpMrsValue.Sbp = FinalBpMrsValue.Sbp;
                 g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp;
                 g_typeBpMrsValue.Hr = FinalBpMrsValue.Hr;

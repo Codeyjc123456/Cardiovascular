@@ -646,7 +646,7 @@ namespace CardioVascular.Views.SystemPage
             workStatus = WorkStatus.NoWork;
             try
             {
-                FeaturePoint featurepoint = new FeaturePoint();
+                FeaturePoint.FeaturePoint featurepoint = new ();
                 g_typeBpMrsValue.Sbp = 120;
                 g_typeBpMrsValue.Dbp = 70;
                 if (featurepoint.Identify(120,70, RpRawData) == 0)//保存数据
