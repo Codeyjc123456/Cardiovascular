@@ -218,6 +218,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="FeaturePoint">
+      <HintPath>bin\x64\Debug\net10.0-windows\FeaturePoint.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\..\..\..\动脉硬化\最新版本\BXASHK(20260121发货)\bin\Debug\log4net.dll</HintPath>
     </Reference>

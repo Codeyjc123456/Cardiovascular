@@ -401,7 +401,7 @@ namespace Cardio.Views.MeasurePage
         {
             try
             {
-                FeaturePoint featurepoint = new ();
+                FeaturePoint.FeaturePoint featurepoint = new ();
                 g_typeBpMrsValue.Sbp = FinalBpMrsValue.Sbp;
                 g_typeBpMrsValue.Dbp = FinalBpMrsValue.Dbp;
                 g_typeBpMrsValue.Hr = FinalBpMrsValue.Hr;
